@@ -1,4 +1,5 @@
 import { NextIntlClientProvider } from 'next-intl';
+import { Provider } from '@/components/ui/provider';
 
 type Props = {
   children: React.ReactNode;
@@ -6,9 +7,11 @@ type Props = {
 
 export default function RootLayout(props: Props) {
   return (
-    <html lang='uk'>
+    <html lang='uk' suppressHydrationWarning>
       <body>
-        <NextIntlClientProvider>{props.children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <Provider>{props.children}</Provider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
