@@ -1,0 +1,103 @@
+import { Seeder, SeederFactoryManager } from 'typeorm-extension';
+import { faker } from '@faker-js/faker';
+import { User } from '../../features/users/user.entity';
+import { Account } from '../../features/cards/account.entity';
+import { Card } from '../../features/cards/card.entity';
+import { Transaction } from '../../features/transactions/transaction.entity';
+
+export default class AppSeeder implements Seeder {
+  public async run(_, factoryManager: SeederFactoryManager) {
+    const userFactory = factoryManager.get(User);
+    const users = await Promise.all(
+      Array.from({ length: 20 }).map((_, i) => {
+        const id = i + 1;
+        return userFactory.make({ id });
+      }),
+    );
+    const accountFactory = factoryManager.get(Account);
+    const accounts = await Promise.all(
+      Array.from({ length: 40 }).map((_, i) => {
+        const id = i + 1;
+        const user = faker.helpers.arrayElement(users);
+        return accountFactory.make({ id, user });
+      }),
+    );
+    const cardFactory = factoryManager.get(Card);
+    const accountsUsers = accounts.flatMap((account) =>
+      [
+        account.user,
+        ...faker.helpers.arrayElements(
+          users.filter((user) => user.id !== account.user.id),
+          { min: 0, max: 9 },
+        ),
+      ].map((user) => ({ account, user })),
+    );
+    const cards = await Promise.all(
+      accountsUsers.map(({ account, user }, i) => {
+        const id = i + 1;
+        return cardFactory.make({ id, account, user });
+      }),
+    );
+    const transactionFactory = factoryManager.get(Transaction);
+    const transactions = await Promise.all(
+      Array.from({ length: 40 }).map(() => {
+        const executorUser = faker.helpers.arrayElement(users);
+        const sum = faker.number.int({ min: 1, max: 1000 });
+        if (faker.number.int(8) !== 0) {
+          const description = 'deposit';
+          const receiverCard = faker.helpers.arrayElement(cards);
+          receiverCard.account.balance += sum;
+          return transactionFactory.make({
+            executorUser,
+            receiverCard,
+            sum,
+            description,
+          });
+        } else {
+          const description = 'withdraw';
+          const senderCard = faker.helpers.arrayElement(
+            cards.filter((card) => card.account.balance >= sum),
+          );
+          senderCard.account.balance -= sum;
+          return transactionFactory.make({
+            executorUser,
+            senderCard,
+            sum,
+            description,
+          });
+        }
+      }),
+    );
+    const transfers = await Promise.all(
+      Array.from({ length: 40 }).map(() => {
+        const sum = faker.number.int({ min: 1, max: 1000 });
+        const description = faker.lorem.words(2);
+        const senderCard = faker.helpers.arrayElement(
+          cards.filter((card) => card.account.balance >= sum),
+        );
+        const receiverCard = faker.helpers.arrayElement(cards);
+        senderCard.account.balance -= sum;
+        receiverCard.account.balance += sum;
+        return transactionFactory.make({
+          senderCard,
+          receiverCard,
+          sum,
+          description,
+        });
+      }),
+    );
+    transactions.push(...transfers);
+    for (const user of users) {
+      await userFactory.save(user);
+    }
+    for (const account of accounts) {
+      await accountFactory.save(account);
+    }
+    for (const card of cards) {
+      await cardFactory.save(card);
+    }
+    for (const transaction of transactions) {
+      await transactionFactory.save(transaction);
+    }
+  }
+}
