@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './features/users/users.module';
+import { CardsModule } from './features/cards/cards.module';
+import { TransactionsModule } from './features/transactions/transactions.module';
 
 @Module({
   imports: [
@@ -20,6 +23,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         ssl: true,
       }),
     }),
+    UsersModule,
+    CardsModule,
+    TransactionsModule,
   ],
 })
 export class AppModule {}
