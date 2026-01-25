@@ -1,6 +1,7 @@
 import { Box, Flex, IconButton } from '@chakra-ui/react';
-import { LuMenu, LuUser } from 'react-icons/lu';
+import { LuUser } from 'react-icons/lu';
 import CustomContainer from './custom-container';
+import NavbarDrawer from './navbar-drawer';
 
 export default function CustomHeader() {
   return (
@@ -14,9 +15,7 @@ export default function CustomHeader() {
     >
       <CustomContainer>
         <Flex justify='space-between'>
-          <IconButton size='xs' variant='ghost'>
-            <LuMenu />
-          </IconButton>
+          <NavbarDrawer />
           <IconButton size='xs' variant='ghost'>
             <LuUser />
           </IconButton>
