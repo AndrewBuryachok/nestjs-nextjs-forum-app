@@ -1,1 +1,12 @@
-{}
+{
+  "drawers": {
+    "navbar": {
+      "title": "Меню"
+    }
+  },
+  "pages": {
+    "cards": "Карти",
+    "transactions": "Транзакції",
+    "wallet": "Гаманець"
+  }
+}
