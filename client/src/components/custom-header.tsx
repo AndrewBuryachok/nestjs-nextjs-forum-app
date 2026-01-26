@@ -1,5 +1,6 @@
-import { Box, Container, Flex, IconButton } from '@chakra-ui/react';
+import { Box, Flex, IconButton } from '@chakra-ui/react';
 import { LuUser } from 'react-icons/lu';
+import CustomContainer from './custom-container';
 import NavbarDrawer from './navbar-drawer';
 
 export default function CustomHeader() {
@@ -12,14 +13,14 @@ export default function CustomHeader() {
       top='0'
       zIndex='sticky'
     >
-      <Container maxW='5xl' p='4'>
+      <CustomContainer>
         <Flex justify='space-between'>
           <NavbarDrawer />
           <IconButton size='xs' variant='ghost'>
             <LuUser />
           </IconButton>
         </Flex>
-      </Container>
+      </CustomContainer>
     </Box>
   );
 }
