@@ -1,5 +1,5 @@
 import { NextIntlClientProvider } from 'next-intl';
-import { Box } from '@chakra-ui/react';
+import { Box, Stack } from '@chakra-ui/react';
 import { Provider } from '@/components/ui/provider';
 import CustomHeader from '@/components/custom-header';
 import CustomContainer from '@/components/custom-container';
@@ -16,7 +16,9 @@ export default function RootLayout(props: Props) {
           <Provider>
             <CustomHeader />
             <Box as='main'>
-              <CustomContainer>{props.children}</CustomContainer>
+              <CustomContainer>
+                <Stack>{props.children}</Stack>
+              </CustomContainer>
             </Box>
           </Provider>
         </NextIntlClientProvider>
