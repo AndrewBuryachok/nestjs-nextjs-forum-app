@@ -9,6 +9,7 @@
     "sender": "Відправник",
     "sum": "Сума"
   },
+  "currency": "діам",
   "drawers": {
     "navbar": {
       "title": "Меню"

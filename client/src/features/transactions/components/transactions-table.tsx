@@ -1,6 +1,11 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import { Transaction } from '../types';
 import CustomTable from '@/components/custom-table';
+import CustomAvatarWithCard from '@/components/custom-avatar-with-card';
+import CustomAvatarWithUser from '@/components/custom-avatar-with-user';
+import CurrencyText from '@/components/currency-text';
+import CustomText from '@/components/custom-text';
+import DateText from '@/components/date-text';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.transactions;
@@ -15,22 +20,34 @@ export default function TransactionsTable(props: Props) {
         {
           value: 'sender',
           render: (transaction) =>
-            transaction.senderCard?.user.nick ?? transaction.executorUser!.nick,
+            transaction.senderCard ? (
+              <CustomAvatarWithCard card={transaction.senderCard} />
+            ) : (
+              <CustomAvatarWithUser user={transaction.executorUser!} />
+            ),
         },
         {
           value: 'receiver',
           render: (transaction) =>
-            transaction.receiverCard?.user.nick ??
-            transaction.executorUser!.nick,
+            transaction.receiverCard ? (
+              <CustomAvatarWithCard card={transaction.receiverCard} />
+            ) : (
+              <CustomAvatarWithUser user={transaction.executorUser!} />
+            ),
         },
-        { value: 'sum', render: (transaction) => transaction.sum },
+        {
+          value: 'sum',
+          render: (transaction) => <CurrencyText value={transaction.sum} />,
+        },
         {
           value: 'description',
-          render: (transaction) => transaction.description || '-',
+          render: (transaction) => (
+            <CustomText muted value={transaction.description || '-'} />
+          ),
         },
         {
           value: 'created',
-          render: (transaction) => transaction.createdAt.toString(),
+          render: (transaction) => <DateText value={transaction.createdAt} />,
         },
       ]}
     />
