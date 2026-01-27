@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Card } from './card.entity';
+import { Request, Response } from '../../common/interfaces';
 
 @Injectable()
 export class CardsService {
@@ -10,19 +11,21 @@ export class CardsService {
     private cardsRepository: Repository<Card>,
   ) {}
 
-  getMyCards(myId: number): Promise<Card[]> {
-    return this.getCardsQueryBuilder()
+  async getMyCards(myId: number, req: Request): Promise<Response<Card>> {
+    const [data, total] = await this.getCardsQueryBuilder(req)
       .where('card.userId = :myId', { myId })
-      .getMany();
+      .getManyAndCount();
+    return { data, total };
   }
 
-  getAllCards(): Promise<Card[]> {
-    return this.getCardsQueryBuilder()
+  async getAllCards(req: Request): Promise<Response<Card>> {
+    const [data, total] = await this.getCardsQueryBuilder(req)
       .where('card.userId = account.userId')
-      .getMany();
+      .getManyAndCount();
+    return { data, total };
   }
 
-  private getCardsQueryBuilder(): SelectQueryBuilder<Card> {
+  private getCardsQueryBuilder(req: Request): SelectQueryBuilder<Card> {
     return this.cardsRepository
       .createQueryBuilder('card')
       .select(['card.id'])
@@ -35,6 +38,8 @@ export class CardsService {
       ])
       .innerJoin('account.user', 'ownerUser')
       .addSelect(['ownerUser.id', 'ownerUser.nick', 'ownerUser.avatar'])
-      .orderBy('card.id', 'DESC');
+      .orderBy('card.id', 'DESC')
+      .skip(req.skip)
+      .take(req.take);
   }
 }
