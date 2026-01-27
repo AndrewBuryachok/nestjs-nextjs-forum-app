@@ -23,13 +23,13 @@ describe('App', () => {
     it('GET /cards/my', () => {
       return request(app.getHttpServer())
         .get('/cards/my')
-        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
 
     it('GET /cards/all', () => {
       return request(app.getHttpServer())
         .get('/cards/all')
-        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
   });
 
@@ -37,13 +37,13 @@ describe('App', () => {
     it('GET /transactions/my', () => {
       return request(app.getHttpServer())
         .get('/transactions/my')
-        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
 
     it('GET /transactions/all', () => {
       return request(app.getHttpServer())
         .get('/transactions/all')
-        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
   });
 });
