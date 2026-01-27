@@ -1,15 +1,18 @@
-import { useTranslations } from 'next-intl';
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import { Transaction } from '../types';
 import CustomTable from '@/components/custom-table';
+import CustomAvatarWithCard from '@/components/custom-avatar-with-card';
+import CustomAvatarWithUser from '@/components/custom-avatar-with-user';
+import BankIconWithText from '@/components/bank-icon-with-text';
+import CurrencyText from '@/components/currency-text';
+import CustomText from '@/components/custom-text';
+import DateText from '@/components/date-text';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.transactions;
 };
 
 export default function TransactionsTable(props: Props) {
-  const t = useTranslations();
-
   return (
     <CustomTable<Transaction>
       page='transactions'
@@ -18,29 +21,44 @@ export default function TransactionsTable(props: Props) {
         {
           value: 'sender',
           render: (transaction) =>
-            transaction.senderUser
-              ? transaction.senderUser.nick
-              : transaction.executorUser
-                ? transaction.executorUser.nick
-                : t('bank'),
+            transaction.senderUser && transaction.senderCard ? (
+              <CustomAvatarWithCard
+                user={transaction.senderUser}
+                card={transaction.senderCard}
+              />
+            ) : transaction.executorUser ? (
+              <CustomAvatarWithUser user={transaction.executorUser} />
+            ) : (
+              <BankIconWithText />
+            ),
         },
         {
           value: 'receiver',
           render: (transaction) =>
-            transaction.receiverUser
-              ? transaction.receiverUser.nick
-              : transaction.executorUser
-                ? transaction.executorUser.nick
-                : t('bank'),
+            transaction.receiverUser && transaction.receiverCard ? (
+              <CustomAvatarWithCard
+                user={transaction.receiverUser}
+                card={transaction.receiverCard}
+              />
+            ) : transaction.executorUser ? (
+              <CustomAvatarWithUser user={transaction.executorUser} />
+            ) : (
+              <BankIconWithText />
+            ),
         },
-        { value: 'sum', render: (transaction) => transaction.sum },
+        {
+          value: 'sum',
+          render: (transaction) => <CurrencyText value={transaction.sum} />,
+        },
         {
           value: 'description',
-          render: (transaction) => transaction.description || '-',
+          render: (transaction) => (
+            <CustomText muted value={transaction.description || '-'} />
+          ),
         },
         {
           value: 'created',
-          render: (transaction) => transaction.createdAt.toString(),
+          render: (transaction) => <DateText value={transaction.createdAt} />,
         },
       ]}
     />
