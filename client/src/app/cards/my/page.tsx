@@ -5,6 +5,10 @@ export function generateMetadata() {
   return generateCardsMetadata({ tab: 'my' });
 }
 
-export default function Page() {
-  return <CardsPage tab='my' />;
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default function Page(props: Props) {
+  return <CardsPage tab='my' searchParams={props.searchParams} />;
 }

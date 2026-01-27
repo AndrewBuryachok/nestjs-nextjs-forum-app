@@ -10,6 +10,7 @@ import DateText from '@/components/date-text';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.transactions;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export default function TransactionsTable(props: Props) {
@@ -17,6 +18,7 @@ export default function TransactionsTable(props: Props) {
     <CustomTable<Transaction>
       page='transactions'
       tab={props.tab}
+      searchParams={props.searchParams}
       columns={[
         {
           value: 'sender',
