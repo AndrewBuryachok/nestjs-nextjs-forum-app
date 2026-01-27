@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transaction } from './transaction.entity';
+import { Request, Response } from '../../common/interfaces';
 
 @Injectable()
 export class TransactionsService {
@@ -10,8 +11,11 @@ export class TransactionsService {
     private transactionsRepository: Repository<Transaction>,
   ) {}
 
-  getMyTransactions(myId: number): Promise<Transaction[]> {
-    return this.getTransactionsQueryBuilder()
+  async getMyTransactions(
+    myId: number,
+    req: Request,
+  ): Promise<Response<Transaction>> {
+    const [data, total] = await this.getTransactionsQueryBuilder(req)
       .leftJoin('senderCard.cardUsers', 'senderCardUsers')
       .leftJoin('receiverCard.cardUsers', 'receiverCardUsers')
       .where(
@@ -22,14 +26,19 @@ export class TransactionsService {
         ),
         { myId },
       )
-      .getMany();
+      .getManyAndCount();
+    return { data, total };
   }
 
-  getAllTransactions(): Promise<Transaction[]> {
-    return this.getTransactionsQueryBuilder().getMany();
+  async getAllTransactions(req: Request): Promise<Response<Transaction>> {
+    const [data, total] =
+      await this.getTransactionsQueryBuilder(req).getManyAndCount();
+    return { data, total };
   }
 
-  private getTransactionsQueryBuilder(): SelectQueryBuilder<Transaction> {
+  private getTransactionsQueryBuilder(
+    req: Request,
+  ): SelectQueryBuilder<Transaction> {
     return this.transactionsRepository
       .createQueryBuilder('transaction')
       .select([
@@ -56,6 +65,8 @@ export class TransactionsService {
       ])
       .leftJoin('transaction.receiverCard', 'receiverCard')
       .addSelect(['receiverCard.id', 'receiverCard.name'])
-      .orderBy('transaction.id', 'DESC');
+      .orderBy('transaction.id', 'DESC')
+      .skip(req.skip)
+      .take(req.take);
   }
 }
