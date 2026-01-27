@@ -1,7 +1,27 @@
 {
+  "columns": {
+    "balance": "Баланс",
+    "card": "Карта",
+    "created": "Створено",
+    "description": "Опис",
+    "owner": "Власник",
+    "receiver": "Отримувач",
+    "sender": "Відправник",
+    "sum": "Сума"
+  },
   "drawers": {
     "navbar": {
       "title": "Меню"
+    }
+  },
+  "emptyStates": {
+    "cards": {
+      "title": "Список карт порожній",
+      "description": "Створіть карту, щоб вона з'явилася тут"
+    },
+    "transactions": {
+      "title": "Список транзакцій порожній",
+      "description": "Створіть транзакцію, щоб вона з'явилася тут"
     }
   },
   "pages": {
