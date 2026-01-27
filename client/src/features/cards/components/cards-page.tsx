@@ -4,6 +4,7 @@ import CardsTable from './cards-table';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.cards;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export default function CardsPage(props: Props) {
@@ -11,7 +12,7 @@ export default function CardsPage(props: Props) {
     <CustomPage
       page='cards'
       tab={props.tab}
-      table={<CardsTable tab={props.tab} />}
+      table={<CardsTable tab={props.tab} searchParams={props.searchParams} />}
     />
   );
 }

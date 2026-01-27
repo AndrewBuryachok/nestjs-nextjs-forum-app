@@ -5,6 +5,10 @@ export function generateMetadata() {
   return generateTransactionsMetadata({ tab: 'my' });
 }
 
-export default function Page() {
-  return <TransactionsPage tab='my' />;
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default function Page(props: Props) {
+  return <TransactionsPage tab='my' searchParams={props.searchParams} />;
 }

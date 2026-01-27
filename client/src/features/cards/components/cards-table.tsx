@@ -8,6 +8,7 @@ import DateText from '@/components/date-text';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.cards;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export default function CardsTable(props: Props) {
@@ -15,6 +16,7 @@ export default function CardsTable(props: Props) {
     <CustomTable<Card>
       page='cards'
       tab={props.tab}
+      searchParams={props.searchParams}
       columns={[
         {
           value: 'owner',
