@@ -4,6 +4,7 @@ import TransactionsTable from './transactions-table';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.transactions;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export default function TransactionsPage(props: Props) {
@@ -11,7 +12,9 @@ export default function TransactionsPage(props: Props) {
     <CustomPage
       page='transactions'
       tab={props.tab}
-      table={<TransactionsTable tab={props.tab} />}
+      table={
+        <TransactionsTable tab={props.tab} searchParams={props.searchParams} />
+      }
     />
   );
 }
