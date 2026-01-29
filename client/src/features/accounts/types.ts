@@ -5,8 +5,14 @@ export interface BaseAccount {
   name: string;
 }
 
-export interface Account extends BaseAccount {
+export interface BaseAccountWithUser extends BaseAccount {
   user: BaseUser;
+}
+
+export interface BaseAccountWithUserAndBalance extends BaseAccountWithUser {
   balance: number;
+}
+
+export interface Account extends BaseAccountWithUserAndBalance {
   createdAt: Date;
 }
