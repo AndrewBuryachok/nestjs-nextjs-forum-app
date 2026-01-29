@@ -25,6 +25,28 @@ export class CardsService {
     return { data, total };
   }
 
+  selectUserCards(userId: number): Promise<Card[]> {
+    return this.selectCardsQueryBuilder(userId).getMany();
+  }
+
+  selectUserCardsWithBalance(userId: number): Promise<Card[]> {
+    return this.selectCardsQueryBuilder(userId)
+      .addSelect(['account.balance'])
+      .getMany();
+  }
+
+  private selectCardsQueryBuilder(userId: number): SelectQueryBuilder<Card> {
+    return this.cardsRepository
+      .createQueryBuilder('card')
+      .select(['card.id'])
+      .innerJoin('card.account', 'account')
+      .addSelect(['account.id', 'account.name'])
+      .innerJoin('account.user', 'ownerUser')
+      .addSelect(['ownerUser.id', 'ownerUser.nick', 'ownerUser.avatar'])
+      .where('card.userId = :userId', { userId })
+      .orderBy('account.name', 'ASC');
+  }
+
   private getCardsQueryBuilder(req: Request): SelectQueryBuilder<Card> {
     return this.cardsRepository
       .createQueryBuilder('card')
