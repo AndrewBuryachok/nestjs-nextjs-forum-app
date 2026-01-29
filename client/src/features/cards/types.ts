@@ -5,8 +5,14 @@ export interface BaseCard {
   name: string;
 }
 
-export interface Card extends BaseCard {
+export interface SelectCard extends BaseCard {
   user: BaseUser;
+}
+
+export interface SelectCardWithBalance extends SelectCard {
   balance: number;
+}
+
+export interface Card extends SelectCardWithBalance {
   createdAt: Date;
 }

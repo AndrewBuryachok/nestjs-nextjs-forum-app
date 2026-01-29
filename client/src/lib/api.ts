@@ -17,3 +17,12 @@ export async function get<T>(route: string, { page, ...req }: Request) {
     return { data: [], total: 0 };
   }
 }
+
+export async function select<T>(route: string) {
+  try {
+    const res = await api.get<T[]>(route);
+    return res.data;
+  } catch (error) {
+    return [];
+  }
+}
