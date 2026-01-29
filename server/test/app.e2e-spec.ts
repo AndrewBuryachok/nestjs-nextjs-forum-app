@@ -19,6 +19,14 @@ describe('App', () => {
     await app.close();
   });
 
+  describe('Users', () => {
+    it('GET /users/all/select', () => {
+      return request(app.getHttpServer())
+        .get('/users/all/select')
+        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+    });
+  });
+
   describe('Cards', () => {
     it('GET /cards/my', () => {
       return request(app.getHttpServer())
@@ -30,6 +38,24 @@ describe('App', () => {
       return request(app.getHttpServer())
         .get('/cards/all')
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /cards/my/select', () => {
+      return request(app.getHttpServer())
+        .get('/cards/my/select')
+        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+    });
+
+    it('GET /cards/:userId/select', () => {
+      return request(app.getHttpServer())
+        .get('/cards/1/select')
+        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+    });
+
+    it('GET /cards/:userId/select-with-balance', () => {
+      return request(app.getHttpServer())
+        .get('/cards/1/select-with-balance')
+        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
     });
   });
 
