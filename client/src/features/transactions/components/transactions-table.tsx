@@ -7,6 +7,7 @@ import BankIconWithText from '@/components/bank-icon-with-text';
 import CurrencyText from '@/components/currency-text';
 import CustomText from '@/components/custom-text';
 import DateText from '@/components/date-text';
+import TransactionsActions from './transactions-actions';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.transactions;
@@ -61,6 +62,12 @@ export default function TransactionsTable(props: Props) {
         {
           value: 'created',
           render: (transaction) => <DateText value={transaction.createdAt} />,
+        },
+        {
+          value: 'actions',
+          render: (transaction) => (
+            <TransactionsActions tab={props.tab} transaction={transaction} />
+          ),
         },
       ]}
     />

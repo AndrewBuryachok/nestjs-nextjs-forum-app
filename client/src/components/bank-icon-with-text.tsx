@@ -1,6 +1,6 @@
 import { useTranslations } from 'next-intl';
-import { HStack, Square } from '@chakra-ui/react';
-import { LuLandmark } from 'react-icons/lu';
+import { HStack } from '@chakra-ui/react';
+import BankIcon from './bank-icon';
 import CustomText from './custom-text';
 
 export default function BankIconWithText() {
@@ -8,9 +8,7 @@ export default function BankIconWithText() {
 
   return (
     <HStack>
-      <Square bg='bg.muted' borderRadius='sm' size='8'>
-        <LuLandmark />
-      </Square>
+      <BankIcon />
       <CustomText value={t('bank')} />
     </HStack>
   );
