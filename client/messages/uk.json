@@ -19,7 +19,8 @@
   },
   "currency": "діам",
   "dialogs": {
-    "card": "Карту"
+    "card": "Карту",
+    "transaction": "Транзакцію"
   },
   "drawers": {
     "navbar": {
