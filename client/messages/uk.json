@@ -1,15 +1,26 @@
 {
+  "actions": {
+    "view": "Переглянути"
+  },
+  "buttons": {
+    "close": "Закрити"
+  },
   "columns": {
+    "actions": "Дії",
     "balance": "Баланс",
     "card": "Карта",
     "created": "Створено",
     "description": "Опис",
+    "id": "Ідентифікатор",
     "owner": "Власник",
     "receiver": "Отримувач",
     "sender": "Відправник",
     "sum": "Сума"
   },
   "currency": "діам",
+  "dialogs": {
+    "card": "Карту"
+  },
   "drawers": {
     "navbar": {
       "title": "Меню"

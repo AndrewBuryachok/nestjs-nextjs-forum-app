@@ -5,6 +5,7 @@ import CustomAvatarWithUser from '@/components/custom-avatar-with-user';
 import CustomText from '@/components/custom-text';
 import CurrencyText from '@/components/currency-text';
 import DateText from '@/components/date-text';
+import CardsActions from './cards-actions';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.cards;
@@ -33,6 +34,10 @@ export default function CardsTable(props: Props) {
         {
           value: 'created',
           render: (card) => <DateText value={card.account.createdAt} />,
+        },
+        {
+          value: 'actions',
+          render: (card) => <CardsActions tab={props.tab} card={card} />,
         },
       ]}
     />
