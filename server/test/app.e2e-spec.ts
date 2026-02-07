@@ -28,6 +28,20 @@ describe('App', () => {
   });
 
   describe('Cards', () => {
+    it('POST /cards', () => {
+      return request(app.getHttpServer())
+        .post('/cards')
+        .send({ name: 'Card' })
+        .expect(201);
+    });
+
+    it('POST /cards/all', () => {
+      return request(app.getHttpServer())
+        .post('/cards/all')
+        .send({ userId: 1, name: 'Card' })
+        .expect(201);
+    });
+
     it('GET /cards/my', () => {
       return request(app.getHttpServer())
         .get('/cards/my')
