@@ -1,12 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Account } from './account.entity';
 import { Card } from './card.entity';
+import { ExtCreateCardDto } from './card.dto';
+import { CardError } from './card-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
 @Injectable()
 export class CardsService {
   constructor(
+    @InjectRepository(Account)
+    private accountsRepository: Repository<Account>,
     @InjectRepository(Card)
     private cardsRepository: Repository<Card>,
   ) {}
@@ -33,6 +38,28 @@ export class CardsService {
     return this.selectCardsQueryBuilder(userId)
       .addSelect(['account.balance'])
       .getMany();
+  }
+
+  async createCard(dto: ExtCreateCardDto): Promise<void> {
+    await this.create(dto);
+  }
+
+  private async create(dto: ExtCreateCardDto): Promise<Card> {
+    try {
+      const account = this.accountsRepository.create({
+        userId: dto.userId,
+        name: dto.name,
+      });
+      await this.accountsRepository.save(account);
+      const card = this.cardsRepository.create({
+        accountId: account.id,
+        userId: dto.userId,
+      });
+      await this.cardsRepository.save(card);
+      return card;
+    } catch (error) {
+      throw new InternalServerErrorException(CardError.CREATE_FAILED);
+    }
   }
 
   private selectCardsQueryBuilder(userId: number): SelectQueryBuilder<Card> {
