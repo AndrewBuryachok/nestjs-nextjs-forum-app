@@ -1,6 +1,7 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { Box, Stack } from '@chakra-ui/react';
 import { Provider } from '@/components/ui/provider';
+import { Toaster } from '@/components/ui/toaster';
 import { DialogProvider } from '@/providers/dialog-provider';
 import CustomHeader from '@/components/custom-header';
 import CustomContainer from '@/components/custom-container';
@@ -23,6 +24,7 @@ export default function RootLayout(props: Props) {
                 </CustomContainer>
               </Box>
             </DialogProvider>
+            <Toaster />
           </Provider>
         </NextIntlClientProvider>
       </body>
