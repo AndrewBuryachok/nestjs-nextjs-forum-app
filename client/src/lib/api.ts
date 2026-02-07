@@ -1,5 +1,6 @@
 import 'server-only';
-import xior from 'xior';
+import xior, { isXiorError } from 'xior';
+import { getTranslations } from 'next-intl/server';
 import { Request } from '@/types/request';
 import { Response } from '@/types/response';
 import { PAGE_SIZE } from '@/constants/pagination';
@@ -24,5 +25,23 @@ export async function select<T>(route: string) {
     return res.data;
   } catch (error) {
     return [];
+  }
+}
+
+export async function send<T>(
+  method: 'POST' | 'PATCH' | 'DELETE',
+  route: string,
+  body?: T,
+) {
+  try {
+    await api.request({ method, url: route, data: body });
+    return { ok: true };
+  } catch (error) {
+    if (isXiorError<{ message: string }>(error)) {
+      const t = await getTranslations();
+      const message = t(`errors.${error.response?.data.message}`);
+      return { ok: false, message };
+    }
+    return { ok: false };
   }
 }

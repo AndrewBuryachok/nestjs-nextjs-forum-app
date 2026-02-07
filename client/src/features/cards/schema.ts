@@ -1,0 +1,13 @@
+import { z } from 'zod';
+
+export const createCardSchema = z.object({
+  name: z.string().min(1).max(16),
+});
+
+export type CreateCardType = z.infer<typeof createCardSchema>;
+
+export const createCardWithUserSchema = createCardSchema.extend({
+  userId: z.number().int().min(1),
+});
+
+export type CreateCardWithUserType = z.infer<typeof createCardWithUserSchema>;
