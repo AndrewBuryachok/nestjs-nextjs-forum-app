@@ -2,6 +2,7 @@ import { useTranslations } from 'next-intl';
 import { Button, Stack } from '@chakra-ui/react';
 
 type Props = {
+  disabled?: boolean;
   loading: boolean;
   onSubmit: () => void;
   children: React.ReactNode;
