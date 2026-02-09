@@ -19,6 +19,8 @@ describe('App', () => {
     await app.close();
   });
 
+  let cards: number[];
+
   describe('Users', () => {
     it('GET /users/all/select', () => {
       return request(app.getHttpServer())
@@ -45,7 +47,8 @@ describe('App', () => {
     it('GET /cards/my', () => {
       return request(app.getHttpServer())
         .get('/cards/my')
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
+        .then((res) => (cards = res.body.data.map((card) => card.id)));
     });
 
     it('GET /cards/all', () => {
@@ -74,6 +77,20 @@ describe('App', () => {
   });
 
   describe('Transactions', () => {
+    it('POST /transactions/deposit', () => {
+      return request(app.getHttpServer())
+        .post('/transactions/deposit')
+        .send({ cardId: cards[0], sum: 100 })
+        .expect(201);
+    });
+
+    it('POST /transactions/withdraw', () => {
+      return request(app.getHttpServer())
+        .post('/transactions/withdraw')
+        .send({ cardId: cards[0], sum: 10 })
+        .expect(201);
+    });
+
     it('GET /transactions/my', () => {
       return request(app.getHttpServer())
         .get('/transactions/my')

@@ -1,4 +1,5 @@
 import { IsInt, IsNotEmpty, IsString, MaxLength, Min } from 'class-validator';
+import { CreateTransactionDto } from '../transactions/transaction.dto';
 
 export class CreateCardDto {
   @IsNotEmpty()
@@ -13,3 +14,5 @@ export class ExtCreateCardDto extends CreateCardDto {
   @Min(1)
   userId: number;
 }
+
+export class UpdateCardBalanceDto extends CreateTransactionDto {}

@@ -1,9 +1,14 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Account } from './account.entity';
 import { Card } from './card.entity';
-import { ExtCreateCardDto } from './card.dto';
+import { ExtCreateCardDto, UpdateCardBalanceDto } from './card.dto';
 import { CardError } from './card-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
@@ -44,6 +49,34 @@ export class CardsService {
     await this.create(dto);
   }
 
+  async increaseCardBalance(dto: UpdateCardBalanceDto): Promise<void> {
+    const card = await this.throwIfCardNotFound(dto.cardId);
+    await this.increaseBalance(card.accountId, dto.sum);
+  }
+
+  async decreaseCardBalance(dto: UpdateCardBalanceDto): Promise<void> {
+    const card = await this.throwIfCardNotFound(dto.cardId);
+    if (card.account.balance < dto.sum) {
+      throw new BadRequestException(CardError.NOT_ENOUGH_BALANCE);
+    }
+    await this.decreaseBalance(card.accountId, dto.sum);
+  }
+
+  async throwIfCardNotFound(cardId: number): Promise<Card> {
+    const card = await this.findCardById(cardId);
+    if (!card) {
+      throw new NotFoundException(CardError.NOT_FOUND);
+    }
+    return card;
+  }
+
+  private findCardById(id: number): Promise<Card | null> {
+    return this.cardsRepository.findOne({
+      relations: { account: true },
+      where: { id },
+    });
+  }
+
   private async create(dto: ExtCreateCardDto): Promise<Card> {
     try {
       const account = this.accountsRepository.create({
@@ -59,6 +92,22 @@ export class CardsService {
       return card;
     } catch (error) {
       throw new InternalServerErrorException(CardError.CREATE_FAILED);
+    }
+  }
+
+  private async increaseBalance(id: number, sum: number): Promise<void> {
+    try {
+      await this.accountsRepository.increment({ id }, 'balance', sum);
+    } catch (error) {
+      throw new InternalServerErrorException(CardError.INCREASE_BALANCE_FAILED);
+    }
+  }
+
+  private async decreaseBalance(id: number, sum: number): Promise<void> {
+    try {
+      await this.accountsRepository.decrement({ id }, 'balance', sum);
+    } catch (error) {
+      throw new InternalServerErrorException(CardError.DECREASE_BALANCE_FAILED);
     }
   }
 
