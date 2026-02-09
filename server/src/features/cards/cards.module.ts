@@ -10,5 +10,6 @@ import { CardsService } from './cards.service';
   imports: [TypeOrmModule.forFeature([Card, CardUser]), UsersModule],
   controllers: [CardsController],
   providers: [CardsService],
+  exports: [CardsService],
 })
 export class CardsModule {}

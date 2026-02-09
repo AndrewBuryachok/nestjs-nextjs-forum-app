@@ -1,7 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transaction } from './transaction.entity';
+import { CardsService } from '../cards/cards.service';
+import {
+  CreateTransactionDto,
+  CreateTransactionWithDescriptionDto,
+} from './transaction.dto';
+import { TransactionError } from './transaction-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
 @Injectable()
@@ -9,6 +15,7 @@ export class TransactionsService {
   constructor(
     @InjectRepository(Transaction)
     private transactionsRepository: Repository<Transaction>,
+    private cardsService: CardsService,
   ) {}
 
   async getMyTransactions(
@@ -34,6 +41,92 @@ export class TransactionsService {
     const [data, total] =
       await this.getTransactionsQueryBuilder(req).getManyAndCount();
     return { data, total };
+  }
+
+  async createDepositTransaction(
+    myId: number,
+    dto: CreateTransactionDto,
+  ): Promise<void> {
+    await this.createIncreaseTransaction(
+      { ...dto, description: 'поповнення карти' },
+      myId,
+    );
+  }
+
+  async createWithdrawTransaction(
+    myId: number,
+    dto: CreateTransactionDto,
+  ): Promise<void> {
+    await this.createDecreaseTransaction(
+      { ...dto, description: 'зняття готівки' },
+      myId,
+    );
+  }
+
+  async createIncreaseTransaction(
+    dto: CreateTransactionWithDescriptionDto,
+    executorUserId?: number,
+  ): Promise<void> {
+    await this.cardsService.increaseCardBalance(
+      dto.cardId,
+      dto.userId,
+      dto.sum,
+    );
+    await this.createIncrease(dto, executorUserId);
+  }
+
+  async createDecreaseTransaction(
+    dto: CreateTransactionWithDescriptionDto,
+    executorUserId?: number,
+  ): Promise<void> {
+    await this.cardsService.decreaseCardBalance(
+      dto.cardId,
+      dto.userId,
+      dto.sum,
+    );
+    await this.createDecrease(dto, executorUserId);
+  }
+
+  private async createIncrease(
+    dto: CreateTransactionWithDescriptionDto,
+    executorUserId?: number,
+  ): Promise<Transaction> {
+    try {
+      const transaction = this.transactionsRepository.create({
+        executorUserId,
+        receiverUserId: dto.userId,
+        receiverCardId: dto.cardId,
+        sum: dto.sum,
+        description: dto.description,
+      });
+      await this.transactionsRepository.save(transaction);
+      return transaction;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        TransactionError.CREATE_INCREASE_FAILED,
+      );
+    }
+  }
+
+  private async createDecrease(
+    dto: CreateTransactionWithDescriptionDto,
+    executorUserId?: number,
+  ): Promise<Transaction> {
+    try {
+      const transaction = this.transactionsRepository.create({
+        executorUserId,
+        senderUserId: dto.userId,
+        senderCardId: dto.cardId,
+        sum: dto.sum,
+        description: dto.description,
+      });
+      await this.transactionsRepository.save(transaction);
+      return transaction;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        TransactionError.CREATE_DECREASE_FAILED,
+      );
+    }
   }
 
   private getTransactionsQueryBuilder(

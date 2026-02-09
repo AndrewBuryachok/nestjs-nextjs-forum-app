@@ -1,4 +1,10 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Card } from './card.entity';
@@ -47,6 +53,61 @@ export class CardsService {
     await this.create(dto);
   }
 
+  async increaseCardBalance(
+    cardId: number,
+    userId: number,
+    sum: number,
+  ): Promise<void> {
+    await this.throwIfNotCardUser(cardId, userId);
+    await this.increaseBalance(cardId, sum);
+  }
+
+  async decreaseCardBalance(
+    cardId: number,
+    userId: number,
+    sum: number,
+  ): Promise<void> {
+    const card = await this.throwIfNotCardUser(cardId, userId);
+    if (card.balance < sum) {
+      throw new BadRequestException(CardError.NOT_ENOUGH_BALANCE);
+    }
+    await this.decreaseBalance(cardId, sum);
+  }
+
+  async throwIfCardNotFound(cardId: number): Promise<Card> {
+    const card = await this.findCardById(cardId);
+    if (!card) {
+      throw new NotFoundException(CardError.NOT_FOUND);
+    }
+    return card;
+  }
+
+  async throwIfNotCardUser(cardId: number, userId: number): Promise<Card> {
+    const card = await this.throwIfCardNotFound(cardId);
+    const isCardUser = await this.isCardUser(cardId, userId);
+    if (!isCardUser) {
+      throw new ForbiddenException(CardError.NOT_USER);
+    }
+    return card;
+  }
+
+  async isCardUser(cardId: number, userId: number): Promise<boolean> {
+    await this.usersService.throwIfUserNotFound(userId);
+    const cardUser = await this.findUserByCardAndUser(cardId, userId);
+    return !!cardUser;
+  }
+
+  private findCardById(id: number): Promise<Card | null> {
+    return this.cardsRepository.findOneBy({ id });
+  }
+
+  private findUserByCardAndUser(
+    cardId: number,
+    userId: number,
+  ): Promise<CardUser | null> {
+    return this.cardsUsersRepository.findOneBy({ cardId, userId });
+  }
+
   private async create(dto: CreateCardWithUserDto): Promise<Card> {
     try {
       const card = this.cardsRepository.create({
@@ -62,6 +123,22 @@ export class CardsService {
       return card;
     } catch (error) {
       throw new InternalServerErrorException(CardError.CREATE_FAILED);
+    }
+  }
+
+  private async increaseBalance(id: number, sum: number): Promise<void> {
+    try {
+      await this.cardsRepository.increment({ id }, 'balance', sum);
+    } catch (error) {
+      throw new InternalServerErrorException(CardError.INCREASE_BALANCE_FAILED);
+    }
+  }
+
+  private async decreaseBalance(id: number, sum: number): Promise<void> {
+    try {
+      await this.cardsRepository.decrement({ id }, 'balance', sum);
+    } catch (error) {
+      throw new InternalServerErrorException(CardError.DECREASE_BALANCE_FAILED);
     }
   }
 
