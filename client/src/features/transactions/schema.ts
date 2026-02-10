@@ -6,3 +6,12 @@ export const createTransactionSchema = z.object({
 });
 
 export type CreateTransactionType = z.infer<typeof createTransactionSchema>;
+
+export const createTransferSchema = z.object({
+  senderCardId: z.number().int().min(1),
+  receiverCardId: z.number().int().min(1),
+  sum: z.number().int().min(1),
+  description: z.string().max(32),
+});
+
+export type CreateTransferType = z.infer<typeof createTransferSchema>;

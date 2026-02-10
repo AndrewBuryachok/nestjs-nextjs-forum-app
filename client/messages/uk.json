@@ -2,6 +2,7 @@
   "actions": {
     "create": "Створити",
     "deposit": "Поповнити",
+    "transfer": "Переказати",
     "view": "Переглянути",
     "withdraw": "Зняти"
   },
@@ -26,7 +27,8 @@
   "currency": "діам",
   "dialogs": {
     "card": "Карту",
-    "transaction": "Транзакцію"
+    "transaction": "Транзакцію",
+    "transfer": "Переказ"
   },
   "drawers": {
     "navbar": {
@@ -67,6 +69,12 @@
       "create": {
         "failure": "Не вдалося створити транзакцію",
         "success": "Успішно створено транзакцію"
+      }
+    },
+    "transfers": {
+      "create": {
+        "failure": "Не вдалося створити переказ",
+        "success": "Успішно створено переказ"
       }
     }
   }
