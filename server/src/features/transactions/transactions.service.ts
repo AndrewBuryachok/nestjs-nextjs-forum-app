@@ -6,6 +6,7 @@ import { CardsService } from '../cards/cards.service';
 import {
   ExtCreateTransactionDto,
   ExtCreateTransactionWithDescriptionDto,
+  ExtCreateTransferDto,
 } from './transaction.dto';
 import { TransactionError } from './transaction-errors.enum';
 import { Request, Response } from '../../common/interfaces';
@@ -57,6 +58,23 @@ export class TransactionsService {
     });
   }
 
+  async createTransferTransaction(dto: ExtCreateTransferDto): Promise<void> {
+    await this.cardsService.throwIfNotCardUser(
+      dto.senderCardId,
+      dto.myId,
+      dto.isAll,
+    );
+    await this.cardsService.decreaseCardBalance({
+      cardId: dto.senderCardId,
+      sum: dto.sum,
+    });
+    await this.cardsService.increaseCardBalance({
+      cardId: dto.receiverCardId,
+      sum: dto.sum,
+    });
+    await this.createTransfer(dto);
+  }
+
   async createIncreaseTransaction(
     dto: ExtCreateTransactionWithDescriptionDto,
   ): Promise<void> {
@@ -105,6 +123,25 @@ export class TransactionsService {
     } catch (error) {
       throw new InternalServerErrorException(
         TransactionError.CREATE_DECREASE_FAILED,
+      );
+    }
+  }
+
+  private async createTransfer(
+    dto: ExtCreateTransferDto,
+  ): Promise<Transaction> {
+    try {
+      const transaction = this.transactionsRepository.create({
+        senderCardId: dto.senderCardId,
+        receiverCardId: dto.receiverCardId,
+        sum: dto.sum,
+        description: dto.description,
+      });
+      await this.transactionsRepository.save(transaction);
+      return transaction;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        TransactionError.CREATE_TRANSFER_FAILED,
       );
     }
   }

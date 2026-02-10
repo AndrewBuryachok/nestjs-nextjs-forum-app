@@ -1,4 +1,11 @@
-import { IsInt, IsNotEmpty, Min } from 'class-validator';
+import {
+  IsDefined,
+  IsInt,
+  IsNotEmpty,
+  IsString,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class CreateTransactionDto {
   @IsNotEmpty()
@@ -22,4 +29,31 @@ export class CreateTransactionWithDescriptionDto extends CreateTransactionDto {
 
 export class ExtCreateTransactionWithDescriptionDto extends CreateTransactionWithDescriptionDto {
   myId: number;
+}
+
+export class CreateTransferDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  senderCardId: number;
+
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  receiverCardId: number;
+
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  sum: number;
+
+  @IsDefined()
+  @IsString()
+  @MaxLength(32)
+  description: string;
+}
+
+export class ExtCreateTransferDto extends CreateTransferDto {
+  myId: number;
+  isAll: boolean;
 }

@@ -91,6 +91,30 @@ describe('App', () => {
         .expect(201);
     });
 
+    it('POST /transactions/transfer', () => {
+      return request(app.getHttpServer())
+        .post('/transactions/transfer')
+        .send({
+          senderCardId: cards[0],
+          receiverCardId: cards[0],
+          sum: 10,
+          description: '',
+        })
+        .expect(201);
+    });
+
+    it('POST /transactions/transfer/all', () => {
+      return request(app.getHttpServer())
+        .post('/transactions/transfer/all')
+        .send({
+          senderCardId: cards[0],
+          receiverCardId: cards[0],
+          sum: 10,
+          description: '',
+        })
+        .expect(201);
+    });
+
     it('GET /transactions/my', () => {
       return request(app.getHttpServer())
         .get('/transactions/my')

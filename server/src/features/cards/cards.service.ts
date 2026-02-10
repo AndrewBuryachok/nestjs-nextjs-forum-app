@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -66,6 +67,18 @@ export class CardsService {
     const card = await this.findCardById(cardId);
     if (!card) {
       throw new NotFoundException(CardError.NOT_FOUND);
+    }
+    return card;
+  }
+
+  async throwIfNotCardUser(
+    cardId: number,
+    userId: number,
+    isAll: boolean,
+  ): Promise<Card> {
+    const card = await this.throwIfCardNotFound(cardId);
+    if (card.userId !== userId && !isAll) {
+      throw new ForbiddenException(CardError.NOT_USER);
     }
     return card;
   }
