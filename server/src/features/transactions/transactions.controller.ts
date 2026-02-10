@@ -1,7 +1,11 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { Transaction } from './transaction.entity';
-import { CreateTransactionDto } from './transaction.dto';
+import {
+  CreateTransactionDto,
+  CreateTransferDto,
+  CreateTransferWithUserDto,
+} from './transaction.dto';
 import { Request, Response } from '../../common/interfaces';
 
 @Controller('transactions')
@@ -26,5 +30,17 @@ export class TransactionsController {
   @Post('withdraw')
   createWithdrawTransaction(@Body() dto: CreateTransactionDto): Promise<void> {
     return this.transactionsService.createWithdrawTransaction(1, dto);
+  }
+
+  @Post('transfer')
+  createMyTransferTransaction(@Body() dto: CreateTransferDto): Promise<void> {
+    return this.transactionsService.createMyTransferTransaction(1, dto);
+  }
+
+  @Post('transfer/all')
+  createUserTransferTransaction(
+    @Body() dto: CreateTransferWithUserDto,
+  ): Promise<void> {
+    return this.transactionsService.createUserTransferTransaction(dto);
   }
 }

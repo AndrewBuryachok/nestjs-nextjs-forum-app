@@ -6,6 +6,8 @@ import { CardsService } from '../cards/cards.service';
 import {
   CreateTransactionDto,
   CreateTransactionWithDescriptionDto,
+  CreateTransferDto,
+  CreateTransferWithUserDto,
 } from './transaction.dto';
 import { TransactionError } from './transaction-errors.enum';
 import { Request, Response } from '../../common/interfaces';
@@ -61,6 +63,35 @@ export class TransactionsService {
       { ...dto, description: 'зняття готівки' },
       myId,
     );
+  }
+
+  async createMyTransferTransaction(
+    myId: number,
+    dto: CreateTransferDto,
+  ): Promise<void> {
+    await this.createTransferTransaction({ ...dto, senderUserId: myId });
+  }
+
+  async createUserTransferTransaction(
+    dto: CreateTransferWithUserDto,
+  ): Promise<void> {
+    await this.createTransferTransaction(dto);
+  }
+
+  private async createTransferTransaction(
+    dto: CreateTransferWithUserDto,
+  ): Promise<void> {
+    await this.cardsService.decreaseCardBalance(
+      dto.senderCardId,
+      dto.senderUserId,
+      dto.sum,
+    );
+    await this.cardsService.increaseCardBalance(
+      dto.receiverCardId,
+      dto.receiverUserId,
+      dto.sum,
+    );
+    await this.createTransfer(dto);
   }
 
   async createIncreaseTransaction(
@@ -125,6 +156,27 @@ export class TransactionsService {
     } catch (error) {
       throw new InternalServerErrorException(
         TransactionError.CREATE_DECREASE_FAILED,
+      );
+    }
+  }
+
+  private async createTransfer(
+    dto: CreateTransferWithUserDto,
+  ): Promise<Transaction> {
+    try {
+      const transaction = this.transactionsRepository.create({
+        senderUserId: dto.senderUserId,
+        senderCardId: dto.senderCardId,
+        receiverUserId: dto.receiverUserId,
+        receiverCardId: dto.receiverCardId,
+        sum: dto.sum,
+        description: dto.description,
+      });
+      await this.transactionsRepository.save(transaction);
+      return transaction;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        TransactionError.CREATE_TRANSFER_FAILED,
       );
     }
   }
