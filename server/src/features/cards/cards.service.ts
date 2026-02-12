@@ -10,7 +10,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Card } from './card.entity';
 import { CardUser } from './card-user.entity';
 import { UsersService } from '../users/users.service';
-import { CreateCardWithUserDto } from './card.dto';
+import { CreateCardWithUserDto, EditCardDto } from './card.dto';
 import { CardError } from './card-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
@@ -53,6 +53,30 @@ export class CardsService {
     await this.create(dto);
   }
 
+  async editMyCard(
+    myId: number,
+    cardId: number,
+    dto: EditCardDto,
+  ): Promise<void> {
+    await this.throwIfNotCardOwner(cardId, myId);
+    await this.edit(cardId, dto);
+  }
+
+  async editUserCard(cardId: number, dto: EditCardDto): Promise<void> {
+    await this.throwIfCardNotFound(cardId);
+    await this.edit(cardId, dto);
+  }
+
+  async deleteMyCard(myId: number, cardId: number): Promise<void> {
+    await this.throwIfNotCardOwner(cardId, myId);
+    await this.delete(cardId);
+  }
+
+  async deleteUserCard(cardId: number): Promise<void> {
+    await this.throwIfCardNotFound(cardId);
+    await this.delete(cardId);
+  }
+
   async increaseCardBalance(
     cardId: number,
     userId: number,
@@ -78,6 +102,14 @@ export class CardsService {
     const card = await this.findCardById(cardId);
     if (!card) {
       throw new NotFoundException(CardError.NOT_FOUND);
+    }
+    return card;
+  }
+
+  async throwIfNotCardOwner(cardId: number, userId: number): Promise<Card> {
+    const card = await this.throwIfCardNotFound(cardId);
+    if (card.userId !== userId) {
+      throw new ForbiddenException(CardError.NOT_OWNER);
     }
     return card;
   }
@@ -123,6 +155,22 @@ export class CardsService {
       return card;
     } catch (error) {
       throw new InternalServerErrorException(CardError.CREATE_FAILED);
+    }
+  }
+
+  private async edit(id: number, dto: EditCardDto): Promise<void> {
+    try {
+      await this.cardsRepository.update({ id }, { name: dto.name });
+    } catch (error) {
+      throw new InternalServerErrorException(CardError.EDIT_FAILED);
+    }
+  }
+
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.cardsRepository.softDelete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(CardError.DELETE_FAILED);
     }
   }
 

@@ -1,7 +1,21 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { CardsService } from './cards.service';
 import { Card } from './card.entity';
-import { CreateCardDto, CreateCardWithUserDto } from './card.dto';
+import {
+  CardIdDto,
+  CreateCardDto,
+  CreateCardWithUserDto,
+  EditCardDto,
+} from './card.dto';
 import { UserIdDto } from '../users/user.dto';
 import { Request, Response } from '../../common/interfaces';
 
@@ -42,5 +56,31 @@ export class CardsController {
   @Post('all')
   createUserCard(@Body() dto: CreateCardWithUserDto): Promise<void> {
     return this.cardsService.createCard(dto);
+  }
+
+  @Patch(':cardId')
+  editMyCard(
+    @Param() { cardId }: CardIdDto,
+    @Body() dto: EditCardDto,
+  ): Promise<void> {
+    return this.cardsService.editMyCard(1, cardId, dto);
+  }
+
+  @Patch('all/:cardId')
+  editUserCard(
+    @Param() { cardId }: CardIdDto,
+    @Body() dto: EditCardDto,
+  ): Promise<void> {
+    return this.cardsService.editUserCard(cardId, dto);
+  }
+
+  @Delete(':cardId')
+  deleteMyCard(@Param() { cardId }: CardIdDto): Promise<void> {
+    return this.cardsService.deleteMyCard(1, cardId);
+  }
+
+  @Delete('all/:cardId')
+  deleteUserCard(@Param() { cardId }: CardIdDto): Promise<void> {
+    return this.cardsService.deleteUserCard(cardId);
   }
 }
