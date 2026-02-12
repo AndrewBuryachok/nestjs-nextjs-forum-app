@@ -10,6 +10,7 @@ type Props = {
     action: string;
     dialog: string;
     color: Color;
+    userId?: number;
     icon: React.ReactNode;
     body: React.ReactNode;
   }[];
@@ -26,6 +27,7 @@ export default function CustomActions(props: Props) {
         <IconButton
           key={action.action}
           colorPalette={action.color}
+          disabled={!!action.userId && action.userId !== 1}
           onClick={() =>
             openDialog({
               title:
