@@ -127,4 +127,32 @@ describe('App', () => {
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
   });
+
+  describe('Cards', () => {
+    it('PATCH /cards/:cardId', () => {
+      return request(app.getHttpServer())
+        .patch(`/cards/${cards[0]}`)
+        .send({ name: 'Card' })
+        .expect(200);
+    });
+
+    it('PATCH /cards/all/:cardId', () => {
+      return request(app.getHttpServer())
+        .patch(`/cards/all/${cards[1]}`)
+        .send({ name: 'Card' })
+        .expect(200);
+    });
+
+    it('DELETE /cards/:cardId', () => {
+      return request(app.getHttpServer())
+        .delete(`/cards/${cards[0]}`)
+        .expect(200);
+    });
+
+    it('DELETE /cards/all/:cardId', () => {
+      return request(app.getHttpServer())
+        .delete(`/cards/all/${cards[1]}`)
+        .expect(200);
+    });
+  });
 });
