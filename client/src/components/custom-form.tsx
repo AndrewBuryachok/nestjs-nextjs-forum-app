@@ -4,7 +4,7 @@ import { Button, Stack } from '@chakra-ui/react';
 type Props = {
   disabled: boolean;
   onSubmit: () => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 export default function CustomForm(props: Props) {
