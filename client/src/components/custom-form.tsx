@@ -5,7 +5,7 @@ type Props = {
   disabled?: boolean;
   loading: boolean;
   onSubmit: () => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 export default function CustomForm(props: Props) {
@@ -15,7 +15,7 @@ export default function CustomForm(props: Props) {
     <form onSubmit={props.onSubmit}>
       <Stack>
         {props.children}
-        <Button type='submit' loading={props.loading}>
+        <Button type='submit' disabled={props.disabled} loading={props.loading}>
           {t('buttons.submit')}
         </Button>
       </Stack>

@@ -11,3 +11,16 @@ export const createCardWithUserSchema = createCardSchema.extend({
 });
 
 export type CreateCardWithUserType = z.infer<typeof createCardWithUserSchema>;
+
+export const editCardSchema = z.object({
+  cardId: z.number().int().min(1),
+  name: z.string().min(1).max(16),
+});
+
+export type EditCardType = z.infer<typeof editCardSchema>;
+
+export const deleteCardSchema = z.object({
+  cardId: z.number().int().min(1),
+});
+
+export type DeleteCardType = z.infer<typeof deleteCardSchema>;
