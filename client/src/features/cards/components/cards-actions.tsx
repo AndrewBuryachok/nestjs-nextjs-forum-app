@@ -1,6 +1,14 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import { Card } from '../types';
 import { viewCardAction } from '../actions/view-card-action';
+import {
+  editMyCardAction,
+  editUserCardAction,
+} from '../actions/edit-card-action';
+import {
+  deleteMyCardAction,
+  deleteUserCardAction,
+} from '../actions/delete-card-action';
 import CustomActions from '@/components/custom-actions';
 
 type Props = {
@@ -9,9 +17,14 @@ type Props = {
 };
 
 export default function CardsActions(props: Props) {
+  const actions = {
+    my: [editMyCardAction, deleteMyCardAction],
+    all: [editUserCardAction, deleteUserCardAction],
+  }[props.tab];
+
   return (
     <CustomActions
-      actions={[viewCardAction].map((action) => action(props.card))}
+      actions={[viewCardAction, ...actions].map((action) => action(props.card))}
     />
   );
 }
