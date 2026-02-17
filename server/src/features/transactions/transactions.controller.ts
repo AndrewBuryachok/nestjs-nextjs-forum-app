@@ -14,6 +14,7 @@ import {
   CreateTransferDto,
   TransactionIdDto,
 } from './transaction.dto';
+import { MyId } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 
 @Controller('transactions')
@@ -21,8 +22,11 @@ export class TransactionsController {
   constructor(private transactionsService: TransactionsService) {}
 
   @Get('my')
-  getMyTransactions(@Query() req: Request): Promise<Response<Transaction>> {
-    return this.transactionsService.getMyTransactions(1, req);
+  getMyTransactions(
+    @MyId() myId: number,
+    @Query() req: Request,
+  ): Promise<Response<Transaction>> {
+    return this.transactionsService.getMyTransactions(myId, req);
   }
 
   @Get('all')
@@ -31,35 +35,41 @@ export class TransactionsController {
   }
 
   @Post('deposit')
-  createDepositTransaction(@Body() dto: CreateTransactionDto): Promise<void> {
-    return this.transactionsService.createDepositTransaction({
-      ...dto,
-      myId: 1,
-    });
+  createDepositTransaction(
+    @MyId() myId: number,
+    @Body() dto: CreateTransactionDto,
+  ): Promise<void> {
+    return this.transactionsService.createDepositTransaction({ ...dto, myId });
   }
 
   @Post('withdraw')
-  createWithdrawTransaction(@Body() dto: CreateTransactionDto): Promise<void> {
-    return this.transactionsService.createWithdrawTransaction({
-      ...dto,
-      myId: 1,
-    });
+  createWithdrawTransaction(
+    @MyId() myId: number,
+    @Body() dto: CreateTransactionDto,
+  ): Promise<void> {
+    return this.transactionsService.createWithdrawTransaction({ ...dto, myId });
   }
 
   @Post('transfer')
-  createMyTransferTransaction(@Body() dto: CreateTransferDto): Promise<void> {
+  createMyTransferTransaction(
+    @MyId() myId: number,
+    @Body() dto: CreateTransferDto,
+  ): Promise<void> {
     return this.transactionsService.createTransferTransaction({
       ...dto,
-      myId: 1,
+      myId,
       isAll: false,
     });
   }
 
   @Post('transfer/all')
-  createUserTransferTransaction(@Body() dto: CreateTransferDto): Promise<void> {
+  createUserTransferTransaction(
+    @MyId() myId: number,
+    @Body() dto: CreateTransferDto,
+  ): Promise<void> {
     return this.transactionsService.createTransferTransaction({
       ...dto,
-      myId: 1,
+      myId,
       isAll: true,
     });
   }
