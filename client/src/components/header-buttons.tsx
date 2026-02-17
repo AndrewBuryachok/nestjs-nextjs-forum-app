@@ -1,14 +1,12 @@
-import { ButtonGroup, IconButton } from '@chakra-ui/react';
-import { LuUser } from 'react-icons/lu';
+import { ButtonGroup } from '@chakra-ui/react';
 import ThemeButton from './theme-button';
+import AuthMenu from './auth-menu';
 
 export default function HeaderButtons() {
   return (
     <ButtonGroup size='xs' variant='ghost'>
       <ThemeButton />
-      <IconButton>
-        <LuUser />
-      </IconButton>
+      <AuthMenu />
     </ButtonGroup>
   );
 }
