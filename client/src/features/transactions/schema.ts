@@ -40,3 +40,9 @@ export const createTransferWithSenderSchema =
 export type CreateTransferWithSenderType = z.infer<
   typeof createTransferWithSenderSchema
 >;
+
+export const deleteTransactionSchema = z.object({
+  transactionId: z.number().int().min(1),
+});
+
+export type DeleteTransactionType = z.infer<typeof deleteTransactionSchema>;
