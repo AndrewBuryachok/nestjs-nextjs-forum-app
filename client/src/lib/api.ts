@@ -1,12 +1,21 @@
 import 'server-only';
-import xior, { isXiorError } from 'xior';
+import xior, { isXiorError, merge } from 'xior';
 import { getTranslations } from 'next-intl/server';
+import { getAccessToken } from './tokens';
 import { Request } from '@/types/request';
 import { Response } from '@/types/response';
 import { PAGE_SIZE } from '@/constants/pagination';
 
 const api = xior.create({
   baseURL: process.env.API_URL,
+});
+
+api.interceptors.request.use(async (config) => {
+  const token = await getAccessToken();
+  if (!token) {
+    return config;
+  }
+  return merge(config, { headers: { Authorization: `Bearer ${token}` } });
 });
 
 export async function get<T>(route: string, { page, ...req }: Request) {
@@ -28,14 +37,14 @@ export async function select<T>(route: string) {
   }
 }
 
-export async function send<T>(
+export async function send<T, U>(
   method: 'POST' | 'PATCH' | 'DELETE',
   route: string,
   body?: T,
 ) {
   try {
-    await api.request({ method, url: route, data: body });
-    return { ok: true };
+    const res = await api.request<U>({ method, url: route, data: body });
+    return { ok: true, data: res.data };
   } catch (error) {
     if (isXiorError<{ message: string }>(error)) {
       const t = await getTranslations();
