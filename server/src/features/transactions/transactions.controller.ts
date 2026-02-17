@@ -15,6 +15,7 @@ import {
   CreateTransferWithUserDto,
   TransactionIdDto,
 } from './transaction.dto';
+import { MyId } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 
 @Controller('transactions')
@@ -22,8 +23,11 @@ export class TransactionsController {
   constructor(private transactionsService: TransactionsService) {}
 
   @Get('my')
-  getMyTransactions(@Query() req: Request): Promise<Response<Transaction>> {
-    return this.transactionsService.getMyTransactions(1, req);
+  getMyTransactions(
+    @MyId() myId: number,
+    @Query() req: Request,
+  ): Promise<Response<Transaction>> {
+    return this.transactionsService.getMyTransactions(myId, req);
   }
 
   @Get('all')
@@ -32,18 +36,27 @@ export class TransactionsController {
   }
 
   @Post('deposit')
-  createDepositTransaction(@Body() dto: CreateTransactionDto): Promise<void> {
-    return this.transactionsService.createDepositTransaction(1, dto);
+  createDepositTransaction(
+    @MyId() myId: number,
+    @Body() dto: CreateTransactionDto,
+  ): Promise<void> {
+    return this.transactionsService.createDepositTransaction(myId, dto);
   }
 
   @Post('withdraw')
-  createWithdrawTransaction(@Body() dto: CreateTransactionDto): Promise<void> {
-    return this.transactionsService.createWithdrawTransaction(1, dto);
+  createWithdrawTransaction(
+    @MyId() myId: number,
+    @Body() dto: CreateTransactionDto,
+  ): Promise<void> {
+    return this.transactionsService.createWithdrawTransaction(myId, dto);
   }
 
   @Post('transfer')
-  createMyTransferTransaction(@Body() dto: CreateTransferDto): Promise<void> {
-    return this.transactionsService.createMyTransferTransaction(1, dto);
+  createMyTransferTransaction(
+    @MyId() myId: number,
+    @Body() dto: CreateTransferDto,
+  ): Promise<void> {
+    return this.transactionsService.createMyTransferTransaction(myId, dto);
   }
 
   @Post('transfer/all')

@@ -1,7 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from './user.entity';
+import { CreateUserDto } from './user.dto';
 import { UserError } from './user-errors.enum';
 
 @Injectable()
@@ -15,6 +21,27 @@ export class UsersService {
     return this.selectUsersQueryBuilder().getMany();
   }
 
+  async createUser(dto: CreateUserDto): Promise<User> {
+    await this.throwIfNickAlreadyUsed(dto.nick);
+    const user = await this.create(dto);
+    return user;
+  }
+
+  async setUserToken(userId: number, token: string): Promise<void> {
+    await this.setToken(userId, token);
+  }
+
+  async resetUserToken(userId: number): Promise<void> {
+    await this.resetToken(userId);
+  }
+
+  async throwIfNickAlreadyUsed(nick: string): Promise<void> {
+    const user = await this.findUserByNick(nick);
+    if (user) {
+      throw new BadRequestException(UserError.NICK_ALREADY_USED);
+    }
+  }
+
   async throwIfUserNotFound(userId: number): Promise<User> {
     const user = await this.findUserById(userId);
     if (!user) {
@@ -23,8 +50,41 @@ export class UsersService {
     return user;
   }
 
-  private findUserById(id: number): Promise<User | null> {
+  findUserById(id: number): Promise<User | null> {
     return this.usersRepository.findOneBy({ id });
+  }
+
+  findUserByNick(nick: string): Promise<User | null> {
+    return this.usersRepository.findOneBy({ nick });
+  }
+
+  private async create(dto: CreateUserDto): Promise<User> {
+    try {
+      const user = this.usersRepository.create({
+        nick: dto.nick,
+        password: dto.password,
+      });
+      await this.usersRepository.save(user);
+      return user;
+    } catch (error) {
+      throw new InternalServerErrorException(UserError.CREATE_FAILED);
+    }
+  }
+
+  private async setToken(id: number, token: string): Promise<void> {
+    try {
+      await this.usersRepository.update({ id }, { token });
+    } catch (error) {
+      throw new InternalServerErrorException(UserError.SET_TOKEN_FAILED);
+    }
+  }
+
+  private async resetToken(id: number): Promise<void> {
+    try {
+      await this.usersRepository.update({ id }, { token: '' });
+    } catch (error) {
+      throw new InternalServerErrorException(UserError.RESET_TOKEN_FAILED);
+    }
   }
 
   private selectUsersQueryBuilder(): SelectQueryBuilder<User> {
