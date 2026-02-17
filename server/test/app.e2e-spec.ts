@@ -20,6 +20,7 @@ describe('App', () => {
   });
 
   let cards: number[];
+  let transactions: number[];
 
   describe('Users', () => {
     it('GET /users/all/select', () => {
@@ -118,13 +119,29 @@ describe('App', () => {
     it('GET /transactions/my', () => {
       return request(app.getHttpServer())
         .get('/transactions/my')
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
+        .then(
+          (res) =>
+            (transactions = res.body.data.map((transaction) => transaction.id)),
+        );
     });
 
     it('GET /transactions/all', () => {
       return request(app.getHttpServer())
         .get('/transactions/all')
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('DELETE /transactions/:transactionId', () => {
+      return request(app.getHttpServer())
+        .delete(`/transactions/${transactions[0]}`)
+        .expect(200);
+    });
+
+    it('DELETE /transactions/:transactionId', () => {
+      return request(app.getHttpServer())
+        .delete(`/transactions/${transactions[1]}`)
+        .expect(200);
     });
   });
 

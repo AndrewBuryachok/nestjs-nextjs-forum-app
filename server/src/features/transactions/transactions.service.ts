@@ -1,9 +1,14 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import { CardsService } from '../cards/cards.service';
 import {
+  DeleteTransactionDto,
   ExtCreateTransactionDto,
   ExtCreateTransactionWithDescriptionDto,
   ExtCreateTransferDto,
@@ -89,6 +94,39 @@ export class TransactionsService {
     await this.createDecrease(dto);
   }
 
+  async deleteTransaction(dto: DeleteTransactionDto): Promise<void> {
+    const transaction = await this.throwIfTransactionNotFound(
+      dto.transactionId,
+    );
+    if (transaction.receiverCardId) {
+      await this.cardsService.decreaseCardBalance({
+        cardId: transaction.receiverCardId,
+        sum: transaction.sum,
+      });
+    }
+    if (transaction.senderCardId) {
+      await this.cardsService.increaseCardBalance({
+        cardId: transaction.senderCardId,
+        sum: transaction.sum,
+      });
+    }
+    await this.delete(transaction.id);
+  }
+
+  async throwIfTransactionNotFound(
+    transactionId: number,
+  ): Promise<Transaction> {
+    const transaction = await this.findTransactionById(transactionId);
+    if (!transaction) {
+      throw new NotFoundException(TransactionError.NOT_FOUND);
+    }
+    return transaction;
+  }
+
+  private findTransactionById(id: number): Promise<Transaction | null> {
+    return this.transactionsRepository.findOneBy({ id });
+  }
+
   private async createIncrease(
     dto: ExtCreateTransactionWithDescriptionDto,
   ): Promise<Transaction> {
@@ -143,6 +181,14 @@ export class TransactionsService {
       throw new InternalServerErrorException(
         TransactionError.CREATE_TRANSFER_FAILED,
       );
+    }
+  }
+
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.transactionsRepository.delete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(TransactionError.DELETE_FAILED);
     }
   }
 

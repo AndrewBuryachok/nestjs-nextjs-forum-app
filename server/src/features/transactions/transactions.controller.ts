@@ -1,7 +1,19 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { Transaction } from './transaction.entity';
-import { CreateTransactionDto, CreateTransferDto } from './transaction.dto';
+import {
+  CreateTransactionDto,
+  CreateTransferDto,
+  TransactionIdDto,
+} from './transaction.dto';
 import { Request, Response } from '../../common/interfaces';
 
 @Controller('transactions')
@@ -50,5 +62,12 @@ export class TransactionsController {
       myId: 1,
       isAll: true,
     });
+  }
+
+  @Delete(':transactionId')
+  deleteTransaction(
+    @Param() { transactionId }: TransactionIdDto,
+  ): Promise<void> {
+    return this.transactionsService.deleteTransaction({ transactionId });
   }
 }
