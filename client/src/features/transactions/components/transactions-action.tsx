@@ -1,17 +1,14 @@
-import { useTranslations } from 'next-intl';
-import { Tabs } from '@chakra-ui/react';
 import { PAGE_TABS_MAP } from '@/config/navigation';
+import CustomAction from '@/components/custom-action';
+import TabsWrapper from '@/components/tabs-wrapper';
 import CreateTransferForm from '../forms/create-transfer-form';
 import CreateTransactionForm from '../forms/create-transaction-form';
-import CustomAction from '@/components/custom-action';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.transactions;
 };
 
 export default function TransactionsAction(props: Props) {
-  const t = useTranslations();
-
   const tabs = ['deposit', 'withdraw', 'transfer'];
 
   return props.tab === 'all' ? (
@@ -19,24 +16,17 @@ export default function TransactionsAction(props: Props) {
       action='create'
       dialog='transaction'
       body={
-        <Tabs.Root fitted lazyMount unmountOnExit defaultValue={tabs[0]}>
-          <Tabs.List>
-            {tabs.map((tab) => (
-              <Tabs.Trigger key={tab} value={tab}>
-                {t(`actions.${tab}`)}
-              </Tabs.Trigger>
-            ))}
-          </Tabs.List>
-          {tabs.map((tab, index) => (
-            <Tabs.Content key={tab} value={tab}>
-              {index === tabs.length - 1 ? (
-                <CreateTransferForm isAll={true} />
-              ) : (
-                <CreateTransactionForm type={!index} />
-              )}
-            </Tabs.Content>
-          ))}
-        </Tabs.Root>
+        <TabsWrapper
+          label='actions'
+          value={tabs}
+          render={(index) =>
+            index === tabs.length ? (
+              <CreateTransferForm isAll={true} />
+            ) : (
+              <CreateTransactionForm type={!index} />
+            )
+          }
+        />
       }
     />
   ) : (
