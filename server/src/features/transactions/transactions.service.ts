@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transaction } from './transaction.entity';
@@ -118,6 +122,39 @@ export class TransactionsService {
     await this.createDecrease(dto, executorUserId);
   }
 
+  async deleteTransaction(transactionId: number): Promise<void> {
+    const transaction = await this.throwIfTransactionNotFound(transactionId);
+    if (transaction.receiverUserId && transaction.receiverCardId) {
+      await this.cardsService.decreaseCardBalance(
+        transaction.receiverCardId,
+        transaction.receiverUserId,
+        transaction.sum,
+      );
+    }
+    if (transaction.senderUserId && transaction.senderCardId) {
+      await this.cardsService.increaseCardBalance(
+        transaction.senderCardId,
+        transaction.senderUserId,
+        transaction.sum,
+      );
+    }
+    await this.delete(transactionId);
+  }
+
+  async throwIfTransactionNotFound(
+    transactionId: number,
+  ): Promise<Transaction> {
+    const transaction = await this.findTransactionById(transactionId);
+    if (!transaction) {
+      throw new NotFoundException(TransactionError.NOT_FOUND);
+    }
+    return transaction;
+  }
+
+  private findTransactionById(id: number): Promise<Transaction | null> {
+    return this.transactionsRepository.findOneBy({ id });
+  }
+
   private async createIncrease(
     dto: CreateTransactionWithDescriptionDto,
     executorUserId?: number,
@@ -178,6 +215,14 @@ export class TransactionsService {
       throw new InternalServerErrorException(
         TransactionError.CREATE_TRANSFER_FAILED,
       );
+    }
+  }
+
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.transactionsRepository.delete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(TransactionError.DELETE_FAILED);
     }
   }
 

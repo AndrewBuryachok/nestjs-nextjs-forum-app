@@ -6,6 +6,15 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class TransactionIdDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
+  transactionId: number;
+}
 
 export class CreateTransactionDto {
   @IsNotEmpty()
