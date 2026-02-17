@@ -17,6 +17,7 @@ import {
   EditCardDto,
 } from './card.dto';
 import { UserIdDto } from '../users/user.dto';
+import { MyId, Public } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 
 @Controller('cards')
@@ -24,8 +25,11 @@ export class CardsController {
   constructor(private cardsService: CardsService) {}
 
   @Get('my')
-  getMyCards(@Query() req: Request): Promise<Response<Card>> {
-    return this.cardsService.getMyCards(1, req);
+  getMyCards(
+    @MyId() myId: number,
+    @Query() req: Request,
+  ): Promise<Response<Card>> {
+    return this.cardsService.getMyCards(myId, req);
   }
 
   @Get('all')
@@ -34,10 +38,11 @@ export class CardsController {
   }
 
   @Get('my/select')
-  selectMyCards(): Promise<Card[]> {
-    return this.cardsService.selectUserCardsWithBalance(1);
+  selectMyCards(@MyId() myId: number): Promise<Card[]> {
+    return this.cardsService.selectUserCardsWithBalance(myId);
   }
 
+  @Public()
   @Get(':userId/select')
   selectUserCards(@Param() { userId }: UserIdDto): Promise<Card[]> {
     return this.cardsService.selectUserCards(userId);
@@ -49,8 +54,11 @@ export class CardsController {
   }
 
   @Post()
-  createMyCard(@Body() dto: CreateCardDto): Promise<void> {
-    return this.cardsService.createCard({ ...dto, userId: 1 });
+  createMyCard(
+    @MyId() myId: number,
+    @Body() dto: CreateCardDto,
+  ): Promise<void> {
+    return this.cardsService.createCard({ ...dto, userId: myId });
   }
 
   @Post('all')
@@ -60,10 +68,11 @@ export class CardsController {
 
   @Patch(':cardId')
   editMyCard(
+    @MyId() myId: number,
     @Param() { cardId }: CardIdDto,
     @Body() dto: EditCardDto,
   ): Promise<void> {
-    return this.cardsService.editMyCard(1, cardId, dto);
+    return this.cardsService.editMyCard(myId, cardId, dto);
   }
 
   @Patch('all/:cardId')
@@ -75,8 +84,11 @@ export class CardsController {
   }
 
   @Delete(':cardId')
-  deleteMyCard(@Param() { cardId }: CardIdDto): Promise<void> {
-    return this.cardsService.deleteMyCard(1, cardId);
+  deleteMyCard(
+    @MyId() myId: number,
+    @Param() { cardId }: CardIdDto,
+  ): Promise<void> {
+    return this.cardsService.deleteMyCard(myId, cardId);
   }
 
   @Delete('all/:cardId')
