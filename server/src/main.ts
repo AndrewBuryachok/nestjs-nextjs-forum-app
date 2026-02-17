@@ -14,7 +14,12 @@ async function bootstrap() {
     };
     next();
   });
-  morgan.token('body', (req) => JSON.stringify(req['body']));
+  morgan.token('user', (req) => req['user']?.nick ?? '-');
+  morgan.token('body', (req) => {
+    const body = { ...req['body'] };
+    delete body.password;
+    return JSON.stringify(body);
+  });
   morgan.token('result', (req, res) => {
     const body = res['locals'].body;
     if (!body) {
@@ -35,7 +40,7 @@ async function bootstrap() {
   });
   app.use(
     morgan(
-      ':method :url :status :res[content-length] - :response-time ms :body :result',
+      ':user :method :url :status :res[content-length] - :response-time ms :body :result',
     ),
   );
   app.useGlobalPipes(

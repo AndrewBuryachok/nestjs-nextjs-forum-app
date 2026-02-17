@@ -1,9 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './features/auth/auth.module';
 import { UsersModule } from './features/users/users.module';
 import { CardsModule } from './features/cards/cards.module';
 import { TransactionsModule } from './features/transactions/transactions.module';
+import { AtGuard } from './common/guards';
 
 @Module({
   imports: [
@@ -23,9 +26,17 @@ import { TransactionsModule } from './features/transactions/transactions.module'
         ssl: true,
       }),
     }),
+    AuthModule,
     UsersModule,
     CardsModule,
     TransactionsModule,
+  ],
+  providers: [
+    { provide: APP_GUARD, useClass: AtGuard },
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({ transform: true, whitelist: true }),
+    },
   ],
 })
 export class AppModule {}
