@@ -13,6 +13,12 @@ export class User {
   @Column({ unique: true })
   nick: string;
 
+  @Column()
+  password: string;
+
+  @Column({ default: '' })
+  token: string;
+
   @Column({ default: '' })
   avatar: string;
 
