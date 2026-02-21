@@ -78,7 +78,7 @@ describe('App', () => {
       return request(app.getHttpServer())
         .post('/cards/all')
         .set('Authorization', `Bearer ${user.access}`)
-        .send({ userId: 1, name: 'Card' })
+        .send({ userId: user.user.id, name: 'Card' })
         .expect(201);
     });
 
@@ -106,13 +106,13 @@ describe('App', () => {
 
     it('GET /cards/:userId/select', () => {
       return request(app.getHttpServer())
-        .get('/cards/1/select')
+        .get(`/cards/${user.user.id}/select`)
         .expect((res) => expect(res.body.length).toBeGreaterThan(0));
     });
 
     it('GET /cards/:userId/select-with-balance', () => {
       return request(app.getHttpServer())
-        .get('/cards/1/select-with-balance')
+        .get(`/cards/${user.user.id}/select-with-balance`)
         .set('Authorization', `Bearer ${user.access}`)
         .expect((res) => expect(res.body.length).toBeGreaterThan(0));
     });
