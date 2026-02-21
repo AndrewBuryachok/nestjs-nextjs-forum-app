@@ -2,7 +2,9 @@
 
 import { useTranslations } from 'next-intl';
 import { ButtonGroup, IconButton } from '@chakra-ui/react';
+import { useAuthContext } from '@/providers/auth-provider';
 import { useDialogContext } from '@/providers/dialog-provider';
+import AuthFormWithTabs from '@/features/auth/forms/auth-form-with-tabs';
 import { Color } from '@/constants/colors';
 
 type Props = {
@@ -19,23 +21,33 @@ type Props = {
 export default function CustomActions(props: Props) {
   const t = useTranslations();
 
+  const { user } = useAuthContext();
+
   const { openDialog } = useDialogContext();
+
+  const openActionDialog = props.actions.map(
+    (action) => () =>
+      openDialog({
+        title:
+          t(`actions.${action.action}`) + ' ' + t(`dialogs.${action.dialog}`),
+        body: action.body,
+      }),
+  );
+
+  const openAuthDialog = () =>
+    openDialog({ title: t('dialogs.auth'), body: <AuthFormWithTabs /> });
 
   return (
     <ButtonGroup attached size='2xs' variant='plain'>
-      {props.actions.map((action) => (
+      {props.actions.map((action, index) => (
         <IconButton
           key={action.action}
           colorPalette={action.color}
-          disabled={!!action.userId && action.userId !== 1}
-          onClick={() =>
-            openDialog({
-              title:
-                t(`actions.${action.action}`) +
-                ' ' +
-                t(`dialogs.${action.dialog}`),
-              body: action.body,
-            })
+          disabled={!!action.userId && action.userId !== user?.id}
+          onClick={
+            user || action.color === Color.BLUE
+              ? openActionDialog[index]
+              : openAuthDialog
           }
         >
           {action.icon}
