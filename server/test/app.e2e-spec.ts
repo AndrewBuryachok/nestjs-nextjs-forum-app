@@ -78,7 +78,7 @@ describe('App', () => {
       return request(app.getHttpServer())
         .post('/cards/all')
         .set('Authorization', `Bearer ${user.access}`)
-        .send({ userId: 1, name: 'Card' })
+        .send({ userId: user.user.id, name: 'Card' })
         .expect(201);
     });
 
@@ -106,13 +106,13 @@ describe('App', () => {
 
     it('GET /cards/:userId/select', () => {
       return request(app.getHttpServer())
-        .get('/cards/1/select')
+        .get(`/cards/${user.user.id}/select`)
         .expect((res) => expect(res.body.length).toBeGreaterThan(0));
     });
 
     it('GET /cards/:userId/select-with-balance', () => {
       return request(app.getHttpServer())
-        .get('/cards/1/select-with-balance')
+        .get(`/cards/${user.user.id}/select-with-balance`)
         .set('Authorization', `Bearer ${user.access}`)
         .expect((res) => expect(res.body.length).toBeGreaterThan(0));
     });
@@ -123,7 +123,7 @@ describe('App', () => {
       return request(app.getHttpServer())
         .post('/transactions/deposit')
         .set('Authorization', `Bearer ${user.access}`)
-        .send({ userId: 1, cardId: cards[0], sum: 100 })
+        .send({ userId: user.user.id, cardId: cards[0], sum: 100 })
         .expect(201);
     });
 
@@ -131,7 +131,7 @@ describe('App', () => {
       return request(app.getHttpServer())
         .post('/transactions/withdraw')
         .set('Authorization', `Bearer ${user.access}`)
-        .send({ userId: 1, cardId: cards[0], sum: 10 })
+        .send({ userId: user.user.id, cardId: cards[0], sum: 10 })
         .expect(201);
     });
 
@@ -141,7 +141,7 @@ describe('App', () => {
         .set('Authorization', `Bearer ${user.access}`)
         .send({
           senderCardId: cards[0],
-          receiverUserId: 1,
+          receiverUserId: user.user.id,
           receiverCardId: cards[0],
           sum: 10,
           description: '',
@@ -154,9 +154,9 @@ describe('App', () => {
         .post('/transactions/transfer/all')
         .set('Authorization', `Bearer ${user.access}`)
         .send({
-          senderUserId: 1,
+          senderUserId: user.user.id,
           senderCardId: cards[0],
-          receiverUserId: 1,
+          receiverUserId: user.user.id,
           receiverCardId: cards[0],
           sum: 10,
           description: '',
