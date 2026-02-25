@@ -9,6 +9,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Account } from './account.entity';
 import { Card } from './card.entity';
+import { UsersService } from '../users/users.service';
+import { User } from '../users/user.entity';
 import {
   DeleteCardDto,
   ExtCreateCardDto,
@@ -25,6 +27,7 @@ export class CardsService {
     private accountsRepository: Repository<Account>,
     @InjectRepository(Card)
     private cardsRepository: Repository<Card>,
+    private usersService: UsersService,
   ) {}
 
   async getMyCards(myId: number, req: Request): Promise<Response<Card>> {
@@ -49,6 +52,12 @@ export class CardsService {
     return this.selectCardsQueryBuilder(userId)
       .addSelect(['account.balance'])
       .getMany();
+  }
+
+  async selectCardUsers(cardId: number): Promise<User[]> {
+    const cards = await this.findCardsById(cardId);
+    const users = cards.map((card) => card.userId);
+    return this.usersService.selectUsersByIds(users);
   }
 
   async createCard(dto: ExtCreateCardDto): Promise<void> {
@@ -123,6 +132,10 @@ export class CardsService {
       relations: { account: true },
       where: { id },
     });
+  }
+
+  private findCardsById(id: number): Promise<Card[]> {
+    return this.cardsRepository.findBy({ account: { cards: { id } } });
   }
 
   private async create(dto: ExtCreateCardDto): Promise<Card> {
@@ -200,6 +213,7 @@ export class CardsService {
       ])
       .innerJoin('account.user', 'ownerUser')
       .addSelect(['ownerUser.id', 'ownerUser.nick', 'ownerUser.avatar'])
+      .loadRelationCountAndMap('account.users', 'account.cards')
       .orderBy('card.id', 'DESC')
       .skip(req.skip)
       .take(req.take);
