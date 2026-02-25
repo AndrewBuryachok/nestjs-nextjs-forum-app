@@ -4,6 +4,7 @@ import CustomTable from '@/components/custom-table';
 import CustomAvatarWithUser from '@/components/custom-avatar-with-user';
 import CustomText from '@/components/custom-text';
 import CurrencyText from '@/components/currency-text';
+import CardsUsersActions from './cards-users-actions';
 import DateText from '@/components/date-text';
 import CardsActions from './cards-actions';
 
@@ -30,6 +31,10 @@ export default function CardsTable(props: Props) {
         {
           value: 'balance',
           render: (card) => <CurrencyText value={card.account.balance} />,
+        },
+        {
+          value: 'users',
+          render: (card) => <CardsUsersActions card={card} />,
         },
         {
           value: 'created',

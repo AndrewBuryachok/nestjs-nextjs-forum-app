@@ -29,7 +29,8 @@
     "receiver": "Отримувач",
     "sender": "Відправник",
     "sum": "Сума",
-    "user": "Користувач"
+    "user": "Користувач",
+    "users": "Користувачі"
   },
   "currency": "діам",
   "dialogs": {
@@ -37,7 +38,8 @@
     "card": "Карту",
     "logout": "Вихід",
     "transaction": "Транзакцію",
-    "transfer": "Переказ"
+    "transfer": "Переказ",
+    "users": "Користувачів"
   },
   "drawers": {
     "navbar": {

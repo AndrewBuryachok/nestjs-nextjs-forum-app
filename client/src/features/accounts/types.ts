@@ -15,4 +15,5 @@ export interface BaseAccountWithUserAndBalance extends BaseAccountWithUser {
 
 export interface Account extends BaseAccountWithUserAndBalance {
   createdAt: Date;
+  users: number;
 }
