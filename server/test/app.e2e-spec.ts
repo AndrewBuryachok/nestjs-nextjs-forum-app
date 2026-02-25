@@ -116,6 +116,12 @@ describe('App', () => {
         .set('Authorization', `Bearer ${user.access}`)
         .expect((res) => expect(res.body.length).toBeGreaterThan(0));
     });
+
+    it('GET /cards/:cardId/users', () => {
+      return request(app.getHttpServer())
+        .get(`/cards/${cards[0]}/users`)
+        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+    });
   });
 
   describe('Transactions', () => {
