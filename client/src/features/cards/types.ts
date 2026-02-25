@@ -15,4 +15,5 @@ export interface SelectCardWithBalance extends SelectCard {
 
 export interface Card extends SelectCardWithBalance {
   createdAt: Date;
+  users: number;
 }

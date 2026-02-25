@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import { SelectCard, SelectCardWithBalance } from './types';
+import { BaseUser } from '../users/types';
 import { fetcher } from '@/lib/fetcher';
 
 export const useSelectMyCards = () =>
@@ -13,3 +14,6 @@ export const useSelectUserCardsWithBalance = (userId: number) =>
     userId ? `/api/cards/${userId}/select-with-balance` : null,
     fetcher,
   );
+
+export const useSelectCardUsers = (cardId: number) =>
+  useSWR<BaseUser[]>(`/api/cards/${cardId}/users`, fetcher);
