@@ -10,6 +10,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Card } from './card.entity';
 import { CardUser } from './card-user.entity';
 import { UsersService } from '../users/users.service';
+import { User } from '../users/user.entity';
 import { CreateCardWithUserDto, EditCardDto } from './card.dto';
 import { CardError } from './card-errors.enum';
 import { Request, Response } from '../../common/interfaces';
@@ -46,6 +47,12 @@ export class CardsService {
     return this.selectCardsQueryBuilder(userId)
       .addSelect(['card.balance'])
       .getMany();
+  }
+
+  async selectCardUsers(cardId: number): Promise<User[]> {
+    const cardUsers = await this.findUsersByCard(cardId);
+    const users = cardUsers.map((cardUser) => cardUser.userId);
+    return this.usersService.selectUsersByIds(users);
   }
 
   async createCard(dto: CreateCardWithUserDto): Promise<void> {
@@ -140,6 +147,10 @@ export class CardsService {
     return this.cardsUsersRepository.findOneBy({ cardId, userId });
   }
 
+  private findUsersByCard(cardId: number): Promise<CardUser[]> {
+    return this.cardsUsersRepository.findBy({ cardId });
+  }
+
   private async create(dto: CreateCardWithUserDto): Promise<Card> {
     try {
       const card = this.cardsRepository.create({
@@ -207,6 +218,7 @@ export class CardsService {
       .select(['card.id', 'card.name', 'card.balance', 'card.createdAt'])
       .innerJoin('card.user', 'ownerUser')
       .addSelect(['ownerUser.id', 'ownerUser.nick', 'ownerUser.avatar'])
+      .loadRelationCountAndMap('card.users', 'card.cardUsers')
       .orderBy('card.id', 'DESC')
       .skip(req.skip)
       .take(req.take);
