@@ -11,7 +11,7 @@ type Props = {
   actions: {
     action: string;
     dialog: string;
-    color: Color;
+    color?: Color;
     userId?: number;
     icon: React.ReactNode;
     body: React.ReactNode;
