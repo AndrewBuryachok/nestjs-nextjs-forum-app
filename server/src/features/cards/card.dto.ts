@@ -24,3 +24,10 @@ export class CreateCardWithUserDto extends CreateCardDto {
   @Min(1)
   userId: number;
 }
+
+export class UpdateCardUserDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  userId: number;
+}

@@ -20,11 +20,20 @@ describe('App', () => {
     await app.close();
   });
 
+  let admin: Tokens;
   let user: Tokens;
   let cards: number[];
   let transactions: number[];
 
   describe('Auth', () => {
+    it('POST /auth/register', () => {
+      return request(app.getHttpServer())
+        .post('/auth/register')
+        .send({ nick: 'Admin', password: 'P@ssw0rd' })
+        .expect(201)
+        .then((res) => (admin = res.body));
+    });
+
     it('POST /auth/register', () => {
       return request(app.getHttpServer())
         .post('/auth/register')
@@ -121,6 +130,44 @@ describe('App', () => {
       return request(app.getHttpServer())
         .get(`/cards/${cards[0]}/users`)
         .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+    });
+
+    it('GET /cards/:cardId/not-users', () => {
+      return request(app.getHttpServer())
+        .get(`/cards/${cards[0]}/not-users`)
+        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+    });
+
+    it('POST /cards/:cardId/users', () => {
+      return request(app.getHttpServer())
+        .post(`/cards/${cards[0]}/users`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ userId: admin.user.id })
+        .expect(201);
+    });
+
+    it('DELETE /cards/:cardId/users', () => {
+      return request(app.getHttpServer())
+        .delete(`/cards/${cards[0]}/users`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ userId: admin.user.id })
+        .expect(200);
+    });
+
+    it('POST /cards/all/:cardId/users', () => {
+      return request(app.getHttpServer())
+        .post(`/cards/all/${cards[0]}/users`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ userId: admin.user.id })
+        .expect(201);
+    });
+
+    it('DELETE /cards/all/:cardId/users', () => {
+      return request(app.getHttpServer())
+        .delete(`/cards/all/${cards[0]}/users`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ userId: admin.user.id })
+        .expect(200);
     });
   });
 
