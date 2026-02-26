@@ -24,3 +24,10 @@ export const deleteCardSchema = z.object({
 });
 
 export type DeleteCardType = z.infer<typeof deleteCardSchema>;
+
+export const updateCardUserSchema = z.object({
+  cardId: z.number().int().min(1),
+  userId: z.number().int().min(1),
+});
+
+export type UpdateCardUserType = z.infer<typeof updateCardUserSchema>;
