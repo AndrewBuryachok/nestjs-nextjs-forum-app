@@ -16,6 +16,7 @@ import {
   CreateCardDto,
   CreateCardWithUserDto,
   EditCardDto,
+  UpdateCardUserDto,
 } from './card.dto';
 import { UserIdDto } from '../users/user.dto';
 import { MyId, Public } from '../../common/decorators';
@@ -60,6 +61,12 @@ export class CardsController {
     return this.cardsService.selectCardUsers(cardId);
   }
 
+  @Public()
+  @Get(':cardId/not-users')
+  selectNotCardUsers(@Param() { cardId }: CardIdDto): Promise<User[]> {
+    return this.cardsService.selectNotCardUsers(cardId);
+  }
+
   @Post()
   createMyCard(
     @MyId() myId: number,
@@ -101,5 +108,39 @@ export class CardsController {
   @Delete('all/:cardId')
   deleteUserCard(@Param() { cardId }: CardIdDto): Promise<void> {
     return this.cardsService.deleteUserCard(cardId);
+  }
+
+  @Post(':cardId/users')
+  addMyCardUser(
+    @MyId() myId: number,
+    @Param() { cardId }: CardIdDto,
+    @Body() dto: UpdateCardUserDto,
+  ): Promise<void> {
+    return this.cardsService.addMyCardUser(myId, cardId, dto);
+  }
+
+  @Post('all/:cardId/users')
+  addUserCardUser(
+    @Param() { cardId }: CardIdDto,
+    @Body() dto: UpdateCardUserDto,
+  ): Promise<void> {
+    return this.cardsService.addUserCardUser(cardId, dto);
+  }
+
+  @Delete(':cardId/users')
+  removeMyCardUser(
+    @MyId() myId: number,
+    @Param() { cardId }: CardIdDto,
+    @Body() dto: UpdateCardUserDto,
+  ): Promise<void> {
+    return this.cardsService.removeMyCardUser(myId, cardId, dto);
+  }
+
+  @Delete('all/:cardId/users')
+  removeUserCardUser(
+    @Param() { cardId }: CardIdDto,
+    @Body() dto: UpdateCardUserDto,
+  ): Promise<void> {
+    return this.cardsService.removeUserCardUser(cardId, dto);
   }
 }

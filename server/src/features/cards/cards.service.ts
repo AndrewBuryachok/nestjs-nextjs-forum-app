@@ -11,7 +11,11 @@ import { Card } from './card.entity';
 import { CardUser } from './card-user.entity';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
-import { CreateCardWithUserDto, EditCardDto } from './card.dto';
+import {
+  CreateCardWithUserDto,
+  EditCardDto,
+  UpdateCardUserDto,
+} from './card.dto';
 import { CardError } from './card-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
@@ -55,6 +59,12 @@ export class CardsService {
     return this.usersService.selectUsersByIds(users);
   }
 
+  async selectNotCardUsers(cardId: number): Promise<User[]> {
+    const cardUsers = await this.findUsersByCard(cardId);
+    const users = cardUsers.map((cardUser) => cardUser.userId);
+    return this.usersService.selectUsersByNotIds(users);
+  }
+
   async createCard(dto: CreateCardWithUserDto): Promise<void> {
     await this.usersService.throwIfUserNotFound(dto.userId);
     await this.create(dto);
@@ -82,6 +92,56 @@ export class CardsService {
   async deleteUserCard(cardId: number): Promise<void> {
     await this.throwIfCardNotFound(cardId);
     await this.delete(cardId);
+  }
+
+  async addMyCardUser(
+    myId: number,
+    cardId: number,
+    dto: UpdateCardUserDto,
+  ): Promise<void> {
+    const card = await this.throwIfNotCardOwner(cardId, myId);
+    await this.addCardUser(card, dto.userId);
+  }
+
+  async addUserCardUser(cardId: number, dto: UpdateCardUserDto): Promise<void> {
+    const card = await this.throwIfCardNotFound(cardId);
+    await this.addCardUser(card, dto.userId);
+  }
+
+  private async addCardUser(card: Card, userId: number): Promise<void> {
+    const isCardUser = await this.isCardUser(card.id, userId);
+    if (isCardUser) {
+      throw new BadRequestException(CardError.USER_ALREADY_IN);
+    }
+    await this.addUser(card.id, userId);
+  }
+
+  async removeMyCardUser(
+    myId: number,
+    cardId: number,
+    dto: UpdateCardUserDto,
+  ): Promise<void> {
+    const card = await this.throwIfNotCardOwner(cardId, myId);
+    await this.removeCardUser(card, dto.userId);
+  }
+
+  async removeUserCardUser(
+    cardId: number,
+    dto: UpdateCardUserDto,
+  ): Promise<void> {
+    const card = await this.throwIfCardNotFound(cardId);
+    await this.removeCardUser(card, dto.userId);
+  }
+
+  private async removeCardUser(card: Card, userId: number): Promise<void> {
+    if (card.userId === userId) {
+      throw new BadRequestException(CardError.USER_IS_OWNER);
+    }
+    const isCardUser = await this.isCardUser(card.id, userId);
+    if (!isCardUser) {
+      throw new BadRequestException(CardError.USER_NOT_IN);
+    }
+    await this.removeUser(card.id, userId);
   }
 
   async increaseCardBalance(
@@ -182,6 +242,23 @@ export class CardsService {
       await this.cardsRepository.softDelete({ id });
     } catch (error) {
       throw new InternalServerErrorException(CardError.DELETE_FAILED);
+    }
+  }
+
+  private async addUser(cardId: number, userId: number): Promise<void> {
+    try {
+      const cardUser = this.cardsUsersRepository.create({ cardId, userId });
+      await this.cardsUsersRepository.save(cardUser);
+    } catch (error) {
+      throw new InternalServerErrorException(CardError.ADD_USER_FAILED);
+    }
+  }
+
+  private async removeUser(cardId: number, userId: number): Promise<void> {
+    try {
+      await this.cardsUsersRepository.softDelete({ cardId, userId });
+    } catch (error) {
+      throw new InternalServerErrorException(CardError.REMOVE_USER_FAILED);
     }
   }
 
