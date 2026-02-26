@@ -17,3 +17,6 @@ export const useSelectUserCardsWithBalance = (userId: number) =>
 
 export const useSelectCardUsers = (cardId: number) =>
   useSWR<BaseUser[]>(`/api/cards/${cardId}/users`, fetcher);
+
+export const useSelectNotCardUsers = (cardId: number) =>
+  useSWR<BaseUser[]>(`/api/cards/${cardId}/not-users`, fetcher);

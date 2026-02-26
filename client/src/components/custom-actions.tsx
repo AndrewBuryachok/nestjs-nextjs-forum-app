@@ -12,6 +12,7 @@ type Props = {
     action: string;
     dialog: string;
     color?: Color;
+    disabled?: boolean;
     userId?: number;
     icon: React.ReactNode;
     body: React.ReactNode;
@@ -43,7 +44,9 @@ export default function CustomActions(props: Props) {
         <IconButton
           key={action.action}
           colorPalette={action.color}
-          disabled={!!action.userId && action.userId !== user?.id}
+          disabled={
+            action.disabled || (!!action.userId && action.userId !== user?.id)
+          }
           onClick={
             user || action.color === Color.BLUE
               ? openActionDialog[index]
