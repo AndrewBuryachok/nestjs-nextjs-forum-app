@@ -15,6 +15,7 @@ import {
   DeleteCardDto,
   ExtCreateCardDto,
   ExtEditCardDto,
+  ExtUpdateCardUserDto,
   UpdateCardBalanceDto,
 } from './card.dto';
 import { CardError } from './card-errors.enum';
@@ -60,6 +61,12 @@ export class CardsService {
     return this.usersService.selectUsersByIds(users);
   }
 
+  async selectNotCardUsers(cardId: number): Promise<User[]> {
+    const cards = await this.findCardsById(cardId);
+    const users = cards.map((card) => card.userId);
+    return this.usersService.selectUsersByNotIds(users);
+  }
+
   async createCard(dto: ExtCreateCardDto): Promise<void> {
     await this.create(dto);
   }
@@ -80,6 +87,41 @@ export class CardsService {
       dto.isAll,
     );
     await this.delete(card.accountId);
+  }
+
+  async addCardUser(dto: ExtUpdateCardUserDto): Promise<void> {
+    const card = await this.throwIfNotCardOwner(
+      dto.cardId,
+      dto.myId,
+      dto.isAll,
+    );
+    const subCard = await this.findCardByAccountAndUser(
+      card.accountId,
+      dto.userId,
+    );
+    if (subCard) {
+      throw new BadRequestException(CardError.USER_ALREADY_IN);
+    }
+    await this.addUser(card.accountId, dto.userId);
+  }
+
+  async removeCardUser(dto: ExtUpdateCardUserDto): Promise<void> {
+    const card = await this.throwIfNotCardOwner(
+      dto.cardId,
+      dto.myId,
+      dto.isAll,
+    );
+    if (card.account.userId === dto.userId) {
+      throw new BadRequestException(CardError.USER_IS_OWNER);
+    }
+    const subCard = await this.findCardByAccountAndUser(
+      card.accountId,
+      dto.userId,
+    );
+    if (!subCard) {
+      throw new BadRequestException(CardError.USER_NOT_IN);
+    }
+    await this.removeUser(subCard.id);
   }
 
   async increaseCardBalance(dto: UpdateCardBalanceDto): Promise<void> {
@@ -134,6 +176,13 @@ export class CardsService {
     });
   }
 
+  private findCardByAccountAndUser(
+    accountId: number,
+    userId: number,
+  ): Promise<Card | null> {
+    return this.cardsRepository.findOneBy({ accountId, userId });
+  }
+
   private findCardsById(id: number): Promise<Card[]> {
     return this.cardsRepository.findBy({ account: { cards: { id } } });
   }
@@ -169,6 +218,23 @@ export class CardsService {
       await this.cardsRepository.softDelete({ accountId });
     } catch (error) {
       throw new InternalServerErrorException(CardError.DELETE_FAILED);
+    }
+  }
+
+  private async addUser(accountId: number, userId: number): Promise<void> {
+    try {
+      const card = this.cardsRepository.create({ accountId, userId });
+      await this.cardsRepository.save(card);
+    } catch (error) {
+      throw new InternalServerErrorException(CardError.ADD_USER_FAILED);
+    }
+  }
+
+  private async removeUser(id: number): Promise<void> {
+    try {
+      await this.cardsRepository.softDelete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(CardError.REMOVE_USER_FAILED);
     }
   }
 

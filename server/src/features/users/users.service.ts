@@ -26,6 +26,12 @@ export class UsersService {
       .getMany();
   }
 
+  selectUsersByNotIds(ids: number[]): Promise<User[]> {
+    return this.selectUsersQueryBuilder()
+      .where('user.id != ALL (:ids)', { ids })
+      .getMany();
+  }
+
   async createUser(dto: CreateUserDto): Promise<User> {
     await this.throwIfNickAlreadyUsed(dto.nick);
     const user = await this.create(dto);

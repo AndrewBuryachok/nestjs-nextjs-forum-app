@@ -1,4 +1,7 @@
 export enum CardError {
+  USER_ALREADY_IN = 'Користувач вже в карті',
+  USER_NOT_IN = 'Користувач не в карті',
+  USER_IS_OWNER = 'Користувач є власником карти',
   NOT_ENOUGH_BALANCE = 'Недостатньо балансу на карті',
   NOT_OWNER = 'Ви не власник карти',
   NOT_USER = 'Ви не користувач карти',
@@ -6,6 +9,8 @@ export enum CardError {
   CREATE_FAILED = 'Не вдалося створити карту',
   EDIT_FAILED = 'Не вдалося редагувати карту',
   DELETE_FAILED = 'Не вдалося видалити карту',
+  ADD_USER_FAILED = 'Не вдалося додати користувача',
+  REMOVE_USER_FAILED = 'Не вдалося прибрати користувача',
   INCREASE_BALANCE_FAILED = 'Не вдалося збільшити баланс карти',
   DECREASE_BALANCE_FAILED = 'Не вдалося зменшити баланс карти',
 }

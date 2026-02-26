@@ -37,4 +37,17 @@ export class DeleteCardDto extends CardIdDto {
   isAll: boolean;
 }
 
+export class UpdateCardUserDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  userId: number;
+}
+
+export class ExtUpdateCardUserDto extends UpdateCardUserDto {
+  cardId: number;
+  myId: number;
+  isAll: boolean;
+}
+
 export class UpdateCardBalanceDto extends CreateTransactionDto {}
