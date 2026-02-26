@@ -34,7 +34,7 @@ export default function CardsTable(props: Props) {
         },
         {
           value: 'users',
-          render: (card) => <CardsUsersActions card={card} />,
+          render: (card) => <CardsUsersActions tab={props.tab} card={card} />,
         },
         {
           value: 'created',
