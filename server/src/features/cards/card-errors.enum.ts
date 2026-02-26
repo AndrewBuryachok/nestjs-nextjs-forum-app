@@ -1,4 +1,7 @@
 export enum CardError {
+  USER_ALREADY_IN = 'cards.user_already_in',
+  USER_NOT_IN = 'cards.user_not_in',
+  USER_IS_OWNER = 'cards.user_is_owner',
   NOT_ENOUGH_BALANCE = 'cards.not_enough_balance',
   NOT_OWNER = 'cards.not_owner',
   NOT_USER = 'cards.not_user',
@@ -6,6 +9,8 @@ export enum CardError {
   CREATE_FAILED = 'cards.create_failed',
   EDIT_FAILED = 'cards.edit_failed',
   DELETE_FAILED = 'cards.delete_failed',
+  ADD_USER_FAILED = 'cards.add_user_failed',
+  REMOVE_USER_FAILED = 'cards.remove_user_failed',
   INCREASE_BALANCE_FAILED = 'cards.increase_balance_failed',
   DECREASE_BALANCE_FAILED = 'cards.decrease_balance_failed',
 }
