@@ -14,8 +14,9 @@ import {
   CreateTransferDto,
   TransactionIdDto,
 } from './transaction.dto';
-import { MyId } from '../../common/decorators';
+import { MyId, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
+import { Role } from '../../common/enums';
 
 @Controller('transactions')
 export class TransactionsController {
@@ -29,11 +30,13 @@ export class TransactionsController {
     return this.transactionsService.getMyTransactions(myId, req);
   }
 
+  @Roles([Role.ADMIN])
   @Get('all')
   getAllTransactions(@Query() req: Request): Promise<Response<Transaction>> {
     return this.transactionsService.getAllTransactions(req);
   }
 
+  @Roles([Role.ADMIN])
   @Post('deposit')
   createDepositTransaction(
     @MyId() myId: number,
@@ -42,6 +45,7 @@ export class TransactionsController {
     return this.transactionsService.createDepositTransaction({ ...dto, myId });
   }
 
+  @Roles([Role.ADMIN])
   @Post('withdraw')
   createWithdrawTransaction(
     @MyId() myId: number,
@@ -62,6 +66,7 @@ export class TransactionsController {
     });
   }
 
+  @Roles([Role.ADMIN])
   @Post('transfer/all')
   createUserTransferTransaction(
     @MyId() myId: number,
@@ -74,6 +79,7 @@ export class TransactionsController {
     });
   }
 
+  @Roles([Role.ADMIN])
   @Delete(':transactionId')
   deleteTransaction(
     @Param() { transactionId }: TransactionIdDto,

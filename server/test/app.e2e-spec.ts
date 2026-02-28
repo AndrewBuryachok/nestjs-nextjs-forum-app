@@ -1,19 +1,32 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from '../src/app.module';
+import { User } from '../src/features/users/user.entity';
 import { Tokens } from '../src/common/interfaces';
+import { hashData } from '../src/common/utils';
+import { Role } from '../src/common/enums';
 
 describe('App', () => {
   let app: INestApplication<App>;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
     app = moduleFixture.createNestApplication();
     await app.init();
+    const usersRepository = moduleFixture.get<Repository<User>>(
+      getRepositoryToken(User),
+    );
+    const nick = 'Admin';
+    const password = await hashData('P@ssw0rd');
+    const roles = [Role.ADMIN];
+    const user = usersRepository.create({ nick, password, roles });
+    await usersRepository.save(user);
   });
 
   afterAll(async () => {
@@ -26,9 +39,9 @@ describe('App', () => {
   let transactions: number[];
 
   describe('Auth', () => {
-    it('POST /auth/register', () => {
+    it('POST /auth/login', () => {
       return request(app.getHttpServer())
-        .post('/auth/register')
+        .post('/auth/login')
         .send({ nick: 'Admin', password: 'P@ssw0rd' })
         .expect(201)
         .then((res) => (admin = res.body));
@@ -86,7 +99,7 @@ describe('App', () => {
     it('POST /cards/all', () => {
       return request(app.getHttpServer())
         .post('/cards/all')
-        .set('Authorization', `Bearer ${user.access}`)
+        .set('Authorization', `Bearer ${admin.access}`)
         .send({ userId: user.user.id, name: 'Card' })
         .expect(201);
     });
@@ -102,7 +115,7 @@ describe('App', () => {
     it('GET /cards/all', () => {
       return request(app.getHttpServer())
         .get('/cards/all')
-        .set('Authorization', `Bearer ${user.access}`)
+        .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
 
@@ -122,7 +135,7 @@ describe('App', () => {
     it('GET /cards/:userId/select-with-balance', () => {
       return request(app.getHttpServer())
         .get(`/cards/${user.user.id}/select-with-balance`)
-        .set('Authorization', `Bearer ${user.access}`)
+        .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.length).toBeGreaterThan(0));
     });
 
@@ -157,7 +170,7 @@ describe('App', () => {
     it('POST /cards/all/:cardId/users', () => {
       return request(app.getHttpServer())
         .post(`/cards/all/${cards[0]}/users`)
-        .set('Authorization', `Bearer ${user.access}`)
+        .set('Authorization', `Bearer ${admin.access}`)
         .send({ userId: admin.user.id })
         .expect(201);
     });
@@ -165,7 +178,7 @@ describe('App', () => {
     it('DELETE /cards/all/:cardId/users', () => {
       return request(app.getHttpServer())
         .delete(`/cards/all/${cards[0]}/users`)
-        .set('Authorization', `Bearer ${user.access}`)
+        .set('Authorization', `Bearer ${admin.access}`)
         .send({ userId: admin.user.id })
         .expect(200);
     });
@@ -175,7 +188,7 @@ describe('App', () => {
     it('POST /transactions/deposit', () => {
       return request(app.getHttpServer())
         .post('/transactions/deposit')
-        .set('Authorization', `Bearer ${user.access}`)
+        .set('Authorization', `Bearer ${admin.access}`)
         .send({ cardId: cards[0], sum: 100 })
         .expect(201);
     });
@@ -183,7 +196,7 @@ describe('App', () => {
     it('POST /transactions/withdraw', () => {
       return request(app.getHttpServer())
         .post('/transactions/withdraw')
-        .set('Authorization', `Bearer ${user.access}`)
+        .set('Authorization', `Bearer ${admin.access}`)
         .send({ cardId: cards[0], sum: 10 })
         .expect(201);
     });
@@ -204,7 +217,7 @@ describe('App', () => {
     it('POST /transactions/transfer/all', () => {
       return request(app.getHttpServer())
         .post('/transactions/transfer/all')
-        .set('Authorization', `Bearer ${user.access}`)
+        .set('Authorization', `Bearer ${admin.access}`)
         .send({
           senderCardId: cards[0],
           receiverCardId: cards[0],
@@ -228,21 +241,21 @@ describe('App', () => {
     it('GET /transactions/all', () => {
       return request(app.getHttpServer())
         .get('/transactions/all')
-        .set('Authorization', `Bearer ${user.access}`)
+        .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
 
     it('DELETE /transactions/:transactionId', () => {
       return request(app.getHttpServer())
         .delete(`/transactions/${transactions[0]}`)
-        .set('Authorization', `Bearer ${user.access}`)
+        .set('Authorization', `Bearer ${admin.access}`)
         .expect(200);
     });
 
     it('DELETE /transactions/:transactionId', () => {
       return request(app.getHttpServer())
         .delete(`/transactions/${transactions[1]}`)
-        .set('Authorization', `Bearer ${user.access}`)
+        .set('Authorization', `Bearer ${admin.access}`)
         .expect(200);
     });
   });
@@ -259,7 +272,7 @@ describe('App', () => {
     it('PATCH /cards/all/:cardId', () => {
       return request(app.getHttpServer())
         .patch(`/cards/all/${cards[1]}`)
-        .set('Authorization', `Bearer ${user.access}`)
+        .set('Authorization', `Bearer ${admin.access}`)
         .send({ name: 'Card' })
         .expect(200);
     });
@@ -274,7 +287,7 @@ describe('App', () => {
     it('DELETE /cards/all/:cardId', () => {
       return request(app.getHttpServer())
         .delete(`/cards/all/${cards[1]}`)
-        .set('Authorization', `Bearer ${user.access}`)
+        .set('Authorization', `Bearer ${admin.access}`)
         .expect(200);
     });
   });

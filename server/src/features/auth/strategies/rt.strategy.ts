@@ -27,6 +27,6 @@ export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
     if (!user || !user.token || !(await compareData(token, user.token))) {
       throw new UnauthorizedException(AuthError.INVALID_REFRESH_TOKEN);
     }
-    return { ...payload, nick: user.nick };
+    return { ...payload, nick: user.nick, roles: user.roles };
   }
 }

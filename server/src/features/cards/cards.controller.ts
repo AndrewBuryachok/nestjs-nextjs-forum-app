@@ -19,8 +19,9 @@ import {
   UpdateCardUserDto,
 } from './card.dto';
 import { UserIdDto } from '../users/user.dto';
-import { MyId, Public } from '../../common/decorators';
+import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
+import { Role } from '../../common/enums';
 
 @Controller('cards')
 export class CardsController {
@@ -34,6 +35,7 @@ export class CardsController {
     return this.cardsService.getMyCards(myId, req);
   }
 
+  @Roles([Role.ADMIN])
   @Get('all')
   getAllCards(@Query() req: Request): Promise<Response<Card>> {
     return this.cardsService.getAllCards(req);
@@ -50,6 +52,7 @@ export class CardsController {
     return this.cardsService.selectUserCards(userId);
   }
 
+  @Roles([Role.ADMIN])
   @Get(':userId/select-with-balance')
   selectUserCardsWithBalance(@Param() { userId }: UserIdDto): Promise<Card[]> {
     return this.cardsService.selectUserCardsWithBalance(userId);
@@ -75,6 +78,7 @@ export class CardsController {
     return this.cardsService.createCard({ ...dto, userId: myId });
   }
 
+  @Roles([Role.ADMIN])
   @Post('all')
   createUserCard(@Body() dto: ExtCreateCardDto): Promise<void> {
     return this.cardsService.createCard(dto);
@@ -89,6 +93,7 @@ export class CardsController {
     return this.cardsService.editCard({ ...dto, cardId, myId, isAll: false });
   }
 
+  @Roles([Role.ADMIN])
   @Patch('all/:cardId')
   editUserCard(
     @MyId() myId: number,
@@ -106,6 +111,7 @@ export class CardsController {
     return this.cardsService.deleteCard({ cardId, myId, isAll: false });
   }
 
+  @Roles([Role.ADMIN])
   @Delete('all/:cardId')
   deleteUserCard(
     @MyId() myId: number,
@@ -128,6 +134,7 @@ export class CardsController {
     });
   }
 
+  @Roles([Role.ADMIN])
   @Post('all/:cardId/users')
   addUserCardUser(
     @MyId() myId: number,
@@ -156,6 +163,7 @@ export class CardsController {
     });
   }
 
+  @Roles([Role.ADMIN])
   @Delete('all/:cardId/users')
   removeUserCardUser(
     @MyId() myId: number,
