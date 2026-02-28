@@ -4,10 +4,13 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { Tabs } from '@chakra-ui/react';
 import { useAuthContext } from '@/providers/auth-provider';
+import { canAccess } from '@/lib/can-access';
+import { Role } from '@/constants/roles';
 
 type Props = {
   page: string;
   tab: string;
+  roles: Role[];
 };
 
 export default function TabsTrigger(props: Props) {
@@ -15,7 +18,7 @@ export default function TabsTrigger(props: Props) {
 
   const { user } = useAuthContext();
 
-  const disabled = !user;
+  const disabled = !canAccess(props.roles, user?.roles);
 
   return disabled ? (
     <Tabs.Trigger disabled value={props.tab}>

@@ -1,10 +1,10 @@
 'use client';
 
 import { createContext, useContext } from 'react';
-import { BaseUser } from '@/features/users/types';
+import { BaseUserWithRoles } from '@/features/users/types';
 
 type AuthContextType = {
-  user: BaseUser | null;
+  user: BaseUserWithRoles | null;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);

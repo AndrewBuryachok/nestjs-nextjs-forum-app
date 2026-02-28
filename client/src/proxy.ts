@@ -2,6 +2,7 @@ import xior from 'xior';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { PAGE_TABS_MAP } from './config/navigation';
+import { canAccess } from './lib/can-access';
 import { decrypt, encrypt, sessionOptions } from './lib/session';
 import { accessTokenOptions, refreshTokenOptions } from './lib/tokens';
 import { Tokens } from './types/tokens';
@@ -33,9 +34,10 @@ export async function proxy(request: NextRequest) {
   const page = pathname.split('/')[1];
   const tab = pathname.split('/')[2];
   for (const [pageKey, pageValue] of Object.entries(PAGE_TABS_MAP)) {
-    for (const tabKey of Object.keys(pageValue)) {
+    for (const [tabKey, tabValue] of Object.entries(pageValue)) {
       if (pageKey === page && tabKey === tab) {
-        if (!session) {
+        const roles = 'roles' in tabValue ? tabValue.roles : [];
+        if (!canAccess(roles, session?.user.roles)) {
           return NextResponse.redirect(new URL('/', request.url));
         }
       }
