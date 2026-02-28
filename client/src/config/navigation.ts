@@ -1,10 +1,12 @@
+import { Role } from '@/constants/roles';
+
 export const PAGE_TABS_MAP = {
   cards: {
     my: {},
-    all: {},
+    all: { roles: [Role.ADMIN] },
   },
   transactions: {
     my: {},
-    all: {},
+    all: { roles: [Role.ADMIN] },
   },
 };
