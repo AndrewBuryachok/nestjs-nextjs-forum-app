@@ -1,12 +1,12 @@
 import 'server-only';
 import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
-import { BaseUser } from '@/features/users/types';
+import { BaseUserWithRoles } from '@/features/users/types';
 
 const key = new TextEncoder().encode(process.env.SESSION_SECRET);
 
 type SessionPayload = {
-  user: BaseUser;
+  user: BaseUserWithRoles;
 };
 
 export async function encrypt(payload: SessionPayload) {
@@ -36,7 +36,7 @@ export const sessionOptions = {
   path: '/',
 };
 
-export async function createSession(user: BaseUser) {
+export async function createSession(user: BaseUserWithRoles) {
   const cookieStore = await cookies();
   const session = await encrypt({ user });
   cookieStore.set('session', session, sessionOptions);

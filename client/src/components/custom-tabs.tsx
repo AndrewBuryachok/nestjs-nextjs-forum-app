@@ -8,13 +8,18 @@ type Props = {
 };
 
 export default function CustomTabs(props: Props) {
-  const tabs = Object.keys(PAGE_TABS_MAP[props.page]);
+  const tabs = Object.entries(PAGE_TABS_MAP[props.page]);
 
   return (
     <Tabs.Root value={props.tab}>
       <Tabs.List>
-        {tabs.map((key) => (
-          <TabsTrigger key={key} page={props.page} tab={key} />
+        {tabs.map(([key, value]) => (
+          <TabsTrigger
+            key={key}
+            page={props.page}
+            tab={key}
+            roles={'roles' in value ? value.roles : []}
+          />
         ))}
       </Tabs.List>
     </Tabs.Root>

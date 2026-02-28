@@ -1,7 +1,7 @@
-import { BaseUser } from '@/features/users/types';
+import { BaseUserWithRoles } from '@/features/users/types';
 
 export interface Tokens {
-  user: BaseUser;
+  user: BaseUserWithRoles;
   access: string;
   refresh: string;
 }
