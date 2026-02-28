@@ -43,7 +43,7 @@ export class AuthService {
   }
 
   private async signTokens(user: User): Promise<Tokens> {
-    const payload = { sub: user.id, nick: user.nick };
+    const payload = { sub: user.id, nick: user.nick, roles: user.roles };
     const access = await this.jwtService.signAsync(payload, {
       secret: this.configService.getOrThrow('AT_SECRET'),
       expiresIn: this.configService.getOrThrow('AT_EXPIRES_IN'),
@@ -54,7 +54,7 @@ export class AuthService {
     });
     const token = await hashData(refresh);
     await this.usersService.setUserToken(user.id, token);
-    const { id, nick, avatar } = user;
-    return { user: { id, nick, avatar }, access, refresh };
+    const { id, nick, avatar, roles } = user;
+    return { user: { id, nick, avatar, roles }, access, refresh };
   }
 }
