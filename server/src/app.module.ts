@@ -6,7 +6,7 @@ import { AuthModule } from './features/auth/auth.module';
 import { UsersModule } from './features/users/users.module';
 import { CardsModule } from './features/cards/cards.module';
 import { TransactionsModule } from './features/transactions/transactions.module';
-import { AtGuard } from './common/guards';
+import { AtGuard, RolesGuard } from './common/guards';
 
 @Module({
   imports: [
@@ -33,6 +33,7 @@ import { AtGuard } from './common/guards';
   ],
   providers: [
     { provide: APP_GUARD, useClass: AtGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({ transform: true, whitelist: true }),
