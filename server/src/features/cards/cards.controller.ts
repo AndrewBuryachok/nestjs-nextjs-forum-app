@@ -19,8 +19,9 @@ import {
   UpdateCardUserDto,
 } from './card.dto';
 import { UserIdDto } from '../users/user.dto';
-import { MyId, Public } from '../../common/decorators';
+import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
+import { Role } from '../../common/enums';
 
 @Controller('cards')
 export class CardsController {
@@ -34,6 +35,7 @@ export class CardsController {
     return this.cardsService.getMyCards(myId, req);
   }
 
+  @Roles([Role.ADMIN])
   @Get('all')
   getAllCards(@Query() req: Request): Promise<Response<Card>> {
     return this.cardsService.getAllCards(req);
@@ -50,6 +52,7 @@ export class CardsController {
     return this.cardsService.selectUserCards(userId);
   }
 
+  @Roles([Role.ADMIN])
   @Get(':userId/select-with-balance')
   selectUserCardsWithBalance(@Param() { userId }: UserIdDto): Promise<Card[]> {
     return this.cardsService.selectUserCardsWithBalance(userId);
@@ -75,6 +78,7 @@ export class CardsController {
     return this.cardsService.createCard({ ...dto, userId: myId });
   }
 
+  @Roles([Role.ADMIN])
   @Post('all')
   createUserCard(@Body() dto: CreateCardWithUserDto): Promise<void> {
     return this.cardsService.createCard(dto);
@@ -89,6 +93,7 @@ export class CardsController {
     return this.cardsService.editMyCard(myId, cardId, dto);
   }
 
+  @Roles([Role.ADMIN])
   @Patch('all/:cardId')
   editUserCard(
     @Param() { cardId }: CardIdDto,
@@ -105,6 +110,7 @@ export class CardsController {
     return this.cardsService.deleteMyCard(myId, cardId);
   }
 
+  @Roles([Role.ADMIN])
   @Delete('all/:cardId')
   deleteUserCard(@Param() { cardId }: CardIdDto): Promise<void> {
     return this.cardsService.deleteUserCard(cardId);
@@ -119,6 +125,7 @@ export class CardsController {
     return this.cardsService.addMyCardUser(myId, cardId, dto);
   }
 
+  @Roles([Role.ADMIN])
   @Post('all/:cardId/users')
   addUserCardUser(
     @Param() { cardId }: CardIdDto,
@@ -136,6 +143,7 @@ export class CardsController {
     return this.cardsService.removeMyCardUser(myId, cardId, dto);
   }
 
+  @Roles([Role.ADMIN])
   @Delete('all/:cardId/users')
   removeUserCardUser(
     @Param() { cardId }: CardIdDto,
