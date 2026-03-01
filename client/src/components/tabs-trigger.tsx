@@ -10,6 +10,7 @@ import { Role } from '@/constants/roles';
 type Props = {
   page: string;
   tab: string;
+  public: boolean;
   roles: Role[];
 };
 
@@ -18,7 +19,7 @@ export default function TabsTrigger(props: Props) {
 
   const { user } = useAuthContext();
 
-  const disabled = !canAccess(props.roles, user?.roles);
+  const disabled = !canAccess(props.public, props.roles, user?.roles);
 
   return disabled ? (
     <Tabs.Trigger disabled value={props.tab}>
@@ -26,7 +27,9 @@ export default function TabsTrigger(props: Props) {
     </Tabs.Trigger>
   ) : (
     <Tabs.Trigger asChild value={props.tab}>
-      <Link href={`/${props.page}/${props.tab}`}>{t(`tabs.${props.tab}`)}</Link>
+      <Link href={`/${props.page}/${props.tab}`.replace('/main', '')}>
+        {t(`tabs.${props.tab}`)}
+      </Link>
     </Tabs.Trigger>
   );
 }

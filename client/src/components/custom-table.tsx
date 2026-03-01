@@ -19,7 +19,7 @@ type Props<T> = {
 export default async function CustomTable<T extends Data>(props: Props<T>) {
   const t = await getTranslations();
 
-  const route = `/${props.page}/${props.tab}`;
+  const route = `/${props.page}/${props.tab}`.replace('/main', '');
 
   const searchParams = await props.searchParams;
 

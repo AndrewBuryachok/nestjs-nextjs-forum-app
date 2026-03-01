@@ -9,4 +9,7 @@ export const PAGE_TABS_MAP = {
     my: {},
     all: { roles: [Role.ADMIN] },
   },
+  users: {
+    main: { public: true },
+  },
 };
