@@ -9,6 +9,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDto } from './user.dto';
 import { UserError } from './user-errors.enum';
+import { Request, Response } from '../../common/interfaces';
 
 @Injectable()
 export class UsersService {
@@ -16,6 +17,12 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
+
+  async getMainUsers(req: Request): Promise<Response<User>> {
+    const [data, total] =
+      await this.getUsersQueryBuilder(req).getManyAndCount();
+    return { data, total };
+  }
 
   selectAllUsers(): Promise<User[]> {
     return this.selectUsersQueryBuilder().getMany();
@@ -104,5 +111,20 @@ export class UsersService {
       .createQueryBuilder('user')
       .select(['user.id', 'user.nick', 'user.avatar'])
       .orderBy('user.nick', 'ASC');
+  }
+
+  private getUsersQueryBuilder(req: Request): SelectQueryBuilder<User> {
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .select([
+        'user.id',
+        'user.nick',
+        'user.avatar',
+        'user.roles',
+        'user.createdAt',
+      ])
+      .orderBy('user.id', 'DESC')
+      .skip(req.skip)
+      .take(req.take);
   }
 }
