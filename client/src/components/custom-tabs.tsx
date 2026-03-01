@@ -18,6 +18,7 @@ export default function CustomTabs(props: Props) {
             key={key}
             page={props.page}
             tab={key}
+            public={'public' in value}
             roles={'roles' in value ? value.roles : []}
           />
         ))}

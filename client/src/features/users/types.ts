@@ -9,3 +9,7 @@ export interface BaseUser {
 export interface BaseUserWithRoles extends BaseUser {
   roles: Role[];
 }
+
+export interface User extends BaseUserWithRoles {
+  createdAt: Date;
+}
