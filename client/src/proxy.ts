@@ -32,12 +32,13 @@ export async function proxy(request: NextRequest) {
   }
   const pathname = request.nextUrl.pathname;
   const page = pathname.split('/')[1];
-  const tab = pathname.split('/')[2];
+  const tab = pathname.split('/')[2] ?? 'main';
   for (const [pageKey, pageValue] of Object.entries(PAGE_TABS_MAP)) {
     for (const [tabKey, tabValue] of Object.entries(pageValue)) {
       if (pageKey === page && tabKey === tab) {
+        const isPublic = 'public' in tabValue;
         const roles = 'roles' in tabValue ? tabValue.roles : [];
-        if (!canAccess(roles, session?.user.roles)) {
+        if (!canAccess(isPublic, roles, session?.user.roles)) {
           return NextResponse.redirect(new URL('/', request.url));
         }
       }
