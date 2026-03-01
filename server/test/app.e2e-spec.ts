@@ -80,6 +80,12 @@ describe('App', () => {
   });
 
   describe('Users', () => {
+    it('GET /users', () => {
+      return request(app.getHttpServer())
+        .get('/users')
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
     it('GET /users/all/select', () => {
       return request(app.getHttpServer())
         .get('/users/all/select')
