@@ -6,6 +6,7 @@ import { User } from '../../features/users/user.entity';
 import { Card } from '../../features/cards/card.entity';
 import { CardUser } from '../../features/cards/card-user.entity';
 import { Transaction } from '../../features/transactions/transaction.entity';
+import { Shop } from '../../features/shops/shop.entity';
 
 export default class AppSeeder implements Seeder {
   private logger = new Logger(AppSeeder.name);
@@ -112,6 +113,16 @@ export default class AppSeeder implements Seeder {
     }
     transactions.push(...transfers);
     this.logger.log(`Generated ${transfers.length} Transfers`);
+    this.logger.log('Generating Shops...');
+    const shopFactory = factoryManager.get(Shop);
+    const shops: Shop[] = [];
+    for (let i = 0; i < 20; i++) {
+      const card = faker.helpers.arrayElement(cards);
+      const user = randomUserOf(card);
+      const shop = await shopFactory.make({ user, card });
+      shops.push(shop);
+    }
+    this.logger.log(`Generated ${shops.length} Shops`);
     this.logger.log('💾 Saving generated entities to DB...');
     this.logger.log('Saving Users...');
     await dataSource.getRepository(User).save(users);
@@ -125,6 +136,9 @@ export default class AppSeeder implements Seeder {
     this.logger.log('Saving Transactions...');
     await dataSource.getRepository(Transaction).save(transactions);
     this.logger.log(`Saved ${transactions.length} Transactions`);
+    this.logger.log('Saving Shops...');
+    await dataSource.getRepository(Shop).save(shops);
+    this.logger.log(`Saved ${shops.length} Shops`);
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
     this.logger.log(
       `✅ Seeding process completed successfully in ${duration}s`,
