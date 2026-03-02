@@ -266,6 +266,28 @@ describe('App', () => {
     });
   });
 
+  describe('Shops', () => {
+    it('GET /shops', () => {
+      return request(app.getHttpServer())
+        .get('/shops')
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /shops/my', () => {
+      return request(app.getHttpServer())
+        .get('/shops/my')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /shops/all', () => {
+      return request(app.getHttpServer())
+        .get('/shops/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+  });
+
   describe('Cards', () => {
     it('PATCH /cards/:cardId', () => {
       return request(app.getHttpServer())
