@@ -267,6 +267,32 @@ describe('App', () => {
   });
 
   describe('Shops', () => {
+    it('POST /shops', () => {
+      return request(app.getHttpServer())
+        .post('/shops')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          cardId: cards[1],
+          name: 'Shop',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+        })
+        .expect(201);
+    });
+
+    it('POST /shops/all', () => {
+      return request(app.getHttpServer())
+        .post('/shops/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          cardId: cards[0],
+          name: 'Shop',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+        })
+        .expect(201);
+    });
+
     it('GET /shops', () => {
       return request(app.getHttpServer())
         .get('/shops')
