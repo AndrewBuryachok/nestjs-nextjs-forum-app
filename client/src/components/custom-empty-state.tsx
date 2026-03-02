@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import { LuBanknote, LuCreditCard, LuUsers } from 'react-icons/lu';
+import { LuBanknote, LuCreditCard, LuStore, LuUsers } from 'react-icons/lu';
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import { EmptyState } from './ui/empty-state';
 
@@ -12,6 +12,7 @@ export default function CustomEmptyState(props: Props) {
 
   const icon = {
     cards: <LuCreditCard />,
+    shops: <LuStore />,
     transactions: <LuBanknote />,
     users: <LuUsers />,
   }[props.page];
