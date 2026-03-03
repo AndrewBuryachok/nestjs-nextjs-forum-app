@@ -1,7 +1,21 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ShopsService } from './shops.service';
 import { Shop } from './shop.entity';
-import { CreateShopDto, CreateShopWithUserDto } from './shop.dto';
+import {
+  CreateShopDto,
+  CreateShopWithUserDto,
+  EditShopDto,
+  ShopIdDto,
+} from './shop.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -42,5 +56,37 @@ export class ShopsController {
   @Post('all')
   createUserShop(@Body() dto: CreateShopWithUserDto): Promise<void> {
     return this.shopsService.createShop(dto);
+  }
+
+  @Patch(':shopId')
+  editMyShop(
+    @MyId() myId: number,
+    @Param() { shopId }: ShopIdDto,
+    @Body() dto: EditShopDto,
+  ): Promise<void> {
+    return this.shopsService.editMyShop(myId, shopId, dto);
+  }
+
+  @Roles([Role.ADMIN])
+  @Patch('all/:shopId')
+  editUserShop(
+    @Param() { shopId }: ShopIdDto,
+    @Body() dto: EditShopDto,
+  ): Promise<void> {
+    return this.shopsService.editUserShop(shopId, dto);
+  }
+
+  @Delete(':shopId')
+  deleteMyShop(
+    @MyId() myId: number,
+    @Param() { shopId }: ShopIdDto,
+  ): Promise<void> {
+    return this.shopsService.deleteMyShop(myId, shopId);
+  }
+
+  @Roles([Role.ADMIN])
+  @Delete('all/:shopId')
+  deleteUserShop(@Param() { shopId }: ShopIdDto): Promise<void> {
+    return this.shopsService.deleteUserShop(shopId);
   }
 }
