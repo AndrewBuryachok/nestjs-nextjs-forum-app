@@ -1,9 +1,14 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Shop } from './shop.entity';
 import { CardsService } from '../cards/cards.service';
-import { CreateShopWithUserDto } from './shop.dto';
+import { CreateShopWithUserDto, EditShopDto } from './shop.dto';
 import { ShopError } from './shop-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
@@ -40,6 +45,51 @@ export class ShopsService {
     await this.create(dto);
   }
 
+  async editMyShop(
+    myId: number,
+    shopId: number,
+    dto: EditShopDto,
+  ): Promise<void> {
+    await this.throwIfNotShopOwner(shopId, myId);
+    await this.edit(shopId, dto);
+  }
+
+  async editUserShop(shopId: number, dto: EditShopDto): Promise<void> {
+    await this.throwIfShopNotFound(shopId);
+    await this.edit(shopId, dto);
+  }
+
+  async deleteMyShop(myId: number, shopId: number): Promise<void> {
+    await this.throwIfNotShopOwner(shopId, myId);
+    await this.delete(shopId);
+  }
+
+  async deleteUserShop(shopId: number): Promise<void> {
+    await this.throwIfShopNotFound(shopId);
+    await this.delete(shopId);
+  }
+
+  async throwIfShopNotFound(shopId: number): Promise<Shop> {
+    const shop = await this.findShopById(shopId);
+    if (!shop) {
+      throw new NotFoundException(ShopError.NOT_FOUND);
+    }
+    return shop;
+  }
+
+  async throwIfNotShopOwner(shopId: number, userId: number): Promise<Shop> {
+    const shop = await this.throwIfShopNotFound(shopId);
+    const isCardUser = await this.cardsService.isCardUser(shop.cardId, userId);
+    if (!isCardUser) {
+      throw new ForbiddenException(ShopError.NOT_OWNER);
+    }
+    return shop;
+  }
+
+  private findShopById(id: number): Promise<Shop | null> {
+    return this.shopsRepository.findOneBy({ id });
+  }
+
   private async create(dto: CreateShopWithUserDto): Promise<Shop> {
     try {
       const shop = this.shopsRepository.create({
@@ -53,6 +103,25 @@ export class ShopsService {
       return shop;
     } catch (error) {
       throw new InternalServerErrorException(ShopError.CREATE_FAILED);
+    }
+  }
+
+  private async edit(id: number, dto: EditShopDto): Promise<void> {
+    try {
+      await this.shopsRepository.update(
+        { id },
+        { name: dto.name, x: dto.x, y: dto.y },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(ShopError.EDIT_FAILED);
+    }
+  }
+
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.shopsRepository.softDelete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(ShopError.DELETE_FAILED);
     }
   }
 
