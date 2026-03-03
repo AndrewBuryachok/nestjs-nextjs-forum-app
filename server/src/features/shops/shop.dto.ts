@@ -6,13 +6,17 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
-export class CreateShopDto {
+export class ShopIdDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
-  cardId: number;
+  @Type(() => Number)
+  shopId: number;
+}
 
+export class EditShopDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(16)
@@ -31,7 +35,25 @@ export class CreateShopDto {
   y: number;
 }
 
+export class ExtEditShopDto extends EditShopDto {
+  shopId: number;
+  myId: number;
+  isAll: boolean;
+}
+
+export class CreateShopDto extends EditShopDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  cardId: number;
+}
+
 export class ExtCreateShopDto extends CreateShopDto {
+  myId: number;
+  isAll: boolean;
+}
+
+export class DeleteShopDto extends ShopIdDto {
   myId: number;
   isAll: boolean;
 }

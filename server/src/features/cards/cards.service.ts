@@ -169,6 +169,15 @@ export class CardsService {
     return card;
   }
 
+  async isCardUser(
+    cardId: number,
+    userId: number,
+    isAll: boolean,
+  ): Promise<boolean> {
+    const cards = await this.findCardsById(cardId);
+    return !!cards.find((card) => card.userId === userId) || isAll;
+  }
+
   private findCardById(id: number): Promise<Card | null> {
     return this.cardsRepository.findOne({
       relations: { account: true },

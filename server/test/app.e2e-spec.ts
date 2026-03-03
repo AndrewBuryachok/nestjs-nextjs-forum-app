@@ -37,6 +37,7 @@ describe('App', () => {
   let user: Tokens;
   let cards: number[];
   let transactions: number[];
+  let shops: number[];
 
   describe('Auth', () => {
     it('POST /auth/login', () => {
@@ -303,7 +304,8 @@ describe('App', () => {
       return request(app.getHttpServer())
         .get('/shops/my')
         .set('Authorization', `Bearer ${user.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
+        .then((res) => (shops = res.body.data.map((shop) => shop.id)));
     });
 
     it('GET /shops/all', () => {
@@ -311,6 +313,44 @@ describe('App', () => {
         .get('/shops/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('PATCH /shops/:shopId', () => {
+      return request(app.getHttpServer())
+        .patch(`/shops/${shops[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          name: 'Shop',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+        })
+        .expect(200);
+    });
+
+    it('PATCH /shops/all/:shopId', () => {
+      return request(app.getHttpServer())
+        .patch(`/shops/all/${shops[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          name: 'Shop',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+        })
+        .expect(200);
+    });
+
+    it('DELETE /shops/:shopId', () => {
+      return request(app.getHttpServer())
+        .delete(`/shops/${shops[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(200);
+    });
+
+    it('DELETE /shops/all/:shopId', () => {
+      return request(app.getHttpServer())
+        .delete(`/shops/all/${shops[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(200);
     });
   });
 
