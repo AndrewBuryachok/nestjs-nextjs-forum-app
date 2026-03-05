@@ -1,10 +1,10 @@
-import { Square } from '@chakra-ui/react';
 import { LuLandmark } from 'react-icons/lu';
+import SquareIcon from './square-icon';
 
 export default function BankIcon() {
   return (
-    <Square bg='bg.muted' borderRadius='sm' size='8'>
+    <SquareIcon>
       <LuLandmark />
-    </Square>
+    </SquareIcon>
   );
 }
