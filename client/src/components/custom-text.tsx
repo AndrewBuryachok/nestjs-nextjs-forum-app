@@ -1,18 +1,20 @@
 import { Text } from '@chakra-ui/react';
+import { Color } from '@/constants/colors';
 
 type Props = {
   muted?: boolean;
+  color?: Color;
   value: string;
 };
 
 export default function CustomText(props: Props) {
-  if (props.muted) {
-    return (
-      <Text color='fg.muted' fontSize='xs'>
-        {props.value}
-      </Text>
-    );
-  }
+  const color = props.muted ? 'fg.muted' : props.color && `${props.color}.500`;
 
-  return <Text>{props.value}</Text>;
+  const fontSize = (props.muted || props.color) && 'xs';
+
+  return (
+    <Text color={color} fontSize={fontSize}>
+      {props.value}
+    </Text>
+  );
 }
