@@ -5,6 +5,11 @@ export const PAGE_TABS_MAP = {
     my: {},
     all: { roles: [Role.ADMIN] },
   },
+  goods: {
+    main: { public: true },
+    my: {},
+    all: { roles: [Role.ADMIN] },
+  },
   shops: {
     main: { public: true },
     my: {},

@@ -1,10 +1,10 @@
+import { BasePlace, Place } from '../places/types';
 import { BaseCard } from '../cards/types';
 
-export interface Shop {
-  id: number;
+export interface BaseShop extends BasePlace {
   card: BaseCard;
-  name: string;
-  x: number;
-  y: number;
-  createdAt: Date;
+}
+
+export interface Shop extends Place {
+  card: BaseCard;
 }
