@@ -7,6 +7,7 @@ import { Card } from '../../features/cards/card.entity';
 import { CardUser } from '../../features/cards/card-user.entity';
 import { Transaction } from '../../features/transactions/transaction.entity';
 import { Shop } from '../../features/shops/shop.entity';
+import { Product } from '../../features/products/product.entity';
 
 export default class AppSeeder implements Seeder {
   private logger = new Logger(AppSeeder.name);
@@ -117,12 +118,23 @@ export default class AppSeeder implements Seeder {
     const shopFactory = factoryManager.get(Shop);
     const shops: Shop[] = [];
     for (let i = 0; i < 20; i++) {
+      const id = i + 1;
       const card = faker.helpers.arrayElement(cards);
       const user = randomUserOf(card);
-      const shop = await shopFactory.make({ user, card });
+      const shop = await shopFactory.make({ id, user, card });
       shops.push(shop);
     }
     this.logger.log(`Generated ${shops.length} Shops`);
+    this.logger.log('Generating Products...');
+    const productFactory = factoryManager.get(Product);
+    const products: Product[] = [];
+    for (let i = 0; i < 40; i++) {
+      const shop = faker.helpers.arrayElement(shops);
+      const user = randomUserOf(shop.card);
+      const product = await productFactory.make({ shop, user });
+      products.push(product);
+    }
+    this.logger.log(`Generated ${products.length} Products`);
     this.logger.log('💾 Saving generated entities to DB...');
     this.logger.log('Saving Users...');
     await dataSource.getRepository(User).save(users);
@@ -139,6 +151,9 @@ export default class AppSeeder implements Seeder {
     this.logger.log('Saving Shops...');
     await dataSource.getRepository(Shop).save(shops);
     this.logger.log(`Saved ${shops.length} Shops`);
+    this.logger.log('Saving Products...');
+    await dataSource.getRepository(Product).save(products);
+    this.logger.log(`Saved ${products.length} Products`);
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
     this.logger.log(
       `✅ Seeding process completed successfully in ${duration}s`,

@@ -7,6 +7,7 @@ import { UsersModule } from './features/users/users.module';
 import { CardsModule } from './features/cards/cards.module';
 import { TransactionsModule } from './features/transactions/transactions.module';
 import { ShopsModule } from './features/shops/shops.module';
+import { ProductsModule } from './features/products/products.module';
 import { AtGuard, RolesGuard } from './common/guards';
 
 @Module({
@@ -32,6 +33,7 @@ import { AtGuard, RolesGuard } from './common/guards';
     CardsModule,
     TransactionsModule,
     ShopsModule,
+    ProductsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AtGuard },
