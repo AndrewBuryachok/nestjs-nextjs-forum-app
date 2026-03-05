@@ -5,6 +5,7 @@ import { Account } from '../../features/cards/account.entity';
 import { Card } from '../../features/cards/card.entity';
 import { Transaction } from '../../features/transactions/transaction.entity';
 import { Shop } from '../../features/shops/shop.entity';
+import { Good } from '../../features/goods/good.entity';
 
 export default class AppSeeder implements Seeder {
   public async run(_, factoryManager: SeederFactoryManager) {
@@ -90,9 +91,17 @@ export default class AppSeeder implements Seeder {
     transactions.push(...transfers);
     const shopFactory = factoryManager.get(Shop);
     const shops = await Promise.all(
-      Array.from({ length: 20 }).map(() => {
+      Array.from({ length: 20 }).map((_, i) => {
+        const id = i + 1;
         const card = faker.helpers.arrayElement(cards);
-        return shopFactory.make({ card });
+        return shopFactory.make({ id, card });
+      }),
+    );
+    const goodFactory = factoryManager.get(Good);
+    const goods = await Promise.all(
+      Array.from({ length: 40 }).map(() => {
+        const shop = faker.helpers.arrayElement(shops);
+        return goodFactory.make({ shop });
       }),
     );
     for (const user of users) {
@@ -109,6 +118,9 @@ export default class AppSeeder implements Seeder {
     }
     for (const shop of shops) {
       await shopFactory.save(shop);
+    }
+    for (const good of goods) {
+      await goodFactory.save(good);
     }
   }
 }

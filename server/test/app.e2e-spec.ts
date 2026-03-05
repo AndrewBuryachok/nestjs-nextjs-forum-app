@@ -314,7 +314,31 @@ describe('App', () => {
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
+  });
 
+  describe('Goods', () => {
+    it('GET /goods', () => {
+      return request(app.getHttpServer())
+        .get('/goods')
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /goods/my', () => {
+      return request(app.getHttpServer())
+        .get('/goods/my')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /goods/all', () => {
+      return request(app.getHttpServer())
+        .get('/goods/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+  });
+
+  describe('Shops', () => {
     it('PATCH /shops/:shopId', () => {
       return request(app.getHttpServer())
         .patch(`/shops/${shops[0]}`)
