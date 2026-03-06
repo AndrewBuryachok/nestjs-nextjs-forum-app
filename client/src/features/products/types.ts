@@ -1,11 +1,11 @@
-import { BaseShop } from '../shops/types';
+import { BaseShopWithCard } from '../shops/types';
 import { BaseUser } from '../users/types';
 import { Item } from '@/constants/items';
 import { Unit } from '@/constants/units';
 
 export interface Product {
   id: number;
-  shop: BaseShop;
+  shop: BaseShopWithCard;
   user: BaseUser;
   item: Item;
   description: string;
