@@ -1,10 +1,10 @@
-import { BaseShop } from '../shops/types';
+import { BaseShopWithCard } from '../shops/types';
 import { Item } from '@/constants/items';
 import { Unit } from '@/constants/units';
 
 export interface Good {
   id: number;
-  shop: BaseShop;
+  shop: BaseShopWithCard;
   item: Item;
   description: string;
   amount: number;
