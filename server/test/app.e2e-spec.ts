@@ -8,7 +8,7 @@ import { AppModule } from '../src/app.module';
 import { User } from '../src/features/users/user.entity';
 import { Tokens } from '../src/common/interfaces';
 import { hashData } from '../src/common/utils';
-import { Role } from '../src/common/enums';
+import { Item, Role, Unit } from '../src/common/enums';
 
 describe('App', () => {
   let app: INestApplication<App>;
@@ -334,6 +334,39 @@ describe('App', () => {
   });
 
   describe('Products', () => {
+    it('POST /products', () => {
+      return request(app.getHttpServer())
+        .post('/products')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          shopId: shops[1],
+          item: Item.STONE,
+          description: '',
+          amount: 27,
+          batch: 64,
+          unit: Unit.PIECE,
+          price: 10,
+        })
+        .expect(201);
+    });
+
+    it('POST /products/all', () => {
+      return request(app.getHttpServer())
+        .post('/products/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          shopId: shops[0],
+          userId: user.user.id,
+          item: Item.STONE,
+          description: '',
+          amount: 27,
+          batch: 64,
+          unit: Unit.PIECE,
+          price: 10,
+        })
+        .expect(201);
+    });
+
     it('GET /products', () => {
       return request(app.getHttpServer())
         .get('/products')
