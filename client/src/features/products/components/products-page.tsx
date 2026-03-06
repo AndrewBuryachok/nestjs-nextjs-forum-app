@@ -1,5 +1,6 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
+import ProductsAction from './products-action';
 import ProductsTable from './products-table';
 
 type Props = {
@@ -12,6 +13,7 @@ export default function ProductsPage(props: Props) {
     <CustomPage
       page='products'
       tab={props.tab}
+      action={<ProductsAction tab={props.tab} />}
       table={
         <ProductsTable tab={props.tab} searchParams={props.searchParams} />
       }
