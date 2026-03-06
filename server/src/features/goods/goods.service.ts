@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Good } from './good.entity';
+import { ShopsService } from '../shops/shops.service';
+import { ExtCreateGoodDto } from './good.dto';
+import { GoodError } from './good-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
 @Injectable()
@@ -9,6 +12,7 @@ export class GoodsService {
   constructor(
     @InjectRepository(Good)
     private goodsRepository: Repository<Good>,
+    private shopsService: ShopsService,
   ) {}
 
   async getMainGoods(req: Request): Promise<Response<Good>> {
@@ -29,6 +33,33 @@ export class GoodsService {
     const [data, total] =
       await this.getGoodsQueryBuilder(req).getManyAndCount();
     return { data, total };
+  }
+
+  async createGood(dto: ExtCreateGoodDto): Promise<void> {
+    await this.shopsService.throwIfNotShopOwner(
+      dto.shopId,
+      dto.myId,
+      dto.isAll,
+    );
+    await this.create(dto);
+  }
+
+  private async create(dto: ExtCreateGoodDto): Promise<Good> {
+    try {
+      const good = this.goodsRepository.create({
+        shopId: dto.shopId,
+        item: dto.item,
+        description: dto.description,
+        amount: dto.amount,
+        batch: dto.batch,
+        unit: dto.unit,
+        price: dto.price,
+      });
+      await this.goodsRepository.save(good);
+      return good;
+    } catch (error) {
+      throw new InternalServerErrorException(GoodError.CREATE_FAILED);
+    }
   }
 
   private getGoodsQueryBuilder(req: Request): SelectQueryBuilder<Good> {

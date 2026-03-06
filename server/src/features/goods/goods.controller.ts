@@ -1,6 +1,7 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { GoodsService } from './goods.service';
 import { Good } from './good.entity';
+import { CreateGoodDto } from './good.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -27,5 +28,22 @@ export class GoodsController {
   @Get('all')
   getAllGoods(@Query() req: Request): Promise<Response<Good>> {
     return this.goodsService.getAllGoods(req);
+  }
+
+  @Post()
+  createMyGood(
+    @MyId() myId: number,
+    @Body() dto: CreateGoodDto,
+  ): Promise<void> {
+    return this.goodsService.createGood({ ...dto, myId, isAll: false });
+  }
+
+  @Roles([Role.ADMIN])
+  @Post('all')
+  createUserGood(
+    @MyId() myId: number,
+    @Body() dto: CreateGoodDto,
+  ): Promise<void> {
+    return this.goodsService.createGood({ ...dto, myId, isAll: true });
   }
 }
