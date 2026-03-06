@@ -40,6 +40,15 @@ export class ShopsService {
     return { data, total };
   }
 
+  selectUserShops(userId: number): Promise<Shop[]> {
+    return this.selectShopsQueryBuilder()
+      .innerJoin('shop.card', 'ownerCard')
+      .innerJoin('ownerCard.account', 'ownerAccount')
+      .innerJoin('ownerAccount.cards', 'ownerCards')
+      .where('ownerCards.userId = :userId', { userId })
+      .getMany();
+  }
+
   async createShop(dto: ExtCreateShopDto): Promise<void> {
     await this.cardsService.throwIfNotCardUser(dto.cardId, dto.myId, dto.isAll);
     await this.create(dto);
@@ -116,6 +125,13 @@ export class ShopsService {
     } catch (error) {
       throw new InternalServerErrorException(ShopError.DELETE_FAILED);
     }
+  }
+
+  private selectShopsQueryBuilder(): SelectQueryBuilder<Shop> {
+    return this.shopsRepository
+      .createQueryBuilder('shop')
+      .select(['shop.id', 'shop.name', 'shop.x', 'shop.y'])
+      .orderBy('shop.name', 'ASC');
   }
 
   private getShopsQueryBuilder(req: Request): SelectQueryBuilder<Shop> {

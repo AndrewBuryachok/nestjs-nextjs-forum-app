@@ -314,6 +314,19 @@ describe('App', () => {
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
+
+    it('GET /shops/my/select', () => {
+      return request(app.getHttpServer())
+        .get('/shops/my/select')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+    });
+
+    it('GET /shops/:userId/select', () => {
+      return request(app.getHttpServer())
+        .get(`/shops/${user.user.id}/select`)
+        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+    });
   });
 
   describe('Goods', () => {

@@ -11,6 +11,7 @@ import {
 import { ShopsService } from './shops.service';
 import { Shop } from './shop.entity';
 import { CreateShopDto, EditShopDto, ShopIdDto } from './shop.dto';
+import { UserIdDto } from '../users/user.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -37,6 +38,17 @@ export class ShopsController {
   @Get('all')
   getAllShops(@Query() req: Request): Promise<Response<Shop>> {
     return this.shopsService.getAllShops(req);
+  }
+
+  @Get('my/select')
+  selectMyShops(@MyId() myId: number): Promise<Shop[]> {
+    return this.shopsService.selectUserShops(myId);
+  }
+
+  @Public()
+  @Get(':userId/select')
+  selectUserShops(@Param() { userId }: UserIdDto): Promise<Shop[]> {
+    return this.shopsService.selectUserShops(userId);
   }
 
   @Post()
