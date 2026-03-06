@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Product } from './product.entity';
+import { ShopsService } from '../shops/shops.service';
+import { CreateProductWithUserDto } from './product.dto';
+import { ProductError } from './product-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
 @Injectable()
@@ -9,6 +12,7 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private productsRepository: Repository<Product>,
+    private shopsService: ShopsService,
   ) {}
 
   async getMainProducts(req: Request): Promise<Response<Product>> {
@@ -29,6 +33,30 @@ export class ProductsService {
     const [data, total] =
       await this.getProductsQueryBuilder(req).getManyAndCount();
     return { data, total };
+  }
+
+  async createProduct(dto: CreateProductWithUserDto): Promise<void> {
+    await this.shopsService.throwIfNotShopOwner(dto.shopId, dto.userId);
+    await this.create(dto);
+  }
+
+  private async create(dto: CreateProductWithUserDto): Promise<Product> {
+    try {
+      const product = this.productsRepository.create({
+        shopId: dto.shopId,
+        userId: dto.userId,
+        item: dto.item,
+        description: dto.description,
+        amount: dto.amount,
+        batch: dto.batch,
+        unit: dto.unit,
+        price: dto.price,
+      });
+      await this.productsRepository.save(product);
+      return product;
+    } catch (error) {
+      throw new InternalServerErrorException(ProductError.CREATE_FAILED);
+    }
   }
 
   private getProductsQueryBuilder(req: Request): SelectQueryBuilder<Product> {
