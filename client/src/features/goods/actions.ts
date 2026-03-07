@@ -1,6 +1,6 @@
 'use server';
 
-import { createGoodSchema } from './schema';
+import { createGoodSchema, deleteGoodSchema, editGoodSchema } from './schema';
 import { actionClient } from '@/lib/safe-action';
 import { send } from '@/lib/api';
 
@@ -14,4 +14,28 @@ export const createUserGoodAction = actionClient
   .inputSchema(createGoodSchema)
   .action(({ parsedInput: body }) => {
     return send('POST', '/goods/all', body);
+  });
+
+export const editMyGoodAction = actionClient
+  .inputSchema(editGoodSchema)
+  .action(({ parsedInput: { goodId, ...body } }) => {
+    return send('PATCH', `/goods/${goodId}`, body);
+  });
+
+export const editUserGoodAction = actionClient
+  .inputSchema(editGoodSchema)
+  .action(({ parsedInput: { goodId, ...body } }) => {
+    return send('PATCH', `/goods/all/${goodId}`, body);
+  });
+
+export const deleteMyGoodAction = actionClient
+  .inputSchema(deleteGoodSchema)
+  .action(({ parsedInput: { goodId } }) => {
+    return send('DELETE', `/goods/${goodId}`);
+  });
+
+export const deleteUserGoodAction = actionClient
+  .inputSchema(deleteGoodSchema)
+  .action(({ parsedInput: { goodId } }) => {
+    return send('DELETE', `/goods/all/${goodId}`);
   });
