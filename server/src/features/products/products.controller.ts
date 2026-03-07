@@ -1,7 +1,21 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Product } from './product.entity';
-import { CreateProductDto, CreateProductWithUserDto } from './product.dto';
+import {
+  CreateProductDto,
+  CreateProductWithUserDto,
+  EditProductDto,
+  ProductIdDto,
+} from './product.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -42,5 +56,37 @@ export class ProductsController {
   @Post('all')
   createUserProduct(@Body() dto: CreateProductWithUserDto): Promise<void> {
     return this.productsService.createProduct(dto);
+  }
+
+  @Patch(':productId')
+  editMyProduct(
+    @MyId() myId: number,
+    @Param() { productId }: ProductIdDto,
+    @Body() dto: EditProductDto,
+  ): Promise<void> {
+    return this.productsService.editMyProduct(myId, productId, dto);
+  }
+
+  @Roles([Role.ADMIN])
+  @Patch('all/:productId')
+  editUserProduct(
+    @Param() { productId }: ProductIdDto,
+    @Body() dto: EditProductDto,
+  ): Promise<void> {
+    return this.productsService.editUserProduct(productId, dto);
+  }
+
+  @Delete(':productId')
+  deleteMyProduct(
+    @MyId() myId: number,
+    @Param() { productId }: ProductIdDto,
+  ): Promise<void> {
+    return this.productsService.deleteMyProduct(myId, productId);
+  }
+
+  @Roles([Role.ADMIN])
+  @Delete('all/:productId')
+  deleteUserProduct(@Param() { productId }: ProductIdDto): Promise<void> {
+    return this.productsService.deleteUserProduct(productId);
   }
 }
