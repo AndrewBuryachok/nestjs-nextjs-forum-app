@@ -1,7 +1,16 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { GoodsService } from './goods.service';
 import { Good } from './good.entity';
-import { CreateGoodDto } from './good.dto';
+import { CreateGoodDto, EditGoodDto, GoodIdDto } from './good.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -45,5 +54,41 @@ export class GoodsController {
     @Body() dto: CreateGoodDto,
   ): Promise<void> {
     return this.goodsService.createGood({ ...dto, myId, isAll: true });
+  }
+
+  @Patch(':goodId')
+  editMyGood(
+    @MyId() myId: number,
+    @Param() { goodId }: GoodIdDto,
+    @Body() dto: EditGoodDto,
+  ): Promise<void> {
+    return this.goodsService.editGood({ ...dto, goodId, myId, isAll: false });
+  }
+
+  @Roles([Role.ADMIN])
+  @Patch('all/:goodId')
+  editUserGood(
+    @MyId() myId: number,
+    @Param() { goodId }: GoodIdDto,
+    @Body() dto: EditGoodDto,
+  ): Promise<void> {
+    return this.goodsService.editGood({ ...dto, goodId, myId, isAll: true });
+  }
+
+  @Delete(':goodId')
+  deleteMyGood(
+    @MyId() myId: number,
+    @Param() { goodId }: GoodIdDto,
+  ): Promise<void> {
+    return this.goodsService.deleteGood({ goodId, myId, isAll: false });
+  }
+
+  @Roles([Role.ADMIN])
+  @Delete('all/:goodId')
+  deleteUserGood(
+    @MyId() myId: number,
+    @Param() { goodId }: GoodIdDto,
+  ): Promise<void> {
+    return this.goodsService.deleteGood({ goodId, myId, isAll: true });
   }
 }

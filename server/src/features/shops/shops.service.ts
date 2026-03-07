@@ -89,6 +89,15 @@ export class ShopsService {
     return shop;
   }
 
+  async isShopOwner(
+    shopId: number,
+    userId: number,
+    isAll: boolean,
+  ): Promise<boolean> {
+    const shop = await this.throwIfShopNotFound(shopId);
+    return this.cardsService.isCardUser(shop.cardId, userId, isAll);
+  }
+
   private findShopById(id: number): Promise<Shop | null> {
     return this.shopsRepository.findOneBy({ id });
   }

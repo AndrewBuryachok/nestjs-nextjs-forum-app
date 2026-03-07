@@ -1,9 +1,14 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Good } from './good.entity';
 import { ShopsService } from '../shops/shops.service';
-import { ExtCreateGoodDto } from './good.dto';
+import { DeleteGoodDto, ExtCreateGoodDto, ExtEditGoodDto } from './good.dto';
 import { GoodError } from './good-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
@@ -44,6 +49,45 @@ export class GoodsService {
     await this.create(dto);
   }
 
+  async editGood(dto: ExtEditGoodDto): Promise<void> {
+    await this.throwIfNotGoodOwner(dto.goodId, dto.myId, dto.isAll);
+    await this.edit(dto.goodId, dto);
+  }
+
+  async deleteGood(dto: DeleteGoodDto): Promise<void> {
+    await this.throwIfNotGoodOwner(dto.goodId, dto.myId, dto.isAll);
+    await this.delete(dto.goodId);
+  }
+
+  async throwIfGoodNotFound(goodId: number): Promise<Good> {
+    const good = await this.findGoodById(goodId);
+    if (!good) {
+      throw new NotFoundException(GoodError.NOT_FOUND);
+    }
+    return good;
+  }
+
+  async throwIfNotGoodOwner(
+    goodId: number,
+    userId: number,
+    isAll: boolean,
+  ): Promise<Good> {
+    const good = await this.throwIfGoodNotFound(goodId);
+    const isShopOwner = await this.shopsService.isShopOwner(
+      good.shopId,
+      userId,
+      isAll,
+    );
+    if (!isShopOwner) {
+      throw new ForbiddenException(GoodError.NOT_OWNER);
+    }
+    return good;
+  }
+
+  private findGoodById(id: number): Promise<Good | null> {
+    return this.goodsRepository.findOneBy({ id });
+  }
+
   private async create(dto: ExtCreateGoodDto): Promise<Good> {
     try {
       const good = this.goodsRepository.create({
@@ -59,6 +103,32 @@ export class GoodsService {
       return good;
     } catch (error) {
       throw new InternalServerErrorException(GoodError.CREATE_FAILED);
+    }
+  }
+
+  private async edit(id: number, dto: ExtEditGoodDto): Promise<void> {
+    try {
+      await this.goodsRepository.update(
+        { id },
+        {
+          item: dto.item,
+          description: dto.description,
+          amount: dto.amount,
+          batch: dto.batch,
+          unit: dto.unit,
+          price: dto.price,
+        },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(GoodError.EDIT_FAILED);
+    }
+  }
+
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.goodsRepository.softDelete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(GoodError.DELETE_FAILED);
     }
   }
 

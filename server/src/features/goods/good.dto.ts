@@ -8,14 +8,18 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { Item, Unit } from '../../common/enums';
 
-export class CreateGoodDto {
+export class GoodIdDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
-  shopId: number;
+  @Type(() => Number)
+  goodId: number;
+}
 
+export class EditGoodDto {
   @IsNotEmpty()
   @IsEnum(Item)
   item: Item;
@@ -47,7 +51,25 @@ export class CreateGoodDto {
   price: number;
 }
 
+export class ExtEditGoodDto extends EditGoodDto {
+  goodId: number;
+  myId: number;
+  isAll: boolean;
+}
+
+export class CreateGoodDto extends EditGoodDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  shopId: number;
+}
+
 export class ExtCreateGoodDto extends CreateGoodDto {
+  myId: number;
+  isAll: boolean;
+}
+
+export class DeleteGoodDto extends GoodIdDto {
   myId: number;
   isAll: boolean;
 }

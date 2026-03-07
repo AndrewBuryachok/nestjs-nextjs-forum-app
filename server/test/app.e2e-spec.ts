@@ -38,6 +38,7 @@ describe('App', () => {
   let cards: number[];
   let transactions: number[];
   let shops: number[];
+  let goods: number[];
 
   describe('Auth', () => {
     it('POST /auth/login', () => {
@@ -372,7 +373,8 @@ describe('App', () => {
       return request(app.getHttpServer())
         .get('/goods/my')
         .set('Authorization', `Bearer ${user.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
+        .then((res) => (goods = res.body.data.map((good) => good.id)));
     });
 
     it('GET /goods/all', () => {
@@ -380,6 +382,50 @@ describe('App', () => {
         .get('/goods/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('PATCH /goods/:goodId', () => {
+      return request(app.getHttpServer())
+        .patch(`/goods/${goods[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          item: Item.STONE,
+          description: '',
+          amount: 27,
+          batch: 64,
+          unit: Unit.PIECE,
+          price: 10,
+        })
+        .expect(200);
+    });
+
+    it('PATCH /goods/all/:goodId', () => {
+      return request(app.getHttpServer())
+        .patch(`/goods/all/${goods[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          item: Item.STONE,
+          description: '',
+          amount: 27,
+          batch: 64,
+          unit: Unit.PIECE,
+          price: 10,
+        })
+        .expect(200);
+    });
+
+    it('DELETE /goods/:goodId', () => {
+      return request(app.getHttpServer())
+        .delete(`/goods/${goods[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(200);
+    });
+
+    it('DELETE /goods/all/:goodId', () => {
+      return request(app.getHttpServer())
+        .delete(`/goods/all/${goods[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(200);
     });
   });
 
