@@ -38,6 +38,7 @@ describe('App', () => {
   let cards: number[];
   let transactions: number[];
   let shops: number[];
+  let products: number[];
 
   describe('Auth', () => {
     it('POST /auth/login', () => {
@@ -377,7 +378,8 @@ describe('App', () => {
       return request(app.getHttpServer())
         .get('/products/my')
         .set('Authorization', `Bearer ${user.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
+        .then((res) => (products = res.body.data.map((product) => product.id)));
     });
 
     it('GET /products/all', () => {
@@ -385,6 +387,50 @@ describe('App', () => {
         .get('/products/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('PATCH /products/:productId', () => {
+      return request(app.getHttpServer())
+        .patch(`/products/${products[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          item: Item.STONE,
+          description: '',
+          amount: 27,
+          batch: 64,
+          unit: Unit.PIECE,
+          price: 10,
+        })
+        .expect(200);
+    });
+
+    it('PATCH /products/all/:productId', () => {
+      return request(app.getHttpServer())
+        .patch(`/products/all/${products[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          item: Item.STONE,
+          description: '',
+          amount: 27,
+          batch: 64,
+          unit: Unit.PIECE,
+          price: 10,
+        })
+        .expect(200);
+    });
+
+    it('DELETE /products/:productId', () => {
+      return request(app.getHttpServer())
+        .delete(`/products/${products[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(200);
+    });
+
+    it('DELETE /products/all/:productId', () => {
+      return request(app.getHttpServer())
+        .delete(`/products/all/${products[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(200);
     });
   });
 

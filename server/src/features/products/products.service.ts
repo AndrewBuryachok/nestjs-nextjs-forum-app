@@ -1,9 +1,15 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Product } from './product.entity';
+import { CardsService } from '../cards/cards.service';
 import { ShopsService } from '../shops/shops.service';
-import { CreateProductWithUserDto } from './product.dto';
+import { CreateProductWithUserDto, EditProductDto } from './product.dto';
 import { ProductError } from './product-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
@@ -12,6 +18,7 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private productsRepository: Repository<Product>,
+    private cardsService: CardsService,
     private shopsService: ShopsService,
   ) {}
 
@@ -40,6 +47,60 @@ export class ProductsService {
     await this.create(dto);
   }
 
+  async editMyProduct(
+    myId: number,
+    productId: number,
+    dto: EditProductDto,
+  ): Promise<void> {
+    await this.throwIfNotProductOwner(productId, myId);
+    await this.edit(productId, dto);
+  }
+
+  async editUserProduct(productId: number, dto: EditProductDto): Promise<void> {
+    await this.throwIfProductNotFound(productId);
+    await this.edit(productId, dto);
+  }
+
+  async deleteMyProduct(myId: number, productId: number): Promise<void> {
+    await this.throwIfNotProductOwner(productId, myId);
+    await this.delete(productId);
+  }
+
+  async deleteUserProduct(productId: number): Promise<void> {
+    await this.throwIfProductNotFound(productId);
+    await this.delete(productId);
+  }
+
+  async throwIfProductNotFound(productId: number): Promise<Product> {
+    const product = await this.findProductById(productId);
+    if (!product) {
+      throw new NotFoundException(ProductError.NOT_FOUND);
+    }
+    return product;
+  }
+
+  async throwIfNotProductOwner(
+    productId: number,
+    userId: number,
+  ): Promise<Product> {
+    const product = await this.throwIfProductNotFound(productId);
+    const isCardUser = await this.cardsService.isCardUser(
+      product.shop.cardId,
+      userId,
+    );
+    if (!isCardUser) {
+      throw new ForbiddenException(ProductError.NOT_OWNER);
+    }
+    return product;
+  }
+
+  private findProductById(id: number): Promise<Product | null> {
+    return this.productsRepository.findOne({
+      relations: { shop: true },
+      where: { id },
+    });
+  }
+
   private async create(dto: CreateProductWithUserDto): Promise<Product> {
     try {
       const product = this.productsRepository.create({
@@ -56,6 +117,32 @@ export class ProductsService {
       return product;
     } catch (error) {
       throw new InternalServerErrorException(ProductError.CREATE_FAILED);
+    }
+  }
+
+  private async edit(id: number, dto: EditProductDto): Promise<void> {
+    try {
+      await this.productsRepository.update(
+        { id },
+        {
+          item: dto.item,
+          description: dto.description,
+          amount: dto.amount,
+          batch: dto.batch,
+          unit: dto.unit,
+          price: dto.price,
+        },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(ProductError.EDIT_FAILED);
+    }
+  }
+
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.productsRepository.softDelete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(ProductError.DELETE_FAILED);
     }
   }
 

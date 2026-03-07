@@ -8,14 +8,18 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { Item, Unit } from '../../common/enums';
 
-export class CreateProductDto {
+export class ProductIdDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
-  shopId: number;
+  @Type(() => Number)
+  productId: number;
+}
 
+export class EditProductDto {
   @IsNotEmpty()
   @IsEnum(Item)
   item: Item;
@@ -45,6 +49,13 @@ export class CreateProductDto {
   @IsInt()
   @Min(1)
   price: number;
+}
+
+export class CreateProductDto extends EditProductDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  shopId: number;
 }
 
 export class CreateProductWithUserDto extends CreateProductDto {
