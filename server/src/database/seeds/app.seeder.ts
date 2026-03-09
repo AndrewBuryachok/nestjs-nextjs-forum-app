@@ -8,6 +8,7 @@ import { CardUser } from '../../features/cards/card-user.entity';
 import { Transaction } from '../../features/transactions/transaction.entity';
 import { Shop } from '../../features/shops/shop.entity';
 import { Product } from '../../features/products/product.entity';
+import { Purchase } from '../../features/purchases/purchase.entity';
 
 export default class AppSeeder implements Seeder {
   private logger = new Logger(AppSeeder.name);
@@ -129,12 +130,51 @@ export default class AppSeeder implements Seeder {
     const productFactory = factoryManager.get(Product);
     const products: Product[] = [];
     for (let i = 0; i < 40; i++) {
+      const id = i + 1;
       const shop = faker.helpers.arrayElement(shops);
       const user = randomUserOf(shop.card);
-      const product = await productFactory.make({ shop, user });
+      const product = await productFactory.make({ id, shop, user });
       products.push(product);
     }
     this.logger.log(`Generated ${products.length} Products`);
+    this.logger.log('Generating Purchases...');
+    const purchaseFactory = factoryManager.get(Purchase);
+    const purchases: Purchase[] = [];
+    for (let i = 0; i < 40; i++) {
+      const product = faker.helpers.arrayElement(
+        products.filter((product) => product.amount > 0),
+      );
+      const card = faker.helpers.arrayElement(
+        cards.filter((card) => card.balance >= product.price),
+      );
+      const user = randomUserOf(card);
+      const max = Math.min(
+        product.amount,
+        Math.floor(card.balance / product.price),
+      );
+      const amount = faker.number.int({ min: 1, max });
+      card.balance -= amount * product.price;
+      product.shop.card.balance += amount * product.price;
+      const transfer = await transactionFactory.make({
+        senderUser: user,
+        senderCard: card,
+        receiverUser: product.user,
+        receiverCard: product.shop.card,
+        sum: amount * product.price,
+        description: 'купівля товару',
+      });
+      transactions.push(transfer);
+      product.amount -= amount;
+      const purchase = await purchaseFactory.make({
+        product,
+        user,
+        card,
+        amount,
+        price: product.price,
+      });
+      purchases.push(purchase);
+    }
+    this.logger.log(`Generated ${purchases.length} Purchases`);
     this.logger.log('💾 Saving generated entities to DB...');
     this.logger.log('Saving Users...');
     await dataSource.getRepository(User).save(users);
@@ -154,6 +194,9 @@ export default class AppSeeder implements Seeder {
     this.logger.log('Saving Products...');
     await dataSource.getRepository(Product).save(products);
     this.logger.log(`Saved ${products.length} Products`);
+    this.logger.log('Saving Purchases...');
+    await dataSource.getRepository(Purchase).save(purchases);
+    this.logger.log(`Saved ${purchases.length} Purchases`);
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
     this.logger.log(
       `✅ Seeding process completed successfully in ${duration}s`,
