@@ -3,6 +3,7 @@ import {
   LuBanknote,
   LuCreditCard,
   LuShoppingBasket,
+  LuShoppingCart,
   LuStore,
   LuUsers,
 } from 'react-icons/lu';
@@ -19,6 +20,7 @@ export default function CustomEmptyState(props: Props) {
   const icon = {
     cards: <LuCreditCard />,
     products: <LuShoppingBasket />,
+    purchases: <LuShoppingCart />,
     shops: <LuStore />,
     transactions: <LuBanknote />,
     users: <LuUsers />,
