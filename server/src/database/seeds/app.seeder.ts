@@ -6,6 +6,7 @@ import { Card } from '../../features/cards/card.entity';
 import { Transaction } from '../../features/transactions/transaction.entity';
 import { Shop } from '../../features/shops/shop.entity';
 import { Good } from '../../features/goods/good.entity';
+import { Purchase } from '../../features/purchases/purchase.entity';
 
 export default class AppSeeder implements Seeder {
   public async run(_, factoryManager: SeederFactoryManager) {
@@ -99,9 +100,35 @@ export default class AppSeeder implements Seeder {
     );
     const goodFactory = factoryManager.get(Good);
     const goods = await Promise.all(
-      Array.from({ length: 40 }).map(() => {
+      Array.from({ length: 40 }).map((_, i) => {
+        const id = i + 1;
         const shop = faker.helpers.arrayElement(shops);
-        return goodFactory.make({ shop });
+        return goodFactory.make({ id, shop });
+      }),
+    );
+    const purchaseFactory = factoryManager.get(Purchase);
+    const purchases = await Promise.all(
+      Array.from({ length: 40 }).map(async () => {
+        const good = faker.helpers.arrayElement(
+          goods.filter((good) => good.amount > 0),
+        );
+        const card = faker.helpers.arrayElement(
+          cards.filter((card) => card.account.balance >= good.price),
+        );
+        const amount = faker.number.int({
+          min: 1,
+          max: Math.min(good.amount, card.account.balance / good.price),
+        });
+        good.amount -= amount;
+        const price = good.price;
+        const transfer = await transactionFactory.make({
+          senderCard: card,
+          receiverCard: good.shop.card,
+          sum: amount * price,
+          description: 'купівля товару',
+        });
+        transactions.push(transfer);
+        return purchaseFactory.make({ good, card, amount, price });
       }),
     );
     for (const user of users) {
@@ -121,6 +148,9 @@ export default class AppSeeder implements Seeder {
     }
     for (const good of goods) {
       await goodFactory.save(good);
+    }
+    for (const purchase of purchases) {
+      await purchaseFactory.save(purchase);
     }
   }
 }
