@@ -15,7 +15,11 @@ export default function CustomNavbar() {
     {
       value: 'trade',
       icon: <LuStore />,
-      links: [{ value: 'goods'}, { value: 'shops' }],
+      links: [
+        { value: 'goods' },
+        { value: 'purchases', my: true },
+        { value: 'shops' },
+      ],
     },
     { value: 'users', icon: <LuUsers /> },
   ];
