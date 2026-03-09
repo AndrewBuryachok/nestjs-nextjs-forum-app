@@ -388,7 +388,25 @@ describe('App', () => {
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
+  });
 
+  describe('Purchases', () => {
+    it('GET /purchases/my', () => {
+      return request(app.getHttpServer())
+        .get('/purchases/my')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /purchases/all', () => {
+      return request(app.getHttpServer())
+        .get('/purchases/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+  });
+
+  describe('Products', () => {
     it('PATCH /products/:productId', () => {
       return request(app.getHttpServer())
         .patch(`/products/${products[0]}`)
