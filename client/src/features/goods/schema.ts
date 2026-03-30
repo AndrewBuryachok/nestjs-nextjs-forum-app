@@ -31,3 +31,11 @@ export const deleteGoodSchema = z.object({
 });
 
 export type DeleteGoodType = z.infer<typeof deleteGoodSchema>;
+
+export const buyGoodSchema = z.object({
+  goodId: z.number().int().min(1),
+  cardId: z.number().int().min(1),
+  amount: z.number().int().min(1).max(27),
+});
+
+export type BuyGoodType = z.infer<typeof buyGoodSchema>;

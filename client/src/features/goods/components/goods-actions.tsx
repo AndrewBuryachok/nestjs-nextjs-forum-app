@@ -1,6 +1,7 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import { Good } from '../types';
 import { viewGoodAction } from '../actions/view-good-action';
+import { buyMyGoodAction, buyUserGoodAction } from '../actions/buy-good-action';
 import {
   editMyGoodAction,
   editUserGoodAction,
@@ -18,9 +19,9 @@ type Props = {
 
 export default function GoodsActions(props: Props) {
   const actions = {
-    main: [],
+    main: [buyMyGoodAction],
     my: [editMyGoodAction, deleteMyGoodAction],
-    all: [editUserGoodAction, deleteUserGoodAction],
+    all: [buyUserGoodAction, editUserGoodAction, deleteUserGoodAction],
   }[props.tab];
 
   return (
