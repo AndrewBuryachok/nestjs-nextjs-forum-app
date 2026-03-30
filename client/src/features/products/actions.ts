@@ -1,6 +1,8 @@
 'use server';
 
 import {
+  buyProductSchema,
+  buyProductWithUserSchema,
   createProductSchema,
   createProductWithUserSchema,
   deleteProductSchema,
@@ -43,4 +45,16 @@ export const deleteUserProductAction = actionClient
   .inputSchema(deleteProductSchema)
   .action(({ parsedInput: { productId } }) => {
     return send('DELETE', `/products/all/${productId}`);
+  });
+
+export const buyMyProductAction = actionClient
+  .inputSchema(buyProductSchema)
+  .action(({ parsedInput: body }) => {
+    return send('POST', '/purchases', body);
+  });
+
+export const buyUserProductAction = actionClient
+  .inputSchema(buyProductWithUserSchema)
+  .action(({ parsedInput: body }) => {
+    return send('POST', '/purchases/all', body);
   });

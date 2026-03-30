@@ -39,3 +39,17 @@ export const deleteProductSchema = z.object({
 });
 
 export type DeleteProductType = z.infer<typeof deleteProductSchema>;
+
+export const buyProductSchema = z.object({
+  productId: z.number().int().min(1),
+  cardId: z.number().int().min(1),
+  amount: z.number().int().min(1).max(27),
+});
+
+export type BuyProductType = z.infer<typeof buyProductSchema>;
+
+export const buyProductWithUserSchema = buyProductSchema.extend({
+  userId: z.number().int().min(1),
+});
+
+export type BuyProductWithUserType = z.infer<typeof buyProductWithUserSchema>;
