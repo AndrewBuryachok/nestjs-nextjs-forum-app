@@ -1,6 +1,7 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { PurchasesService } from './purchases.service';
 import { Purchase } from './purchase.entity';
+import { CreatePurchaseDto, CreatePurchaseWithUserDto } from './purchase.dto';
 import { MyId, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -21,5 +22,19 @@ export class PurchasesController {
   @Get('all')
   getAllPurchases(@Query() req: Request): Promise<Response<Purchase>> {
     return this.purchasesService.getAllPurchases(req);
+  }
+
+  @Post()
+  createMyPurchase(
+    @MyId() myId: number,
+    @Body() dto: CreatePurchaseDto,
+  ): Promise<void> {
+    return this.purchasesService.createPurchase({ ...dto, userId: myId });
+  }
+
+  @Roles([Role.ADMIN])
+  @Post('all')
+  createUserPurchase(@Body() dto: CreatePurchaseWithUserDto): Promise<void> {
+    return this.purchasesService.createPurchase(dto);
   }
 }

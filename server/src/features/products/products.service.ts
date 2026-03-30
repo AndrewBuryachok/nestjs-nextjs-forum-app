@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
@@ -23,8 +24,9 @@ export class ProductsService {
   ) {}
 
   async getMainProducts(req: Request): Promise<Response<Product>> {
-    const [data, total] =
-      await this.getProductsQueryBuilder(req).getManyAndCount();
+    const [data, total] = await this.getProductsQueryBuilder(req)
+      .where('product.amount > 0')
+      .getManyAndCount();
     return { data, total };
   }
 
@@ -71,6 +73,10 @@ export class ProductsService {
     await this.delete(productId);
   }
 
+  async buyProduct(productId: number, amount: number): Promise<void> {
+    await this.decreaseAmount(productId, amount);
+  }
+
   async throwIfProductNotFound(productId: number): Promise<Product> {
     const product = await this.findProductById(productId);
     if (!product) {
@@ -90,6 +96,17 @@ export class ProductsService {
     );
     if (!isCardUser) {
       throw new ForbiddenException(ProductError.NOT_OWNER);
+    }
+    return product;
+  }
+
+  async throwIfNotEnoughAmount(
+    productId: number,
+    amount: number,
+  ): Promise<Product> {
+    const product = await this.throwIfProductNotFound(productId);
+    if (product.amount < amount) {
+      throw new BadRequestException(ProductError.NOT_ENOUGH_AMOUNT);
     }
     return product;
   }
@@ -143,6 +160,16 @@ export class ProductsService {
       await this.productsRepository.softDelete({ id });
     } catch (error) {
       throw new InternalServerErrorException(ProductError.DELETE_FAILED);
+    }
+  }
+
+  private async decreaseAmount(id: number, amount: number): Promise<void> {
+    try {
+      await this.productsRepository.decrement({ id }, 'amount', amount);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        ProductError.DECREASE_AMOUNT_FAILED,
+      );
     }
   }
 
