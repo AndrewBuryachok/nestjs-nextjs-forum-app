@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Purchase } from './purchase.entity';
+import { TransactionsService } from '../transactions/transactions.service';
+import { ProductsService } from '../products/products.service';
+import { CreatePurchaseWithUserDto } from './purchase.dto';
+import { PurchaseError } from './purchase-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
 @Injectable()
@@ -9,6 +13,8 @@ export class PurchasesService {
   constructor(
     @InjectRepository(Purchase)
     private purchasesRepository: Repository<Purchase>,
+    private transactionsService: TransactionsService,
+    private productsService: ProductsService,
   ) {}
 
   async getMyPurchases(
@@ -34,6 +40,42 @@ export class PurchasesService {
     const [data, total] =
       await this.getPurchasesQueryBuilder(req).getManyAndCount();
     return { data, total };
+  }
+
+  async createPurchase(dto: CreatePurchaseWithUserDto): Promise<void> {
+    const product = await this.productsService.throwIfNotEnoughAmount(
+      dto.productId,
+      dto.amount,
+    );
+    await this.transactionsService.createUserTransferTransaction({
+      senderUserId: dto.userId,
+      senderCardId: dto.cardId,
+      receiverUserId: product.userId,
+      receiverCardId: product.shop.cardId,
+      sum: dto.amount * product.price,
+      description: 'купівля товару',
+    });
+    await this.productsService.buyProduct(dto.productId, dto.amount);
+    await this.create(dto, product.price);
+  }
+
+  private async create(
+    dto: CreatePurchaseWithUserDto,
+    price: number,
+  ): Promise<Purchase> {
+    try {
+      const purchase = this.purchasesRepository.create({
+        productId: dto.productId,
+        userId: dto.userId,
+        cardId: dto.cardId,
+        amount: dto.amount,
+        price,
+      });
+      await this.purchasesRepository.save(purchase);
+      return purchase;
+    } catch (error) {
+      throw new InternalServerErrorException(PurchaseError.CREATE_FAILED);
+    }
   }
 
   private getPurchasesQueryBuilder(req: Request): SelectQueryBuilder<Purchase> {

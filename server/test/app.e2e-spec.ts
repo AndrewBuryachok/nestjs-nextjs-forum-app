@@ -391,6 +391,27 @@ describe('App', () => {
   });
 
   describe('Purchases', () => {
+    it('POST /purchases', () => {
+      return request(app.getHttpServer())
+        .post('/purchases')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ productId: products[1], cardId: cards[0], amount: 1 })
+        .expect(201);
+    });
+
+    it('POST /purchases/all', () => {
+      return request(app.getHttpServer())
+        .post('/purchases/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          productId: products[0],
+          userId: user.user.id,
+          cardId: cards[0],
+          amount: 1,
+        })
+        .expect(201);
+    });
+
     it('GET /purchases/my', () => {
       return request(app.getHttpServer())
         .get('/purchases/my')
