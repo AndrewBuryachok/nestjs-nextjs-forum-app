@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
@@ -8,7 +9,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Good } from './good.entity';
 import { ShopsService } from '../shops/shops.service';
-import { DeleteGoodDto, ExtCreateGoodDto, ExtEditGoodDto } from './good.dto';
+import { TransactionsService } from '../transactions/transactions.service';
+import {
+  BuyGoodDto,
+  DeleteGoodDto,
+  ExtCreateGoodDto,
+  ExtEditGoodDto,
+} from './good.dto';
 import { GoodError } from './good-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
@@ -18,11 +25,13 @@ export class GoodsService {
     @InjectRepository(Good)
     private goodsRepository: Repository<Good>,
     private shopsService: ShopsService,
+    private transactionsService: TransactionsService,
   ) {}
 
   async getMainGoods(req: Request): Promise<Response<Good>> {
-    const [data, total] =
-      await this.getGoodsQueryBuilder(req).getManyAndCount();
+    const [data, total] = await this.getGoodsQueryBuilder(req)
+      .where('good.amount > 0')
+      .getManyAndCount();
     return { data, total };
   }
 
@@ -57,6 +66,24 @@ export class GoodsService {
   async deleteGood(dto: DeleteGoodDto): Promise<void> {
     await this.throwIfNotGoodOwner(dto.goodId, dto.myId, dto.isAll);
     await this.delete(dto.goodId);
+  }
+
+  async buyGood(dto: BuyGoodDto): Promise<number> {
+    const good = await this.throwIfGoodNotFound(dto.goodId);
+    if (good.amount < dto.amount) {
+      throw new BadRequestException(GoodError.NOT_ENOUGH_AMOUNT);
+    }
+    const shop = await this.shopsService.throwIfShopNotFound(good.shopId);
+    await this.transactionsService.createTransferTransaction({
+      senderCardId: dto.cardId,
+      receiverCardId: shop.cardId,
+      sum: dto.amount * good.price,
+      description: 'купівля товару',
+      myId: dto.myId,
+      isAll: dto.isAll,
+    });
+    await this.decreaseAmount(dto.goodId, dto.amount);
+    return good.price;
   }
 
   async throwIfGoodNotFound(goodId: number): Promise<Good> {
@@ -129,6 +156,14 @@ export class GoodsService {
       await this.goodsRepository.softDelete({ id });
     } catch (error) {
       throw new InternalServerErrorException(GoodError.DELETE_FAILED);
+    }
+  }
+
+  private async decreaseAmount(id: number, amount: number): Promise<void> {
+    try {
+      await this.goodsRepository.decrement({ id }, 'amount', amount);
+    } catch (error) {
+      throw new InternalServerErrorException(GoodError.DECREASE_AMOUNT_FAILED);
     }
   }
 

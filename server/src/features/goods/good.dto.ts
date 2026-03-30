@@ -9,6 +9,7 @@ import {
   Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ExtCreatePurchaseDto } from '../purchases/purchase.dto';
 import { Item, Unit } from '../../common/enums';
 
 export class GoodIdDto {
@@ -73,3 +74,5 @@ export class DeleteGoodDto extends GoodIdDto {
   myId: number;
   isAll: boolean;
 }
+
+export class BuyGoodDto extends ExtCreatePurchaseDto {}

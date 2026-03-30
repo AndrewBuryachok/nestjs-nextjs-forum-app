@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Purchase } from './purchase.entity';
+import { GoodsService } from '../goods/goods.service';
+import { ExtCreatePurchaseDto } from './purchase.dto';
+import { PurchaseError } from './purchase-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
 @Injectable()
@@ -9,6 +12,7 @@ export class PurchasesService {
   constructor(
     @InjectRepository(Purchase)
     private purchasesRepository: Repository<Purchase>,
+    private goodsService: GoodsService,
   ) {}
 
   async getMyPurchases(
@@ -34,6 +38,29 @@ export class PurchasesService {
     const [data, total] =
       await this.getPurchasesQueryBuilder(req).getManyAndCount();
     return { data, total };
+  }
+
+  async createPurchase(dto: ExtCreatePurchaseDto): Promise<void> {
+    const price = await this.goodsService.buyGood(dto);
+    await this.create(dto, price);
+  }
+
+  private async create(
+    dto: ExtCreatePurchaseDto,
+    price: number,
+  ): Promise<Purchase> {
+    try {
+      const purchase = this.purchasesRepository.create({
+        goodId: dto.goodId,
+        cardId: dto.cardId,
+        amount: dto.amount,
+        price,
+      });
+      await this.purchasesRepository.save(purchase);
+      return purchase;
+    } catch (error) {
+      throw new InternalServerErrorException(PurchaseError.CREATE_FAILED);
+    }
   }
 
   private getPurchasesQueryBuilder(req: Request): SelectQueryBuilder<Purchase> {
