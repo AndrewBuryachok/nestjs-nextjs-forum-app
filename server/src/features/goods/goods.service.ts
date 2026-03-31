@@ -86,6 +86,10 @@ export class GoodsService {
     return good.price;
   }
 
+  async unbuyGood(goodId: number, amount: number): Promise<void> {
+    await this.increaseAmount(goodId, amount);
+  }
+
   async throwIfGoodNotFound(goodId: number): Promise<Good> {
     const good = await this.findGoodById(goodId);
     if (!good) {
@@ -156,6 +160,14 @@ export class GoodsService {
       await this.goodsRepository.softDelete({ id });
     } catch (error) {
       throw new InternalServerErrorException(GoodError.DELETE_FAILED);
+    }
+  }
+
+  private async increaseAmount(id: number, amount: number): Promise<void> {
+    try {
+      await this.goodsRepository.increment({ id }, 'amount', amount);
+    } catch (error) {
+      throw new InternalServerErrorException(GoodError.INCREASE_AMOUNT_FAILED);
     }
   }
 

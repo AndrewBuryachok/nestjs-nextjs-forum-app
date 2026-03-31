@@ -1,9 +1,13 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Purchase } from './purchase.entity';
 import { GoodsService } from '../goods/goods.service';
-import { ExtCreatePurchaseDto } from './purchase.dto';
+import { DeletePurchaseDto, ExtCreatePurchaseDto } from './purchase.dto';
 import { PurchaseError } from './purchase-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
@@ -45,6 +49,24 @@ export class PurchasesService {
     await this.create(dto, price);
   }
 
+  async deletePurchase(dto: DeletePurchaseDto): Promise<void> {
+    const purchase = await this.throwIfPurchaseNotFound(dto.purchaseId);
+    await this.goodsService.unbuyGood(purchase.goodId, purchase.amount);
+    await this.delete(dto.purchaseId);
+  }
+
+  async throwIfPurchaseNotFound(purchaseId: number): Promise<Purchase> {
+    const purchase = await this.findPurchaseById(purchaseId);
+    if (!purchase) {
+      throw new NotFoundException(PurchaseError.NOT_FOUND);
+    }
+    return purchase;
+  }
+
+  private findPurchaseById(id: number): Promise<Purchase | null> {
+    return this.purchasesRepository.findOneBy({ id });
+  }
+
   private async create(
     dto: ExtCreatePurchaseDto,
     price: number,
@@ -60,6 +82,14 @@ export class PurchasesService {
       return purchase;
     } catch (error) {
       throw new InternalServerErrorException(PurchaseError.CREATE_FAILED);
+    }
+  }
+
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.purchasesRepository.delete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(PurchaseError.DELETE_FAILED);
     }
   }
 

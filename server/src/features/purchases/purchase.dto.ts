@@ -1,4 +1,13 @@
 import { IsInt, IsNotEmpty, Max, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class PurchaseIdDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
+  purchaseId: number;
+}
 
 export class CreatePurchaseDto {
   @IsNotEmpty()
@@ -22,3 +31,5 @@ export class ExtCreatePurchaseDto extends CreatePurchaseDto {
   myId: number;
   isAll: boolean;
 }
+
+export class DeletePurchaseDto extends PurchaseIdDto {}

@@ -39,6 +39,7 @@ describe('App', () => {
   let transactions: number[];
   let shops: number[];
   let goods: number[];
+  let purchases: number[];
 
   describe('Auth', () => {
     it('POST /auth/login', () => {
@@ -406,7 +407,10 @@ describe('App', () => {
       return request(app.getHttpServer())
         .get('/purchases/my')
         .set('Authorization', `Bearer ${user.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
+        .then(
+          (res) => (purchases = res.body.data.map((purchase) => purchase.id)),
+        );
     });
 
     it('GET /purchases/all', () => {
@@ -414,6 +418,20 @@ describe('App', () => {
         .get('/purchases/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('DELETE /purchases/:purchaseId', () => {
+      return request(app.getHttpServer())
+        .delete(`/purchases/${purchases[0]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(200);
+    });
+
+    it('DELETE /purchases/:purchaseId', () => {
+      return request(app.getHttpServer())
+        .delete(`/purchases/${purchases[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(200);
     });
   });
 
