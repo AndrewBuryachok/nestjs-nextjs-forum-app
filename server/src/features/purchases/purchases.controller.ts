@@ -1,7 +1,19 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { PurchasesService } from './purchases.service';
 import { Purchase } from './purchase.entity';
-import { CreatePurchaseDto, CreatePurchaseWithUserDto } from './purchase.dto';
+import {
+  CreatePurchaseDto,
+  CreatePurchaseWithUserDto,
+  PurchaseIdDto,
+} from './purchase.dto';
 import { MyId, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -36,5 +48,11 @@ export class PurchasesController {
   @Post('all')
   createUserPurchase(@Body() dto: CreatePurchaseWithUserDto): Promise<void> {
     return this.purchasesService.createPurchase(dto);
+  }
+
+  @Roles([Role.ADMIN])
+  @Delete(':purchaseId')
+  deletePurchase(@Param() { purchaseId }: PurchaseIdDto): Promise<void> {
+    return this.purchasesService.deletePurchase(purchaseId);
   }
 }
