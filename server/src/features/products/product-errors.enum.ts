@@ -5,5 +5,6 @@ export enum ProductError {
   CREATE_FAILED = 'products.create_failed',
   EDIT_FAILED = 'products.edit_failed',
   DELETE_FAILED = 'products.delete_failed',
+  INCREASE_AMOUNT_FAILED = 'products.increase_amount_failed',
   DECREASE_AMOUNT_FAILED = 'products.decrease_amount_failed',
 }
