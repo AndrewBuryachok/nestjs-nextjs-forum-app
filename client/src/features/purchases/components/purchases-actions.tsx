@@ -1,6 +1,7 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import { Purchase } from '../types';
 import { viewPurchaseAction } from '../actions/view-purchase-action';
+import { deletePurchaseAction } from '../actions/delete-purchase-action';
 import CustomActions from '@/components/custom-actions';
 
 type Props = {
@@ -9,9 +10,16 @@ type Props = {
 };
 
 export default function PurchasesActions(props: Props) {
+  const actions = {
+    my: [],
+    all: [deletePurchaseAction],
+  }[props.tab];
+
   return (
     <CustomActions
-      actions={[viewPurchaseAction].map((action) => action(props.purchase))}
+      actions={[viewPurchaseAction, ...actions].map((action) =>
+        action(props.purchase),
+      )}
     />
   );
 }
