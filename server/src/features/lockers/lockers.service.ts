@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Locker } from './locker.entity';
+import { UsersService } from '../users/users.service';
+import { CreateLockerWithUserDto } from './locker.dto';
+import { LockerError } from './locker-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
 @Injectable()
@@ -9,6 +12,7 @@ export class LockersService {
   constructor(
     @InjectRepository(Locker)
     private lockersRepository: Repository<Locker>,
+    private usersService: UsersService,
   ) {}
 
   async getMainLockers(req: Request): Promise<Response<Locker>> {
@@ -28,6 +32,26 @@ export class LockersService {
     const [data, total] =
       await this.getLockersQueryBuilder(req).getManyAndCount();
     return { data, total };
+  }
+
+  async createLocker(dto: CreateLockerWithUserDto): Promise<void> {
+    await this.usersService.throwIfUserNotFound(dto.userId);
+    await this.create(dto);
+  }
+
+  private async create(dto: CreateLockerWithUserDto): Promise<Locker> {
+    try {
+      const locker = this.lockersRepository.create({
+        userId: dto.userId,
+        name: dto.name,
+        x: dto.x,
+        y: dto.y,
+      });
+      await this.lockersRepository.save(locker);
+      return locker;
+    } catch (error) {
+      throw new InternalServerErrorException(LockerError.CREATE_FAILED);
+    }
   }
 
   private getLockersQueryBuilder(req: Request): SelectQueryBuilder<Locker> {

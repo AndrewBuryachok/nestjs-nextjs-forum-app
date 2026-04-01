@@ -1,12 +1,10 @@
-import {
-  IsInt,
-  IsNotEmpty,
-  IsString,
-  Max,
-  MaxLength,
-  Min,
-} from 'class-validator';
+import { IsInt, IsNotEmpty, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import {
+  CreatePlaceDto,
+  CreatePlaceWithCardAndUserDto,
+  CreatePlaceWithCardDto,
+} from '../places/place.dto';
 
 export class ShopIdDto {
   @IsNotEmpty()
@@ -16,35 +14,8 @@ export class ShopIdDto {
   shopId: number;
 }
 
-export class EditShopDto {
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(16)
-  name: string;
+export class CreateShopDto extends CreatePlaceWithCardDto {}
 
-  @IsNotEmpty()
-  @IsInt()
-  @Min(-1000)
-  @Max(1000)
-  x: number;
+export class CreateShopWithUserDto extends CreatePlaceWithCardAndUserDto {}
 
-  @IsNotEmpty()
-  @IsInt()
-  @Min(-1000)
-  @Max(1000)
-  y: number;
-}
-
-export class CreateShopDto extends EditShopDto {
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  cardId: number;
-}
-
-export class CreateShopWithUserDto extends CreateShopDto {
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  userId: number;
-}
+export class EditShopDto extends CreatePlaceDto {}
