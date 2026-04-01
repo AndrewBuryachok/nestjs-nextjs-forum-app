@@ -2,6 +2,7 @@ import { useTranslations } from 'next-intl';
 import {
   LuBanknote,
   LuCreditCard,
+  LuMailbox,
   LuShoppingBasket,
   LuShoppingCart,
   LuStore,
@@ -19,6 +20,7 @@ export default function CustomEmptyState(props: Props) {
 
   const icon = {
     cards: <LuCreditCard />,
+    lockers: <LuMailbox />,
     products: <LuShoppingBasket />,
     purchases: <LuShoppingCart />,
     shops: <LuStore />,
