@@ -7,6 +7,7 @@ import { Transaction } from '../../features/transactions/transaction.entity';
 import { Shop } from '../../features/shops/shop.entity';
 import { Good } from '../../features/goods/good.entity';
 import { Purchase } from '../../features/purchases/purchase.entity';
+import { Locker } from '../../features/lockers/locker.entity';
 
 export default class AppSeeder implements Seeder {
   public async run(_, factoryManager: SeederFactoryManager) {
@@ -131,6 +132,14 @@ export default class AppSeeder implements Seeder {
         return purchaseFactory.make({ good, card, amount, price });
       }),
     );
+    const lockerFactory = factoryManager.get(Locker);
+    const lockers = await Promise.all(
+      Array.from({ length: 20 }).map((_, i) => {
+        const id = i + 1;
+        const user = faker.helpers.arrayElement(users);
+        return lockerFactory.make({ id, user });
+      }),
+    );
     for (const user of users) {
       await userFactory.save(user);
     }
@@ -151,6 +160,9 @@ export default class AppSeeder implements Seeder {
     }
     for (const purchase of purchases) {
       await purchaseFactory.save(purchase);
+    }
+    for (const locker of lockers) {
+      await lockerFactory.save(locker);
     }
   }
 }

@@ -521,6 +521,28 @@ describe('App', () => {
     });
   });
 
+  describe('Lockers', () => {
+    it('GET /lockers', () => {
+      return request(app.getHttpServer())
+        .get('/lockers')
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /lockers/my', () => {
+      return request(app.getHttpServer())
+        .get('/lockers/my')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /lockers/all', () => {
+      return request(app.getHttpServer())
+        .get('/lockers/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+  });
+
   describe('Cards', () => {
     it('PATCH /cards/:cardId', () => {
       return request(app.getHttpServer())
