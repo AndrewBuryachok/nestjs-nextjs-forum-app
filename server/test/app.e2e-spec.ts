@@ -522,6 +522,31 @@ describe('App', () => {
   });
 
   describe('Lockers', () => {
+    it('POST /lockers', () => {
+      return request(app.getHttpServer())
+        .post('/lockers')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          name: 'Locker',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+        })
+        .expect(201);
+    });
+
+    it('POST /lockers/all', () => {
+      return request(app.getHttpServer())
+        .post('/lockers/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          userId: user.user.id,
+          name: 'Locker',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+        })
+        .expect(201);
+    });
+
     it('GET /lockers', () => {
       return request(app.getHttpServer())
         .get('/lockers')
