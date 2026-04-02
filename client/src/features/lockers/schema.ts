@@ -15,3 +15,18 @@ export const createLockerWithUserSchema = createLockerSchema.extend({
 export type CreateLockerWithUserType = z.infer<
   typeof createLockerWithUserSchema
 >;
+
+export const editLockerSchema = z.object({
+  lockerId: z.number().int().min(1),
+  name: z.string().min(1).max(16),
+  x: z.number().int().min(-1000).max(1000),
+  y: z.number().int().min(-1000).max(1000),
+});
+
+export type EditLockerType = z.infer<typeof editLockerSchema>;
+
+export const deleteLockerSchema = z.object({
+  lockerId: z.number().int().min(1),
+});
+
+export type DeleteLockerType = z.infer<typeof deleteLockerSchema>;
