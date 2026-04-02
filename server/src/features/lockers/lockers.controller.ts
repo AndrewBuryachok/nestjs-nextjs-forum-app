@@ -1,7 +1,21 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { LockersService } from './lockers.service';
 import { Locker } from './locker.entity';
-import { CreateLockerDto, ExtCreateLockerDto } from './locker.dto';
+import {
+  CreateLockerDto,
+  EditLockerDto,
+  ExtCreateLockerDto,
+  LockerIdDto,
+} from './locker.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -42,5 +56,51 @@ export class LockersController {
   @Post('all')
   createUserLocker(@Body() dto: ExtCreateLockerDto): Promise<void> {
     return this.lockersService.createLocker(dto);
+  }
+
+  @Patch(':lockerId')
+  editMyLocker(
+    @MyId() myId: number,
+    @Param() { lockerId }: LockerIdDto,
+    @Body() dto: EditLockerDto,
+  ): Promise<void> {
+    return this.lockersService.editLocker({
+      ...dto,
+      lockerId,
+      myId,
+      isAll: false,
+    });
+  }
+
+  @Roles([Role.ADMIN])
+  @Patch('all/:lockerId')
+  editUserLocker(
+    @MyId() myId: number,
+    @Param() { lockerId }: LockerIdDto,
+    @Body() dto: EditLockerDto,
+  ): Promise<void> {
+    return this.lockersService.editLocker({
+      ...dto,
+      lockerId,
+      myId,
+      isAll: true,
+    });
+  }
+
+  @Delete(':lockerId')
+  deleteMyLocker(
+    @MyId() myId: number,
+    @Param() { lockerId }: LockerIdDto,
+  ): Promise<void> {
+    return this.lockersService.deleteLocker({ lockerId, myId, isAll: false });
+  }
+
+  @Roles([Role.ADMIN])
+  @Delete('all/:lockerId')
+  deleteUserLocker(
+    @MyId() myId: number,
+    @Param() { lockerId }: LockerIdDto,
+  ): Promise<void> {
+    return this.lockersService.deleteLocker({ lockerId, myId, isAll: true });
   }
 }

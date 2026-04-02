@@ -40,6 +40,7 @@ describe('App', () => {
   let shops: number[];
   let goods: number[];
   let purchases: number[];
+  let lockers: number[];
 
   describe('Auth', () => {
     it('POST /auth/login', () => {
@@ -557,7 +558,8 @@ describe('App', () => {
       return request(app.getHttpServer())
         .get('/lockers/my')
         .set('Authorization', `Bearer ${user.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
+        .then((res) => (lockers = res.body.data.map((locker) => locker.id)));
     });
 
     it('GET /lockers/all', () => {
@@ -565,6 +567,44 @@ describe('App', () => {
         .get('/lockers/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('PATCH /lockers/:lockerId', () => {
+      return request(app.getHttpServer())
+        .patch(`/lockers/${lockers[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          name: 'Shop',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+        })
+        .expect(200);
+    });
+
+    it('PATCH /lockers/all/:lockerId', () => {
+      return request(app.getHttpServer())
+        .patch(`/lockers/all/${lockers[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          name: 'Shop',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+        })
+        .expect(200);
+    });
+
+    it('DELETE /lockers/:lockerId', () => {
+      return request(app.getHttpServer())
+        .delete(`/lockers/${lockers[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(200);
+    });
+
+    it('DELETE /lockers/all/:lockerId', () => {
+      return request(app.getHttpServer())
+        .delete(`/lockers/all/${lockers[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(200);
     });
   });
 
