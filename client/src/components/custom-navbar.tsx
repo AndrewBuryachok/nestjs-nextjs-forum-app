@@ -24,7 +24,7 @@ export default function CustomNavbar() {
     {
       value: 'mail',
       icon: <LuMailbox />,
-      links: [{ value: 'lockers' }],
+      links: [{ value: 'orders' }, { value: 'lockers' }],
     },
     { value: 'users', icon: <LuUsers /> },
   ];
