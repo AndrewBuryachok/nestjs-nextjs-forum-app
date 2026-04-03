@@ -10,6 +10,8 @@ import { Shop } from '../../features/shops/shop.entity';
 import { Product } from '../../features/products/product.entity';
 import { Purchase } from '../../features/purchases/purchase.entity';
 import { Locker } from '../../features/lockers/locker.entity';
+import { Order } from '../../features/orders/order.entity';
+import { Status } from '../../common/enums';
 
 export default class AppSeeder implements Seeder {
   private logger = new Logger(AppSeeder.name);
@@ -180,11 +182,65 @@ export default class AppSeeder implements Seeder {
     const lockerFactory = factoryManager.get(Locker);
     const lockers: Locker[] = [];
     for (let i = 0; i < 20; i++) {
+      const id = i + 1;
       const user = faker.helpers.arrayElement(users);
-      const locker = await lockerFactory.make({ user });
+      const locker = await lockerFactory.make({ id, user });
       lockers.push(locker);
     }
     this.logger.log(`Generated ${lockers.length} Lockers`);
+    this.logger.log('Generating Orders...');
+    const orderFactory = factoryManager.get(Order);
+    const orders: Order[] = [];
+    for (let i = 0; i < 40; i++) {
+      const locker = faker.helpers.arrayElement(lockers);
+      const sum = faker.number.int({ min: 1, max: 1000 });
+      const customerCard = faker.helpers.arrayElement(
+        cards.filter((card) => card.balance >= sum),
+      );
+      const executorCard = faker.helpers.arrayElement(cards);
+      const customerUser = randomUserOf(customerCard);
+      const executorUser = randomUserOf(executorCard);
+      const order = await orderFactory.make({
+        locker,
+        customerUser,
+        customerCard,
+        sum,
+      });
+      customerCard.balance -= sum;
+      const transaction = await transactionFactory.make({
+        senderUser: customerUser,
+        senderCard: customerCard,
+        sum,
+        description: 'створення замовлення',
+      });
+      transactions.push(transaction);
+      if (order.status !== Status.CREATED) {
+        order.executorUser = executorUser;
+        order.executorCard = executorCard;
+      }
+      if (order.status === Status.COMPLETED) {
+        order.completedAt = new Date();
+        const transaction = await transactionFactory.make({
+          receiverUser: customerUser,
+          receiverCard: customerCard,
+          sum,
+          description: 'завершення замовлення',
+        });
+        transactions.push(transaction);
+        executorCard.balance += sum;
+        const transfer = await transactionFactory.make({
+          senderUser: customerUser,
+          senderCard: customerCard,
+          receiverUser: executorUser,
+          receiverCard: executorCard,
+          sum,
+          description: 'виконання замовлення',
+        });
+        transactions.push(transfer);
+      }
+      orders.push(order);
+    }
+    this.logger.log(`Generated ${orders.length} Orders`);
     this.logger.log('💾 Saving generated entities to DB...');
     this.logger.log('Saving Users...');
     await dataSource.getRepository(User).save(users);
@@ -210,6 +266,9 @@ export default class AppSeeder implements Seeder {
     this.logger.log('Saving Lockers...');
     await dataSource.getRepository(Locker).save(lockers);
     this.logger.log(`Saved ${lockers.length} Lockers`);
+    this.logger.log('Saving Orders...');
+    await dataSource.getRepository(Order).save(orders);
+    this.logger.log(`Saved ${orders.length} Orders`);
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
     this.logger.log(
       `✅ Seeding process completed successfully in ${duration}s`,
