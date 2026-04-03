@@ -44,6 +44,12 @@ export class LockersController {
     return this.lockersService.getAllLockers(req);
   }
 
+  @Public()
+  @Get('all/select')
+  selectAllLockers(): Promise<Locker[]> {
+    return this.lockersService.selectAllLockers();
+  }
+
   @Post()
   createMyLocker(
     @MyId() myId: number,
