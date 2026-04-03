@@ -10,6 +10,7 @@ import { ShopsModule } from './features/shops/shops.module';
 import { GoodsModule } from './features/goods/goods.module';
 import { PurchasesModule } from './features/purchases/purchases.module';
 import { LockersModule } from './features/lockers/lockers.module';
+import { OrdersModule } from './features/orders/orders.module';
 import { AtGuard, RolesGuard } from './common/guards';
 
 @Module({
@@ -38,6 +39,7 @@ import { AtGuard, RolesGuard } from './common/guards';
     GoodsModule,
     PurchasesModule,
     LockersModule,
+    OrdersModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AtGuard },

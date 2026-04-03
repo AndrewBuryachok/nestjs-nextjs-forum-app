@@ -574,7 +574,38 @@ describe('App', () => {
         .get('/lockers/all/select')
         .expect((res) => expect(res.body.length).toBeGreaterThan(0));
     });
+  });
 
+  describe('Orders', () => {
+    it('GET /orders', () => {
+      return request(app.getHttpServer())
+        .get('/orders')
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /orders/my', () => {
+      return request(app.getHttpServer())
+        .get('/orders/my')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /orders/taken', () => {
+      return request(app.getHttpServer())
+        .get('/orders/taken')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /orders/all', () => {
+      return request(app.getHttpServer())
+        .get('/orders/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+  });
+
+  describe('Lockers', () => {
     it('PATCH /lockers/:lockerId', () => {
       return request(app.getHttpServer())
         .patch(`/lockers/${lockers[0]}`)

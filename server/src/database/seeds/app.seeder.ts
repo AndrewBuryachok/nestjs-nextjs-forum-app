@@ -8,6 +8,8 @@ import { Shop } from '../../features/shops/shop.entity';
 import { Good } from '../../features/goods/good.entity';
 import { Purchase } from '../../features/purchases/purchase.entity';
 import { Locker } from '../../features/lockers/locker.entity';
+import { Order } from '../../features/orders/order.entity';
+import { Status } from '../../common/enums';
 
 export default class AppSeeder implements Seeder {
   public async run(_, factoryManager: SeederFactoryManager) {
@@ -140,6 +142,46 @@ export default class AppSeeder implements Seeder {
         return lockerFactory.make({ id, user });
       }),
     );
+    const orderFactory = factoryManager.get(Order);
+    const orders = await Promise.all(
+      Array.from({ length: 40 }).map(async () => {
+        const sum = faker.number.int({ min: 1, max: 1000 });
+        const locker = faker.helpers.arrayElement(lockers);
+        const customerCard = faker.helpers.arrayElement(
+          cards.filter((card) => card.account.balance >= sum),
+        );
+        const executorCard = faker.helpers.arrayElement(cards);
+        const order = await orderFactory.make({ locker, customerCard, sum });
+        const transaction = await transactionFactory.make({
+          executorUser: customerCard.user,
+          senderCard: customerCard,
+          sum,
+          description: 'створення замовлення',
+        });
+        transactions.push(transaction);
+        if (order.status !== Status.CREATED) {
+          order.executorCard = executorCard;
+        }
+        if (order.status === Status.COMPLETED) {
+          order.completedAt = new Date();
+          const transaction = await transactionFactory.make({
+            executorUser: customerCard.user,
+            receiverCard: customerCard,
+            sum,
+            description: 'завершення замовлення',
+          });
+          transactions.push(transaction);
+          const transfer = await transactionFactory.make({
+            senderCard: customerCard,
+            receiverCard: executorCard,
+            sum,
+            description: 'виконання замовлення',
+          });
+          transactions.push(transfer);
+        }
+        return order;
+      }),
+    );
     for (const user of users) {
       await userFactory.save(user);
     }
@@ -163,6 +205,9 @@ export default class AppSeeder implements Seeder {
     }
     for (const locker of lockers) {
       await lockerFactory.save(locker);
+    }
+    for (const order of orders) {
+      await orderFactory.save(order);
     }
   }
 }
