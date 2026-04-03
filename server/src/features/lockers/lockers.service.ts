@@ -41,6 +41,10 @@ export class LockersService {
     return { data, total };
   }
 
+  selectAllLockers(): Promise<Locker[]> {
+    return this.selectLockersQueryBuilder().getMany();
+  }
+
   async createLocker(dto: ExtCreateLockerDto): Promise<void> {
     await this.create(dto);
   }
@@ -111,6 +115,13 @@ export class LockersService {
     } catch (error) {
       throw new InternalServerErrorException(LockerError.DELETE_FAILED);
     }
+  }
+
+  private selectLockersQueryBuilder(): SelectQueryBuilder<Locker> {
+    return this.lockersRepository
+      .createQueryBuilder('locker')
+      .select(['locker.id', 'locker.name', 'locker.x', 'locker.y'])
+      .orderBy('locker.name', 'ASC');
   }
 
   private getLockersQueryBuilder(req: Request): SelectQueryBuilder<Locker> {

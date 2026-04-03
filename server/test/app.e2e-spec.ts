@@ -569,6 +569,12 @@ describe('App', () => {
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
 
+    it('GET /lockers/all/select', () => {
+      return request(app.getHttpServer())
+        .get('/lockers/all/select')
+        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+    });
+
     it('PATCH /lockers/:lockerId', () => {
       return request(app.getHttpServer())
         .patch(`/lockers/${lockers[0]}`)
