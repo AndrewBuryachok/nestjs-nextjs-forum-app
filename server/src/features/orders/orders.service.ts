@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Order } from './order.entity';
+import { TransactionsService } from '../transactions/transactions.service';
+import { LockersService } from '../lockers/lockers.service';
+import { CreateOrderWithUserDto } from './order.dto';
+import { OrderError } from './order-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 import { Status } from '../../common/enums';
 
@@ -10,6 +14,8 @@ export class OrdersService {
   constructor(
     @InjectRepository(Order)
     private ordersRepository: Repository<Order>,
+    private transactionsService: TransactionsService,
+    private lockersService: LockersService,
   ) {}
 
   async getMainOrders(req: Request): Promise<Response<Order>> {
@@ -39,6 +45,38 @@ export class OrdersService {
     const [data, total] =
       await this.getOrdersQueryBuilder(req).getManyAndCount();
     return { data, total };
+  }
+
+  async createOrder(dto: CreateOrderWithUserDto): Promise<void> {
+    await this.lockersService.throwIfLockerNotFound(dto.lockerId);
+    await this.transactionsService.createDecreaseTransaction({
+      userId: dto.userId,
+      cardId: dto.cardId,
+      sum: dto.sum,
+      description: 'створення замовлення',
+    });
+    await this.create(dto);
+  }
+
+  private async create(dto: CreateOrderWithUserDto): Promise<Order> {
+    try {
+      const order = this.ordersRepository.create({
+        lockerId: dto.lockerId,
+        customerUserId: dto.userId,
+        customerCardId: dto.cardId,
+        item: dto.item,
+        description: dto.description,
+        amount: dto.amount,
+        batch: dto.batch,
+        unit: dto.unit,
+        sum: dto.sum,
+        status: Status.CREATED,
+      });
+      await this.ordersRepository.save(order);
+      return order;
+    } catch (error) {
+      throw new InternalServerErrorException(OrderError.CREATE_FAILED);
+    }
   }
 
   private getOrdersQueryBuilder(req: Request): SelectQueryBuilder<Order> {
