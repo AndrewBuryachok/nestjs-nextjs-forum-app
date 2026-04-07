@@ -9,5 +9,6 @@ import { LockersService } from './lockers.service';
   imports: [TypeOrmModule.forFeature([Locker]), UsersModule],
   controllers: [LockersController],
   providers: [LockersService],
+  exports: [LockersService],
 })
 export class LockersModule {}
