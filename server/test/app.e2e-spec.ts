@@ -577,6 +577,40 @@ describe('App', () => {
   });
 
   describe('Orders', () => {
+    it('POST /orders', () => {
+      return request(app.getHttpServer())
+        .post('/orders')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          lockerId: lockers[1],
+          cardId: cards[0],
+          item: Item.STONE,
+          description: '',
+          amount: 27,
+          batch: 64,
+          unit: Unit.PIECE,
+          sum: 10,
+        })
+        .expect(201);
+    });
+
+    it('POST /orders/all', () => {
+      return request(app.getHttpServer())
+        .post('/orders/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          lockerId: lockers[0],
+          cardId: cards[0],
+          item: Item.STONE,
+          description: '',
+          amount: 27,
+          batch: 64,
+          unit: Unit.PIECE,
+          sum: 10,
+        })
+        .expect(201);
+    });
+
     it('GET /orders', () => {
       return request(app.getHttpServer())
         .get('/orders')

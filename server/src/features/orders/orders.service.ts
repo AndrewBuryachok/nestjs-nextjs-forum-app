@@ -1,7 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Order } from './order.entity';
+import { LockersService } from '../lockers/lockers.service';
+import { CardsService } from '../cards/cards.service';
+import { TransactionsService } from '../transactions/transactions.service';
+import { ExtCreateOrderDto } from './order.dto';
+import { OrderError } from './order-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 import { Status } from '../../common/enums';
 
@@ -10,6 +15,9 @@ export class OrdersService {
   constructor(
     @InjectRepository(Order)
     private ordersRepository: Repository<Order>,
+    private lockersService: LockersService,
+    private cardsService: CardsService,
+    private transactionsService: TransactionsService,
   ) {}
 
   async getMainOrders(req: Request): Promise<Response<Order>> {
@@ -39,6 +47,41 @@ export class OrdersService {
     const [data, total] =
       await this.getOrdersQueryBuilder(req).getManyAndCount();
     return { data, total };
+  }
+
+  async createOrder(dto: ExtCreateOrderDto): Promise<void> {
+    await this.lockersService.throwIfLockerNotFound(dto.lockerId);
+    const card = await this.cardsService.throwIfNotCardUser(
+      dto.cardId,
+      dto.myId,
+      dto.isAll,
+    );
+    await this.transactionsService.createDecreaseTransaction({
+      cardId: dto.cardId,
+      sum: dto.sum,
+      description: 'створення замовлення',
+      myId: card.userId,
+    });
+    await this.create(dto);
+  }
+
+  private async create(dto: ExtCreateOrderDto): Promise<Order> {
+    try {
+      const order = this.ordersRepository.create({
+        lockerId: dto.lockerId,
+        customerCardId: dto.cardId,
+        item: dto.item,
+        description: dto.description,
+        amount: dto.amount,
+        batch: dto.batch,
+        unit: dto.unit,
+        sum: dto.sum,
+      });
+      await this.ordersRepository.save(order);
+      return order;
+    } catch (error) {
+      throw new InternalServerErrorException(OrderError.CREATE_FAILED);
+    }
   }
 
   private getOrdersQueryBuilder(req: Request): SelectQueryBuilder<Order> {
