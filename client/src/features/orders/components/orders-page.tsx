@@ -1,5 +1,6 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
+import OrdersAction from './orders-action';
 import OrdersTable from './orders-table';
 
 type Props = {
@@ -12,6 +13,7 @@ export default function OrdersPage(props: Props) {
     <CustomPage
       page='orders'
       tab={props.tab}
+      action={<OrdersAction tab={props.tab} />}
       table={<OrdersTable tab={props.tab} searchParams={props.searchParams} />}
     />
   );
