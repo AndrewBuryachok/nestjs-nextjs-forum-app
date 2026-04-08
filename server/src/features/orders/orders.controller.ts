@@ -1,7 +1,21 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { Order } from './order.entity';
-import { CreateOrderDto, CreateOrderWithUserDto } from './order.dto';
+import {
+  CreateOrderDto,
+  CreateOrderWithUserDto,
+  EditOrderDto,
+  OrderIdDto,
+} from './order.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -50,5 +64,37 @@ export class OrdersController {
   @Post('all')
   createUserOrder(@Body() dto: CreateOrderWithUserDto): Promise<void> {
     return this.ordersService.createOrder(dto);
+  }
+
+  @Patch(':orderId')
+  editMyOrder(
+    @MyId() myId: number,
+    @Param() { orderId }: OrderIdDto,
+    @Body() dto: EditOrderDto,
+  ): Promise<void> {
+    return this.ordersService.editMyOrder(myId, orderId, dto);
+  }
+
+  @Roles([Role.ADMIN])
+  @Patch('all/:orderId')
+  editUserOrder(
+    @Param() { orderId }: OrderIdDto,
+    @Body() dto: EditOrderDto,
+  ): Promise<void> {
+    return this.ordersService.editUserOrder(orderId, dto);
+  }
+
+  @Delete(':orderId')
+  deleteMyOrder(
+    @MyId() myId: number,
+    @Param() { orderId }: OrderIdDto,
+  ): Promise<void> {
+    return this.ordersService.deleteMyOrder(myId, orderId);
+  }
+
+  @Roles([Role.ADMIN])
+  @Delete('all/:orderId')
+  deleteUserOrder(@Param() { orderId }: OrderIdDto): Promise<void> {
+    return this.ordersService.deleteUserOrder(orderId);
   }
 }

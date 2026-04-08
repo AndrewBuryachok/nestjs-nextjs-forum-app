@@ -1,10 +1,17 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Order } from './order.entity';
+import { CardsService } from '../cards/cards.service';
 import { TransactionsService } from '../transactions/transactions.service';
 import { LockersService } from '../lockers/lockers.service';
-import { CreateOrderWithUserDto } from './order.dto';
+import { CreateOrderWithUserDto, EditOrderDto } from './order.dto';
 import { OrderError } from './order-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 import { Status } from '../../common/enums';
@@ -14,6 +21,7 @@ export class OrdersService {
   constructor(
     @InjectRepository(Order)
     private ordersRepository: Repository<Order>,
+    private cardsService: CardsService,
     private transactionsService: TransactionsService,
     private lockersService: LockersService,
   ) {}
@@ -58,6 +66,113 @@ export class OrdersService {
     await this.create(dto);
   }
 
+  async editMyOrder(
+    myId: number,
+    orderId: number,
+    dto: EditOrderDto,
+  ): Promise<void> {
+    const order = await this.throwIfNotOrderCustomer(orderId, myId);
+    await this.editOrder(order, dto);
+  }
+
+  async editUserOrder(orderId: number, dto: EditOrderDto): Promise<void> {
+    const order = await this.throwIfOrderNotFound(orderId);
+    await this.editOrder(order, dto);
+  }
+
+  private async editOrder(order: Order, dto: EditOrderDto): Promise<void> {
+    this.throwIfOrderNotCreated(order);
+    if (order.sum < dto.sum) {
+      await this.transactionsService.createDecreaseTransaction({
+        userId: order.customerUserId,
+        cardId: order.customerCardId,
+        sum: dto.sum - order.sum,
+        description: 'редагування замовлення',
+      });
+    }
+    if (order.sum > dto.sum) {
+      await this.transactionsService.createIncreaseTransaction({
+        userId: order.customerUserId,
+        cardId: order.customerCardId,
+        sum: order.sum - dto.sum,
+        description: 'редагування замовлення',
+      });
+    }
+    await this.edit(order.id, dto);
+  }
+
+  async deleteMyOrder(myId: number, orderId: number): Promise<void> {
+    const order = await this.throwIfNotOrderCustomer(orderId, myId);
+    await this.deleteOrder(order);
+  }
+
+  async deleteUserOrder(orderId: number): Promise<void> {
+    const order = await this.throwIfOrderNotFound(orderId);
+    await this.deleteOrder(order);
+  }
+
+  private async deleteOrder(order: Order): Promise<void> {
+    this.throwIfOrderNotCreated(order);
+    await this.transactionsService.createIncreaseTransaction({
+      userId: order.customerUserId,
+      cardId: order.customerCardId,
+      sum: order.sum,
+      description: 'видалення замовлення',
+    });
+    await this.delete(order.id);
+  }
+
+  async throwIfOrderNotFound(orderId: number): Promise<Order> {
+    const order = await this.findOrderById(orderId);
+    if (!order) {
+      throw new NotFoundException(OrderError.NOT_FOUND);
+    }
+    return order;
+  }
+
+  async throwIfNotOrderCustomer(
+    orderId: number,
+    userId: number,
+  ): Promise<Order> {
+    const order = await this.throwIfOrderNotFound(orderId);
+    const isCardUser = await this.cardsService.isCardUser(
+      order.customerCardId,
+      userId,
+    );
+    if (!isCardUser) {
+      throw new ForbiddenException(OrderError.NOT_CUSTOMER);
+    }
+    return order;
+  }
+
+  private throwIfOrderNotCreated(order: Order): void {
+    this.throwIfOrderAlreadyTaken(order);
+    this.throwIfOrderAlreadyExecuted(order);
+    this.throwIfOrderAlreadyCompleted(order);
+  }
+
+  private throwIfOrderAlreadyTaken(order: Order): void {
+    if (order.status === Status.TAKEN) {
+      throw new BadRequestException(OrderError.ALREADY_TAKEN);
+    }
+  }
+
+  private throwIfOrderAlreadyExecuted(order: Order): void {
+    if (order.status === Status.EXECUTED) {
+      throw new BadRequestException(OrderError.ALREADY_EXECUTED);
+    }
+  }
+
+  private throwIfOrderAlreadyCompleted(order: Order): void {
+    if (order.status === Status.COMPLETED) {
+      throw new BadRequestException(OrderError.ALREADY_COMPLETED);
+    }
+  }
+
+  private findOrderById(id: number): Promise<Order | null> {
+    return this.ordersRepository.findOneBy({ id });
+  }
+
   private async create(dto: CreateOrderWithUserDto): Promise<Order> {
     try {
       const order = this.ordersRepository.create({
@@ -76,6 +191,32 @@ export class OrdersService {
       return order;
     } catch (error) {
       throw new InternalServerErrorException(OrderError.CREATE_FAILED);
+    }
+  }
+
+  private async edit(id: number, dto: EditOrderDto): Promise<void> {
+    try {
+      await this.ordersRepository.update(
+        { id },
+        {
+          item: dto.item,
+          description: dto.description,
+          amount: dto.amount,
+          batch: dto.batch,
+          unit: dto.unit,
+          sum: dto.sum,
+        },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(OrderError.EDIT_FAILED);
+    }
+  }
+
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.ordersRepository.delete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(OrderError.DELETE_FAILED);
     }
   }
 
