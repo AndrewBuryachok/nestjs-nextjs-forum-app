@@ -1,11 +1,21 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Order } from './order.entity';
 import { LockersService } from '../lockers/lockers.service';
 import { CardsService } from '../cards/cards.service';
 import { TransactionsService } from '../transactions/transactions.service';
-import { ExtCreateOrderDto } from './order.dto';
+import {
+  DeleteOrderDto,
+  ExtCreateOrderDto,
+  ExtEditOrderDto,
+} from './order.dto';
 import { OrderError } from './order-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 import { Status } from '../../common/enums';
@@ -65,6 +75,83 @@ export class OrdersService {
     await this.create(dto);
   }
 
+  async editOrder(dto: ExtEditOrderDto): Promise<void> {
+    const order = await this.throwIfNotOrderCustomer(
+      dto.orderId,
+      dto.myId,
+      dto.isAll,
+    );
+    this.throwIfOrderAlreadyTaken(order);
+    if (order.sum < dto.sum) {
+      await this.transactionsService.createDecreaseTransaction({
+        cardId: order.customerCardId,
+        sum: dto.sum - order.sum,
+        description: 'редагування замовлення',
+        myId: dto.myId,
+      });
+    }
+    if (order.sum > dto.sum) {
+      await this.transactionsService.createIncreaseTransaction({
+        cardId: order.customerCardId,
+        sum: order.sum - dto.sum,
+        description: 'редагування замовлення',
+        myId: dto.myId,
+      });
+    }
+    await this.edit(dto.orderId, dto);
+  }
+
+  async deleteOrder(dto: DeleteOrderDto): Promise<void> {
+    const order = await this.throwIfNotOrderCustomer(
+      dto.orderId,
+      dto.myId,
+      dto.isAll,
+    );
+    this.throwIfOrderAlreadyTaken(order);
+    await this.transactionsService.createIncreaseTransaction({
+      cardId: order.customerCardId,
+      sum: order.sum,
+      description: 'видалення замовлення',
+      myId: dto.myId,
+    });
+    await this.delete(dto.orderId);
+  }
+
+  async throwIfOrderNotFound(orderId: number): Promise<Order> {
+    const order = await this.findOrderById(orderId);
+    if (!order) {
+      throw new NotFoundException(OrderError.NOT_FOUND);
+    }
+    return order;
+  }
+
+  async throwIfNotOrderCustomer(
+    orderId: number,
+    userId: number,
+    isAll: boolean,
+  ): Promise<Order> {
+    const order = await this.throwIfOrderNotFound(orderId);
+    const isCardUser = await this.cardsService.isCardUser(
+      order.customerCardId,
+      userId,
+      isAll,
+    );
+    if (!isCardUser) {
+      throw new ForbiddenException(OrderError.NOT_CUSTOMER);
+    }
+    return order;
+  }
+
+  private throwIfOrderAlreadyTaken(order: Order): void {
+    if (order.status !== Status.CREATED) {
+      throw new BadRequestException(OrderError.ALREADY_TAKEN);
+    }
+  }
+
+  private findOrderById(id: number): Promise<Order | null> {
+    return this.ordersRepository.findOneBy({ id });
+  }
+
   private async create(dto: ExtCreateOrderDto): Promise<Order> {
     try {
       const order = this.ordersRepository.create({
@@ -81,6 +168,32 @@ export class OrdersService {
       return order;
     } catch (error) {
       throw new InternalServerErrorException(OrderError.CREATE_FAILED);
+    }
+  }
+
+  private async edit(id: number, dto: ExtEditOrderDto): Promise<void> {
+    try {
+      await this.ordersRepository.update(
+        { id },
+        {
+          item: dto.item,
+          description: dto.description,
+          amount: dto.amount,
+          batch: dto.batch,
+          unit: dto.unit,
+          sum: dto.sum,
+        },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(OrderError.EDIT_FAILED);
+    }
+  }
+
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.ordersRepository.delete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(OrderError.DELETE_FAILED);
     }
   }
 

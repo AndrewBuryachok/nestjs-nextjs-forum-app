@@ -41,6 +41,7 @@ describe('App', () => {
   let goods: number[];
   let purchases: number[];
   let lockers: number[];
+  let orders: number[];
 
   describe('Auth', () => {
     it('POST /auth/login', () => {
@@ -621,7 +622,8 @@ describe('App', () => {
       return request(app.getHttpServer())
         .get('/orders/my')
         .set('Authorization', `Bearer ${user.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
+        .then((res) => (orders = res.body.data.map((order) => order.id)));
     });
 
     it('GET /orders/taken', () => {
@@ -636,6 +638,50 @@ describe('App', () => {
         .get('/orders/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('PATCH /orders/:orderId', () => {
+      return request(app.getHttpServer())
+        .patch(`/orders/${orders[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          item: Item.STONE,
+          description: '',
+          amount: 27,
+          batch: 64,
+          unit: Unit.PIECE,
+          sum: 10,
+        })
+        .expect(200);
+    });
+
+    it('PATCH /orders/all/:orderId', () => {
+      return request(app.getHttpServer())
+        .patch(`/orders/all/${orders[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          item: Item.STONE,
+          description: '',
+          amount: 27,
+          batch: 64,
+          unit: Unit.PIECE,
+          sum: 10,
+        })
+        .expect(200);
+    });
+
+    it('DELETE /orders/:orderId', () => {
+      return request(app.getHttpServer())
+        .delete(`/orders/${orders[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(200);
+    });
+
+    it('DELETE /orders/all/:orderId', () => {
+      return request(app.getHttpServer())
+        .delete(`/orders/all/${orders[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(200);
     });
   });
 
