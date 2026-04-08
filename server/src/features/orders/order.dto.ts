@@ -8,19 +8,18 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { Item, Unit } from '../../common/enums';
 
-export class CreateOrderDto {
+export class OrderIdDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
-  lockerId: number;
+  @Type(() => Number)
+  orderId: number;
+}
 
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  cardId: number;
-
+export class EditOrderDto {
   @IsNotEmpty()
   @IsEnum(Item)
   item: Item;
@@ -50,6 +49,18 @@ export class CreateOrderDto {
   @IsInt()
   @Min(1)
   sum: number;
+}
+
+export class CreateOrderDto extends EditOrderDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  lockerId: number;
+
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  cardId: number;
 }
 
 export class CreateOrderWithUserDto extends CreateOrderDto {
