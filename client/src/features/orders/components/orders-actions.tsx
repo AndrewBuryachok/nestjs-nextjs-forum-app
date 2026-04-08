@@ -1,6 +1,14 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import { Order } from '../types';
 import { viewOrderAction } from '../actions/view-order-action';
+import {
+  editMyOrderAction,
+  editUserOrderAction,
+} from '../actions/edit-order-action';
+import {
+  deleteMyOrderAction,
+  deleteUserOrderAction,
+} from '../actions/delete-order-action';
 import CustomActions from '@/components/custom-actions';
 
 type Props = {
@@ -9,9 +17,18 @@ type Props = {
 };
 
 export default function OrdersActions(props: Props) {
+  const actions = {
+    main: [],
+    my: [editMyOrderAction, deleteMyOrderAction],
+    taken: [],
+    all: [editUserOrderAction, deleteUserOrderAction],
+  }[props.tab];
+
   return (
     <CustomActions
-      actions={[viewOrderAction].map((action) => action(props.order))}
+      actions={[viewOrderAction, ...actions].map((action) =>
+        action(props.order),
+      )}
     />
   );
 }
