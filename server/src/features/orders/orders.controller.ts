@@ -15,6 +15,8 @@ import {
   CreateOrderWithUserDto,
   EditOrderDto,
   OrderIdDto,
+  TakeOrderDto,
+  TakeOrderWithUserDto,
 } from './order.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
@@ -96,5 +98,23 @@ export class OrdersController {
   @Delete('all/:orderId')
   deleteUserOrder(@Param() { orderId }: OrderIdDto): Promise<void> {
     return this.ordersService.deleteUserOrder(orderId);
+  }
+
+  @Post(':orderId/take')
+  takeMyOrder(
+    @MyId() myId: number,
+    @Param() { orderId }: OrderIdDto,
+    @Body() dto: TakeOrderDto,
+  ): Promise<void> {
+    return this.ordersService.takeMyOrder(myId, orderId, dto);
+  }
+
+  @Roles([Role.ADMIN])
+  @Post('all/:orderId/take')
+  takeUserOrder(
+    @Param() { orderId }: OrderIdDto,
+    @Body() dto: TakeOrderWithUserDto,
+  ): Promise<void> {
+    return this.ordersService.takeUserOrder(orderId, dto);
   }
 }

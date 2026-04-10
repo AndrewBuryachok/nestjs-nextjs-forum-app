@@ -11,7 +11,12 @@ import { Order } from './order.entity';
 import { CardsService } from '../cards/cards.service';
 import { TransactionsService } from '../transactions/transactions.service';
 import { LockersService } from '../lockers/lockers.service';
-import { CreateOrderWithUserDto, EditOrderDto } from './order.dto';
+import {
+  CreateOrderWithUserDto,
+  EditOrderDto,
+  TakeOrderDto,
+  TakeOrderWithUserDto,
+} from './order.dto';
 import { OrderError } from './order-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 import { Status } from '../../common/enums';
@@ -122,6 +127,31 @@ export class OrdersService {
     await this.delete(order.id);
   }
 
+  async takeMyOrder(
+    myId: number,
+    orderId: number,
+    dto: TakeOrderDto,
+  ): Promise<void> {
+    await this.takeOrder(orderId, { ...dto, userId: myId });
+  }
+
+  async takeUserOrder(
+    orderId: number,
+    dto: TakeOrderWithUserDto,
+  ): Promise<void> {
+    await this.takeOrder(orderId, dto);
+  }
+
+  private async takeOrder(
+    orderId: number,
+    dto: TakeOrderWithUserDto,
+  ): Promise<void> {
+    await this.cardsService.throwIfNotCardUser(dto.cardId, dto.userId);
+    const order = await this.throwIfOrderNotFound(orderId);
+    this.throwIfOrderNotCreated(order);
+    await this.take(orderId, dto);
+  }
+
   async throwIfOrderNotFound(orderId: number): Promise<Order> {
     const order = await this.findOrderById(orderId);
     if (!order) {
@@ -217,6 +247,21 @@ export class OrdersService {
       await this.ordersRepository.delete({ id });
     } catch (error) {
       throw new InternalServerErrorException(OrderError.DELETE_FAILED);
+    }
+  }
+
+  private async take(id: number, dto: TakeOrderWithUserDto): Promise<void> {
+    try {
+      await this.ordersRepository.update(
+        { id },
+        {
+          status: Status.TAKEN,
+          executorUserId: dto.userId,
+          executorCardId: dto.cardId,
+        },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(OrderError.TAKE_FAILED);
     }
   }
 
