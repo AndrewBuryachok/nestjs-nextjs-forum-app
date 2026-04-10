@@ -152,6 +152,21 @@ export class OrdersService {
     await this.take(orderId, dto);
   }
 
+  async cancelMyOrder(myId: number, orderId: number): Promise<void> {
+    const order = await this.throwIfNotOrderExecutor(orderId, myId);
+    await this.cancelOrder(order);
+  }
+
+  async cancelUserOrder(orderId: number): Promise<void> {
+    const order = await this.throwIfOrderNotFound(orderId);
+    await this.cancelOrder(order);
+  }
+
+  private async cancelOrder(order: Order): Promise<void> {
+    this.throwIfOrderNotTaken(order);
+    await this.cancel(order.id);
+  }
+
   async throwIfOrderNotFound(orderId: number): Promise<Order> {
     const order = await this.findOrderById(orderId);
     if (!order) {
@@ -175,10 +190,32 @@ export class OrdersService {
     return order;
   }
 
+  async throwIfNotOrderExecutor(
+    orderId: number,
+    userId: number,
+  ): Promise<Order> {
+    const order = await this.throwIfOrderNotFound(orderId);
+    const isCardUser =
+      !!order.executorCardId &&
+      (await this.cardsService.isCardUser(order.executorCardId, userId));
+    if (!isCardUser) {
+      throw new ForbiddenException(OrderError.NOT_EXECUTOR);
+    }
+    return order;
+  }
+
   private throwIfOrderNotCreated(order: Order): void {
     this.throwIfOrderAlreadyTaken(order);
     this.throwIfOrderAlreadyExecuted(order);
     this.throwIfOrderAlreadyCompleted(order);
+  }
+
+  private throwIfOrderNotTaken(order: Order): void {
+    this.throwIfOrderAlreadyExecuted(order);
+    this.throwIfOrderAlreadyCompleted(order);
+    if (order.status !== Status.TAKEN) {
+      throw new BadRequestException(OrderError.NOT_TAKEN);
+    }
   }
 
   private throwIfOrderAlreadyTaken(order: Order): void {
@@ -262,6 +299,17 @@ export class OrdersService {
       );
     } catch (error) {
       throw new InternalServerErrorException(OrderError.TAKE_FAILED);
+    }
+  }
+
+  private async cancel(id: number): Promise<void> {
+    try {
+      await this.ordersRepository.update(
+        { id },
+        { status: Status.CREATED, executorUserId: null, executorCardId: null },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(OrderError.CANCEL_FAILED);
     }
   }
 
