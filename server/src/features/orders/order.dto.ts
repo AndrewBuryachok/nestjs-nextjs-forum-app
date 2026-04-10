@@ -92,3 +92,9 @@ export class ExtTakeOrderDto extends TakeOrderDto {
   myId: number;
   isAll: boolean;
 }
+
+export class CancelOrderDto {
+  orderId: number;
+  myId: number;
+  isAll: boolean;
+}

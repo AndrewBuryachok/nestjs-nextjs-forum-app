@@ -30,11 +30,11 @@ export class Order {
   customerCard: Card;
 
   @Column({ name: 'executor_card_id', nullable: true })
-  executorCardId?: number;
+  executorCardId?: number | null;
 
   @ManyToOne(() => Card, { nullable: true })
   @JoinColumn({ name: 'executor_card_id' })
-  executorCard?: Card;
+  executorCard?: Card | null;
 
   @Column({ type: 'enum', enum: Item, default: Item.STONE })
   item: Item;

@@ -12,6 +12,7 @@ import { LockersService } from '../lockers/lockers.service';
 import { CardsService } from '../cards/cards.service';
 import { TransactionsService } from '../transactions/transactions.service';
 import {
+  CancelOrderDto,
   DeleteOrderDto,
   ExtCreateOrderDto,
   ExtEditOrderDto,
@@ -125,6 +126,16 @@ export class OrdersService {
     await this.take(dto.orderId, dto);
   }
 
+  async cancelOrder(dto: CancelOrderDto): Promise<void> {
+    const order = await this.throwIfNotOrderExecutor(
+      dto.orderId,
+      dto.myId,
+      dto.isAll,
+    );
+    this.throwIfOrderNotTaken(order);
+    await this.cancel(dto.orderId);
+  }
+
   async throwIfOrderNotFound(orderId: number): Promise<Order> {
     const order = await this.findOrderById(orderId);
     if (!order) {
@@ -150,9 +161,30 @@ export class OrdersService {
     return order;
   }
 
+  async throwIfNotOrderExecutor(
+    orderId: number,
+    userId: number,
+    isAll: boolean,
+  ): Promise<Order> {
+    const order = await this.throwIfOrderNotFound(orderId);
+    const isCardUser =
+      !!order.executorCardId &&
+      (await this.cardsService.isCardUser(order.executorCardId, userId, isAll));
+    if (!isCardUser) {
+      throw new ForbiddenException(OrderError.NOT_EXECUTOR);
+    }
+    return order;
+  }
+
   private throwIfOrderAlreadyTaken(order: Order): void {
     if (order.status !== Status.CREATED) {
       throw new BadRequestException(OrderError.ALREADY_TAKEN);
+    }
+  }
+
+  private throwIfOrderNotTaken(order: Order): void {
+    if (order.status !== Status.TAKEN) {
+      throw new BadRequestException(OrderError.NOT_TAKEN);
     }
   }
 
@@ -213,6 +245,17 @@ export class OrdersService {
       );
     } catch (error) {
       throw new InternalServerErrorException(OrderError.TAKE_FAILED);
+    }
+  }
+
+  private async cancel(id: number): Promise<void> {
+    try {
+      await this.ordersRepository.update(
+        { id },
+        { executorCardId: null, status: Status.CREATED },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(OrderError.CANCEL_FAILED);
     }
   }
 

@@ -656,6 +656,20 @@ describe('App', () => {
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
 
+    it('POST /orders/:orderId/cancel', () => {
+      return request(app.getHttpServer())
+        .post(`/orders/${orders[0]}/cancel`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(201);
+    });
+
+    it('POST /orders/all/:orderId/cancel', () => {
+      return request(app.getHttpServer())
+        .post(`/orders/all/${orders[1]}/cancel`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(201);
+    });
+
     it('PATCH /orders/:orderId', () => {
       return request(app.getHttpServer())
         .patch(`/orders/${orders[0]}`)
