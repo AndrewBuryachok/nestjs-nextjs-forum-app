@@ -10,7 +10,12 @@ import {
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { Order } from './order.entity';
-import { CreateOrderDto, EditOrderDto, OrderIdDto } from './order.dto';
+import {
+  CreateOrderDto,
+  EditOrderDto,
+  OrderIdDto,
+  TakeOrderDto,
+} from './order.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -103,5 +108,29 @@ export class OrdersController {
     @Param() { orderId }: OrderIdDto,
   ): Promise<void> {
     return this.ordersService.deleteOrder({ orderId, myId, isAll: true });
+  }
+
+  @Post(':orderId/take')
+  takeMyOrder(
+    @MyId() myId: number,
+    @Param() { orderId }: OrderIdDto,
+    @Body() dto: TakeOrderDto,
+  ): Promise<void> {
+    return this.ordersService.takeOrder({
+      ...dto,
+      orderId,
+      myId,
+      isAll: false,
+    });
+  }
+
+  @Roles([Role.ADMIN])
+  @Post('all/:orderId/take')
+  takeUserOrder(
+    @MyId() myId: number,
+    @Param() { orderId }: OrderIdDto,
+    @Body() dto: TakeOrderDto,
+  ): Promise<void> {
+    return this.ordersService.takeOrder({ ...dto, orderId, myId, isAll: true });
   }
 }

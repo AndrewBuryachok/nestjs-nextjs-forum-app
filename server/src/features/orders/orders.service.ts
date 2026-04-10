@@ -15,6 +15,7 @@ import {
   DeleteOrderDto,
   ExtCreateOrderDto,
   ExtEditOrderDto,
+  ExtTakeOrderDto,
 } from './order.dto';
 import { OrderError } from './order-errors.enum';
 import { Request, Response } from '../../common/interfaces';
@@ -117,6 +118,13 @@ export class OrdersService {
     await this.delete(dto.orderId);
   }
 
+  async takeOrder(dto: ExtTakeOrderDto): Promise<void> {
+    await this.cardsService.throwIfNotCardUser(dto.cardId, dto.myId, dto.isAll);
+    const order = await this.throwIfOrderNotFound(dto.orderId);
+    this.throwIfOrderAlreadyTaken(order);
+    await this.take(dto.orderId, dto);
+  }
+
   async throwIfOrderNotFound(orderId: number): Promise<Order> {
     const order = await this.findOrderById(orderId);
     if (!order) {
@@ -194,6 +202,17 @@ export class OrdersService {
       await this.ordersRepository.delete({ id });
     } catch (error) {
       throw new InternalServerErrorException(OrderError.DELETE_FAILED);
+    }
+  }
+
+  private async take(id: number, dto: ExtTakeOrderDto): Promise<void> {
+    try {
+      await this.ordersRepository.update(
+        { id },
+        { executorCardId: dto.cardId, status: Status.TAKEN },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(OrderError.TAKE_FAILED);
     }
   }
 

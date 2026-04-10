@@ -626,6 +626,22 @@ describe('App', () => {
         .then((res) => (orders = res.body.data.map((order) => order.id)));
     });
 
+    it('POST /orders/:orderId/take', () => {
+      return request(app.getHttpServer())
+        .post(`/orders/${orders[0]}/take`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ cardId: cards[0] })
+        .expect(201);
+    });
+
+    it('POST /orders/all/:orderId/take', () => {
+      return request(app.getHttpServer())
+        .post(`/orders/all/${orders[1]}/take`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({ cardId: cards[0] })
+        .expect(201);
+    });
+
     it('GET /orders/taken', () => {
       return request(app.getHttpServer())
         .get('/orders/taken')

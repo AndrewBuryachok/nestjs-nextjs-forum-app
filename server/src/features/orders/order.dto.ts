@@ -79,3 +79,16 @@ export class DeleteOrderDto {
   myId: number;
   isAll: boolean;
 }
+
+export class TakeOrderDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  cardId: number;
+}
+
+export class ExtTakeOrderDto extends TakeOrderDto {
+  orderId: number;
+  myId: number;
+  isAll: boolean;
+}

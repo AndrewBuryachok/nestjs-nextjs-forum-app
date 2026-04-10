@@ -5,4 +5,5 @@ export enum OrderError {
   CREATE_FAILED = 'Не вдалося створити замовлення',
   EDIT_FAILED = 'Не вдалося редагувати замовлення',
   DELETE_FAILED = 'Не вдалося видалити замовлення',
+  TAKE_FAILED = 'Не вдалося взяти замовлення',
 }
