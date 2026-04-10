@@ -1,11 +1,14 @@
 export enum OrderError {
   ALREADY_TAKEN = 'orders.already_taken',
+  NOT_TAKEN = 'orders.not_taken',
   ALREADY_EXECUTED = 'orders.already_executed',
   ALREADY_COMPLETED = 'orders.already_completed',
   NOT_CUSTOMER = 'orders.not_customer',
+  NOT_EXECUTOR = 'orders.not_executor',
   NOT_FOUND = 'orders.not_found',
   CREATE_FAILED = 'orders.create_failed',
   EDIT_FAILED = 'orders.edit_failed',
   DELETE_FAILED = 'orders.delete_failed',
   TAKE_FAILED = 'orders.take_failed',
+  CANCEL_FAILED = 'orders.cancel_failed',
 }
