@@ -9,6 +9,10 @@ import {
   deleteMyOrderAction,
   deleteUserOrderAction,
 } from '../actions/delete-order-action';
+import {
+  takeMyOrderAction,
+  takeUserOrderAction,
+} from '../actions/take-order-action';
 import CustomActions from '@/components/custom-actions';
 
 type Props = {
@@ -18,10 +22,10 @@ type Props = {
 
 export default function OrdersActions(props: Props) {
   const actions = {
-    main: [],
+    main: [takeMyOrderAction],
     my: [editMyOrderAction, deleteMyOrderAction],
     taken: [],
-    all: [editUserOrderAction, deleteUserOrderAction],
+    all: [takeUserOrderAction, editUserOrderAction, deleteUserOrderAction],
   }[props.tab];
 
   return (
