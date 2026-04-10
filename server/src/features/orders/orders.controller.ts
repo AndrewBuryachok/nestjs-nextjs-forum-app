@@ -117,4 +117,18 @@ export class OrdersController {
   ): Promise<void> {
     return this.ordersService.takeUserOrder(orderId, dto);
   }
+
+  @Post(':orderId/cancel')
+  cancelMyOrder(
+    @MyId() myId: number,
+    @Param() { orderId }: OrderIdDto,
+  ): Promise<void> {
+    return this.ordersService.cancelMyOrder(myId, orderId);
+  }
+
+  @Roles([Role.ADMIN])
+  @Post('all/:orderId/cancel')
+  cancelUserOrder(@Param() { orderId }: OrderIdDto): Promise<void> {
+    return this.ordersService.cancelUserOrder(orderId);
+  }
 }
