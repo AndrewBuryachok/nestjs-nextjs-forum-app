@@ -4,6 +4,7 @@ import {
   createOrderSchema,
   deleteOrderSchema,
   editOrderSchema,
+  takeOrderSchema,
 } from './schema';
 import { actionClient } from '@/lib/safe-action';
 import { send } from '@/lib/api';
@@ -42,4 +43,16 @@ export const deleteUserOrderAction = actionClient
   .inputSchema(deleteOrderSchema)
   .action(({ parsedInput: { orderId } }) => {
     return send('DELETE', `/orders/all/${orderId}`);
+  });
+
+export const takeMyOrderAction = actionClient
+  .inputSchema(takeOrderSchema)
+  .action(({ parsedInput: { orderId, ...body } }) => {
+    return send('POST', `/orders/${orderId}/take`, body);
+  });
+
+export const takeUserOrderAction = actionClient
+  .inputSchema(takeOrderSchema)
+  .action(({ parsedInput: { orderId, ...body } }) => {
+    return send('POST', `/orders/all/${orderId}/take`, body);
   });

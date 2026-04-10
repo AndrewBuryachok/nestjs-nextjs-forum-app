@@ -32,3 +32,10 @@ export const deleteOrderSchema = z.object({
 });
 
 export type DeleteOrderType = z.infer<typeof deleteOrderSchema>;
+
+export const takeOrderSchema = z.object({
+  orderId: z.number().int().min(1),
+  cardId: z.number().int().min(1),
+});
+
+export type TakeOrderType = z.infer<typeof takeOrderSchema>;
