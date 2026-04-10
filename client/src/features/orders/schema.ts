@@ -51,3 +51,9 @@ export const takeOrderWithUserSchema = takeOrderSchema.extend({
 });
 
 export type TakeOrderWithUserType = z.infer<typeof takeOrderWithUserSchema>;
+
+export const cancelOrderSchema = z.object({
+  orderId: z.number().int().min(1),
+});
+
+export type CancelOrderType = z.infer<typeof cancelOrderSchema>;
