@@ -69,3 +69,17 @@ export class CreateOrderWithUserDto extends CreateOrderDto {
   @Min(1)
   userId: number;
 }
+
+export class TakeOrderDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  cardId: number;
+}
+
+export class TakeOrderWithUserDto extends TakeOrderDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  userId: number;
+}
