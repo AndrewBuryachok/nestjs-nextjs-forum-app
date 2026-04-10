@@ -13,7 +13,12 @@ import {
   takeMyOrderAction,
   takeUserOrderAction,
 } from '../actions/take-order-action';
+import {
+  cancelMyOrderAction,
+  cancelUserOrderAction,
+} from '../actions/cancel-order-action';
 import CustomActions from '@/components/custom-actions';
+import { Status } from '@/constants/statuses';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.orders;
@@ -21,11 +26,26 @@ type Props = {
 };
 
 export default function OrdersActions(props: Props) {
+  const allActions = (status: Status) => {
+    switch (status) {
+      case Status.CREATED:
+        return [
+          takeUserOrderAction,
+          editUserOrderAction,
+          deleteUserOrderAction,
+        ];
+      case Status.TAKEN:
+        return [cancelUserOrderAction];
+      default:
+        return [];
+    }
+  };
+
   const actions = {
     main: [takeMyOrderAction],
     my: [editMyOrderAction, deleteMyOrderAction],
-    taken: [],
-    all: [takeUserOrderAction, editUserOrderAction, deleteUserOrderAction],
+    taken: [cancelMyOrderAction],
+    all: allActions(props.order.status),
   }[props.tab];
 
   return (
