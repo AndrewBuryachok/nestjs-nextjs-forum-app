@@ -62,18 +62,18 @@ export class Order {
   createdAt: Date;
 
   @Column({ name: 'executor_user_id', nullable: true })
-  executorUserId?: number;
+  executorUserId?: number | null;
 
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'executor_user_id' })
-  executorUser?: User;
+  executorUser?: User | null;
 
   @Column({ name: 'executor_card_id', nullable: true })
-  executorCardId?: number;
+  executorCardId?: number | null;
 
   @ManyToOne(() => Card, { nullable: true })
   @JoinColumn({ name: 'executor_card_id' })
-  executorCard?: Card;
+  executorCard?: Card | null;
 
   @Column({ type: 'timestamptz', name: 'completed_at', nullable: true })
   completedAt?: Date;
