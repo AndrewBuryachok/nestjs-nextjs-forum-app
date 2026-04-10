@@ -1,6 +1,7 @@
 'use server';
 
 import {
+  cancelOrderSchema,
   createOrderSchema,
   createOrderWithUserSchema,
   deleteOrderSchema,
@@ -57,4 +58,16 @@ export const takeUserOrderAction = actionClient
   .inputSchema(takeOrderWithUserSchema)
   .action(({ parsedInput: { orderId, ...body } }) => {
     return send('POST', `/orders/all/${orderId}/take`, body);
+  });
+
+export const cancelMyOrderAction = actionClient
+  .inputSchema(cancelOrderSchema)
+  .action(({ parsedInput: { orderId } }) => {
+    return send('POST', `/orders/${orderId}/cancel`);
+  });
+
+export const cancelUserOrderAction = actionClient
+  .inputSchema(cancelOrderSchema)
+  .action(({ parsedInput: { orderId } }) => {
+    return send('POST', `/orders/all/${orderId}/cancel`);
   });
