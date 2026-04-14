@@ -131,4 +131,18 @@ export class OrdersController {
   cancelUserOrder(@Param() { orderId }: OrderIdDto): Promise<void> {
     return this.ordersService.cancelUserOrder(orderId);
   }
+
+  @Post(':orderId/execute')
+  executeMyOrder(
+    @MyId() myId: number,
+    @Param() { orderId }: OrderIdDto,
+  ): Promise<void> {
+    return this.ordersService.executeMyOrder(myId, orderId);
+  }
+
+  @Roles([Role.ADMIN])
+  @Post('all/:orderId/execute')
+  executeUserOrder(@Param() { orderId }: OrderIdDto): Promise<void> {
+    return this.ordersService.executeUserOrder(orderId);
+  }
 }
