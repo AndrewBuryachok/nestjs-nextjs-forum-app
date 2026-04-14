@@ -51,3 +51,9 @@ export const executeOrderSchema = z.object({
 });
 
 export type ExecuteOrderType = z.infer<typeof executeOrderSchema>;
+
+export const completeOrderSchema = z.object({
+  orderId: z.number().int().min(1),
+});
+
+export type CompleteOrderType = z.infer<typeof completeOrderSchema>;

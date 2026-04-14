@@ -2,6 +2,7 @@
 
 import {
   cancelOrderSchema,
+  completeOrderSchema,
   createOrderSchema,
   deleteOrderSchema,
   editOrderSchema,
@@ -81,4 +82,16 @@ export const executeUserOrderAction = actionClient
   .inputSchema(executeOrderSchema)
   .action(({ parsedInput: { orderId } }) => {
     return send('POST', `/orders/all/${orderId}/execute`);
+  });
+
+export const completeMyOrderAction = actionClient
+  .inputSchema(completeOrderSchema)
+  .action(({ parsedInput: { orderId } }) => {
+    return send('POST', `/orders/${orderId}/complete`);
+  });
+
+export const completeUserOrderAction = actionClient
+  .inputSchema(completeOrderSchema)
+  .action(({ parsedInput: { orderId } }) => {
+    return send('POST', `/orders/all/${orderId}/complete`);
   });
