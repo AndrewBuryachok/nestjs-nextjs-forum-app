@@ -9,4 +9,5 @@ export enum OrderError {
   DELETE_FAILED = 'Не вдалося видалити замовлення',
   TAKE_FAILED = 'Не вдалося взяти замовлення',
   CANCEL_FAILED = 'Не вдалося скасувати замовлення',
+  EXECUTE_FAILED = 'Не вдалося виконати замовлення',
 }

@@ -595,6 +595,40 @@ describe('App', () => {
         .expect(201);
     });
 
+    it('POST /orders', () => {
+      return request(app.getHttpServer())
+        .post('/orders')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          lockerId: lockers[0],
+          cardId: cards[0],
+          item: Item.STONE,
+          description: '',
+          amount: 27,
+          batch: 64,
+          unit: Unit.PIECE,
+          sum: 10,
+        })
+        .expect(201);
+    });
+
+    it('POST /orders/all', () => {
+      return request(app.getHttpServer())
+        .post('/orders/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          lockerId: lockers[1],
+          cardId: cards[0],
+          item: Item.STONE,
+          description: '',
+          amount: 27,
+          batch: 64,
+          unit: Unit.PIECE,
+          sum: 10,
+        })
+        .expect(201);
+    });
+
     it('POST /orders/all', () => {
       return request(app.getHttpServer())
         .post('/orders/all')
@@ -666,6 +700,36 @@ describe('App', () => {
     it('POST /orders/all/:orderId/cancel', () => {
       return request(app.getHttpServer())
         .post(`/orders/all/${orders[1]}/cancel`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(201);
+    });
+
+    it('POST /orders/:orderId/take', () => {
+      return request(app.getHttpServer())
+        .post(`/orders/${orders[2]}/take`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ cardId: cards[0] })
+        .expect(201);
+    });
+
+    it('POST /orders/all/:orderId/take', () => {
+      return request(app.getHttpServer())
+        .post(`/orders/all/${orders[3]}/take`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({ cardId: cards[0] })
+        .expect(201);
+    });
+
+    it('POST /orders/:orderId/execute', () => {
+      return request(app.getHttpServer())
+        .post(`/orders/${orders[2]}/execute`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(201);
+    });
+
+    it('POST /orders/all/:orderId/execute', () => {
+      return request(app.getHttpServer())
+        .post(`/orders/all/${orders[3]}/execute`)
         .set('Authorization', `Bearer ${admin.access}`)
         .expect(201);
     });

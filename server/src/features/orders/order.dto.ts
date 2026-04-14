@@ -98,3 +98,9 @@ export class CancelOrderDto {
   myId: number;
   isAll: boolean;
 }
+
+export class ExecuteOrderDto {
+  orderId: number;
+  myId: number;
+  isAll: boolean;
+}
