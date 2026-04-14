@@ -6,6 +6,7 @@ import {
   createOrderWithUserSchema,
   deleteOrderSchema,
   editOrderSchema,
+  executeOrderSchema,
   takeOrderSchema,
   takeOrderWithUserSchema,
 } from './schema';
@@ -70,4 +71,16 @@ export const cancelUserOrderAction = actionClient
   .inputSchema(cancelOrderSchema)
   .action(({ parsedInput: { orderId } }) => {
     return send('POST', `/orders/all/${orderId}/cancel`);
+  });
+
+export const executeMyOrderAction = actionClient
+  .inputSchema(executeOrderSchema)
+  .action(({ parsedInput: { orderId } }) => {
+    return send('POST', `/orders/${orderId}/execute`);
+  });
+
+export const executeUserOrderAction = actionClient
+  .inputSchema(executeOrderSchema)
+  .action(({ parsedInput: { orderId } }) => {
+    return send('POST', `/orders/all/${orderId}/execute`);
   });
