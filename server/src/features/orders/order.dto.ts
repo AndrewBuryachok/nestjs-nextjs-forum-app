@@ -104,3 +104,9 @@ export class ExecuteOrderDto {
   myId: number;
   isAll: boolean;
 }
+
+export class CompleteOrderDto {
+  orderId: number;
+  myId: number;
+  isAll: boolean;
+}

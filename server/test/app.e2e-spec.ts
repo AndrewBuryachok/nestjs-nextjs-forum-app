@@ -734,6 +734,20 @@ describe('App', () => {
         .expect(201);
     });
 
+    it('POST /orders/:orderId/complete', () => {
+      return request(app.getHttpServer())
+        .post(`/orders/${orders[2]}/complete`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(201);
+    });
+
+    it('POST /orders/all/:orderId/complete', () => {
+      return request(app.getHttpServer())
+        .post(`/orders/all/${orders[3]}/complete`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(201);
+    });
+
     it('PATCH /orders/:orderId', () => {
       return request(app.getHttpServer())
         .patch(`/orders/${orders[0]}`)

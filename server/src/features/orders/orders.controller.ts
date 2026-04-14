@@ -167,4 +167,21 @@ export class OrdersController {
   ): Promise<void> {
     return this.ordersService.executeOrder({ orderId, myId, isAll: true });
   }
+
+  @Post(':orderId/complete')
+  completeMyOrder(
+    @MyId() myId: number,
+    @Param() { orderId }: OrderIdDto,
+  ): Promise<void> {
+    return this.ordersService.completeOrder({ orderId, myId, isAll: false });
+  }
+
+  @Roles([Role.ADMIN])
+  @Post('all/:orderId/complete')
+  completeUserOrder(
+    @MyId() myId: number,
+    @Param() { orderId }: OrderIdDto,
+  ): Promise<void> {
+    return this.ordersService.completeOrder({ orderId, myId, isAll: true });
+  }
 }

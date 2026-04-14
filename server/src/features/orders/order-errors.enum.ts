@@ -1,6 +1,8 @@
 export enum OrderError {
   ALREADY_TAKEN = 'Замовлення вже взято',
   NOT_TAKEN = 'Замовлення не взято',
+  NOT_EXECUTED = 'Замовлення не виконано',
+  ALREADY_COMPLETED = 'Замовлення вже завершено',
   NOT_CUSTOMER = 'Ви не замовник замовлення',
   NOT_EXECUTOR = 'Ви не виконавець замовлення',
   NOT_FOUND = 'Не вдалося знайти замовлення',
@@ -10,4 +12,5 @@ export enum OrderError {
   TAKE_FAILED = 'Не вдалося взяти замовлення',
   CANCEL_FAILED = 'Не вдалося скасувати замовлення',
   EXECUTE_FAILED = 'Не вдалося виконати замовлення',
+  COMPLETE_FAILED = 'Не вдалося завершити замовлення',
 }

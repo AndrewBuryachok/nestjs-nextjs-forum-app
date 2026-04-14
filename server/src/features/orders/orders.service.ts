@@ -13,6 +13,7 @@ import { CardsService } from '../cards/cards.service';
 import { TransactionsService } from '../transactions/transactions.service';
 import {
   CancelOrderDto,
+  CompleteOrderDto,
   DeleteOrderDto,
   ExecuteOrderDto,
   ExtCreateOrderDto,
@@ -147,6 +148,31 @@ export class OrdersService {
     await this.execute(dto.orderId);
   }
 
+  async completeOrder(dto: CompleteOrderDto): Promise<void> {
+    const order = await this.throwIfNotOrderCustomer(
+      dto.orderId,
+      dto.myId,
+      dto.isAll,
+    );
+    this.throwIfOrderAlreadyCompleted(order);
+    this.throwIfOrderNotExecuted(order);
+    await this.transactionsService.createIncreaseTransaction({
+      cardId: order.customerCardId,
+      sum: order.sum,
+      description: 'завершення замовлення',
+      myId: dto.myId,
+    });
+    await this.transactionsService.createTransferTransaction({
+      senderCardId: order.customerCardId,
+      receiverCardId: order.executorCardId!,
+      sum: order.sum,
+      description: 'виконання замовлення',
+      myId: dto.myId,
+      isAll: dto.isAll,
+    });
+    await this.complete(dto.orderId);
+  }
+
   async throwIfOrderNotFound(orderId: number): Promise<Order> {
     const order = await this.findOrderById(orderId);
     if (!order) {
@@ -196,6 +222,18 @@ export class OrdersService {
   private throwIfOrderNotTaken(order: Order): void {
     if (order.status !== Status.TAKEN) {
       throw new BadRequestException(OrderError.NOT_TAKEN);
+    }
+  }
+
+  private throwIfOrderNotExecuted(order: Order): void {
+    if (order.status !== Status.EXECUTED) {
+      throw new BadRequestException(OrderError.NOT_EXECUTED);
+    }
+  }
+
+  private throwIfOrderAlreadyCompleted(order: Order): void {
+    if (order.status === Status.COMPLETED) {
+      throw new BadRequestException(OrderError.ALREADY_COMPLETED);
     }
   }
 
@@ -275,6 +313,17 @@ export class OrdersService {
       await this.ordersRepository.update({ id }, { status: Status.EXECUTED });
     } catch (error) {
       throw new InternalServerErrorException(OrderError.EXECUTE_FAILED);
+    }
+  }
+
+  private async complete(id: number): Promise<void> {
+    try {
+      await this.ordersRepository.update(
+        { id },
+        { completedAt: new Date(), status: Status.COMPLETED },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(OrderError.COMPLETE_FAILED);
     }
   }
 
