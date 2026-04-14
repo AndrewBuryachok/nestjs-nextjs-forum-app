@@ -182,6 +182,35 @@ export class OrdersService {
     await this.execute(order.id);
   }
 
+  async completeMyOrder(myId: number, orderId: number): Promise<void> {
+    const order = await this.throwIfNotOrderCustomer(orderId, myId);
+    await this.completeOrder(order);
+  }
+
+  async completeUserOrder(orderId: number): Promise<void> {
+    const order = await this.throwIfOrderNotFound(orderId);
+    await this.completeOrder(order);
+  }
+
+  private async completeOrder(order: Order): Promise<void> {
+    this.throwIfOrderNotExecuted(order);
+    await this.transactionsService.createIncreaseTransaction({
+      userId: order.customerUserId,
+      cardId: order.customerCardId,
+      sum: order.sum,
+      description: 'завершення замовлення',
+    });
+    await this.transactionsService.createUserTransferTransaction({
+      senderUserId: order.customerUserId,
+      senderCardId: order.customerCardId,
+      receiverUserId: order.executorUserId!,
+      receiverCardId: order.executorCardId!,
+      sum: order.sum,
+      description: 'виконання замовлення',
+    });
+    await this.complete(order.id);
+  }
+
   async throwIfOrderNotFound(orderId: number): Promise<Order> {
     const order = await this.findOrderById(orderId);
     if (!order) {
@@ -230,6 +259,13 @@ export class OrdersService {
     this.throwIfOrderAlreadyCompleted(order);
     if (order.status !== Status.TAKEN) {
       throw new BadRequestException(OrderError.NOT_TAKEN);
+    }
+  }
+
+  private throwIfOrderNotExecuted(order: Order): void {
+    this.throwIfOrderAlreadyCompleted(order);
+    if (order.status !== Status.EXECUTED) {
+      throw new BadRequestException(OrderError.NOT_EXECUTED);
     }
   }
 
@@ -333,6 +369,17 @@ export class OrdersService {
       await this.ordersRepository.update({ id }, { status: Status.EXECUTED });
     } catch (error) {
       throw new InternalServerErrorException(OrderError.EXECUTE_FAILED);
+    }
+  }
+
+  private async complete(id: number): Promise<void> {
+    try {
+      await this.ordersRepository.update(
+        { id },
+        { status: Status.COMPLETED, completedAt: new Date() },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(OrderError.COMPLETE_FAILED);
     }
   }
 
