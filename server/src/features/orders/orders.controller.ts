@@ -145,4 +145,18 @@ export class OrdersController {
   executeUserOrder(@Param() { orderId }: OrderIdDto): Promise<void> {
     return this.ordersService.executeUserOrder(orderId);
   }
+
+  @Post(':orderId/complete')
+  completeMyOrder(
+    @MyId() myId: number,
+    @Param() { orderId }: OrderIdDto,
+  ): Promise<void> {
+    return this.ordersService.completeMyOrder(myId, orderId);
+  }
+
+  @Roles([Role.ADMIN])
+  @Post('all/:orderId/complete')
+  completeUserOrder(@Param() { orderId }: OrderIdDto): Promise<void> {
+    return this.ordersService.completeUserOrder(orderId);
+  }
 }
