@@ -167,6 +167,21 @@ export class OrdersService {
     await this.cancel(order.id);
   }
 
+  async executeMyOrder(myId: number, orderId: number): Promise<void> {
+    const order = await this.throwIfNotOrderExecutor(orderId, myId);
+    await this.executeOrder(order);
+  }
+
+  async executeUserOrder(orderId: number): Promise<void> {
+    const order = await this.throwIfOrderNotFound(orderId);
+    await this.executeOrder(order);
+  }
+
+  private async executeOrder(order: Order): Promise<void> {
+    this.throwIfOrderNotTaken(order);
+    await this.execute(order.id);
+  }
+
   async throwIfOrderNotFound(orderId: number): Promise<Order> {
     const order = await this.findOrderById(orderId);
     if (!order) {
@@ -310,6 +325,14 @@ export class OrdersService {
       );
     } catch (error) {
       throw new InternalServerErrorException(OrderError.CANCEL_FAILED);
+    }
+  }
+
+  private async execute(id: number): Promise<void> {
+    try {
+      await this.ordersRepository.update({ id }, { status: Status.EXECUTED });
+    } catch (error) {
+      throw new InternalServerErrorException(OrderError.EXECUTE_FAILED);
     }
   }
 
