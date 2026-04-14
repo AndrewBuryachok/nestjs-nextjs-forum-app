@@ -2,6 +2,7 @@ export enum OrderError {
   ALREADY_TAKEN = 'orders.already_taken',
   NOT_TAKEN = 'orders.not_taken',
   ALREADY_EXECUTED = 'orders.already_executed',
+  NOT_EXECUTED = 'orders.not_executed',
   ALREADY_COMPLETED = 'orders.already_completed',
   NOT_CUSTOMER = 'orders.not_customer',
   NOT_EXECUTOR = 'orders.not_executor',
@@ -12,4 +13,5 @@ export enum OrderError {
   TAKE_FAILED = 'orders.take_failed',
   CANCEL_FAILED = 'orders.cancel_failed',
   EXECUTE_FAILED = 'orders.execute_failed',
+  COMPLETE_FAILED = 'orders.complete_failed',
 }
