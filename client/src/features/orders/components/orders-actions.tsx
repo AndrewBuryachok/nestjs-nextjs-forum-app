@@ -17,6 +17,10 @@ import {
   cancelMyOrderAction,
   cancelUserOrderAction,
 } from '../actions/cancel-order-action';
+import {
+  executeMyOrderAction,
+  executeUserOrderAction,
+} from '../actions/execute-order-action';
 import CustomActions from '@/components/custom-actions';
 import { Status } from '@/constants/statuses';
 
@@ -35,7 +39,7 @@ export default function OrdersActions(props: Props) {
           deleteUserOrderAction,
         ];
       case Status.TAKEN:
-        return [cancelUserOrderAction];
+        return [executeUserOrderAction, cancelUserOrderAction];
       default:
         return [];
     }
@@ -44,7 +48,7 @@ export default function OrdersActions(props: Props) {
   const actions = {
     main: [takeMyOrderAction],
     my: [editMyOrderAction, deleteMyOrderAction],
-    taken: [cancelMyOrderAction],
+    taken: [executeMyOrderAction, cancelMyOrderAction],
     all: allActions(props.order.status),
   }[props.tab];
 

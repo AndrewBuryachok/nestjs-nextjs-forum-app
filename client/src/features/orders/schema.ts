@@ -45,3 +45,9 @@ export const cancelOrderSchema = z.object({
 });
 
 export type CancelOrderType = z.infer<typeof cancelOrderSchema>;
+
+export const executeOrderSchema = z.object({
+  orderId: z.number().int().min(1),
+});
+
+export type ExecuteOrderType = z.infer<typeof executeOrderSchema>;
