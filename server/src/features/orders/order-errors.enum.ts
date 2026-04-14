@@ -11,4 +11,5 @@ export enum OrderError {
   DELETE_FAILED = 'orders.delete_failed',
   TAKE_FAILED = 'orders.take_failed',
   CANCEL_FAILED = 'orders.cancel_failed',
+  EXECUTE_FAILED = 'orders.execute_failed',
 }
