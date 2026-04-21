@@ -1,11 +1,8 @@
 import { NextIntlClientProvider } from 'next-intl';
-import { Box, Stack } from '@chakra-ui/react';
 import { Provider } from '@/components/ui/provider';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/providers/auth-provider';
 import { DialogProvider } from '@/providers/dialog-provider';
-import CustomHeader from '@/components/custom-header';
-import CustomContainer from '@/components/custom-container';
 import { verifySession } from '@/lib/session';
 
 type Props = {
@@ -21,14 +18,7 @@ export default async function RootLayout(props: Props) {
         <NextIntlClientProvider>
           <Provider>
             <AuthProvider user={session && session.user}>
-              <DialogProvider>
-                <CustomHeader />
-                <Box as='main'>
-                  <CustomContainer>
-                    <Stack>{props.children}</Stack>
-                  </CustomContainer>
-                </Box>
-              </DialogProvider>
+              <DialogProvider>{props.children}</DialogProvider>
             </AuthProvider>
             <Toaster />
           </Provider>
