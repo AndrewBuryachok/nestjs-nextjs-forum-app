@@ -1,5 +1,5 @@
 import { ScrollArea, Stack } from '@chakra-ui/react';
-import { LuMailbox, LuStore, LuUsers, LuWallet } from 'react-icons/lu';
+import { LuMailbox, LuMap, LuStore, LuUsers, LuWallet } from 'react-icons/lu';
 import NavbarLink from './navbar-link';
 
 export default function CustomNavbar() {
@@ -26,6 +26,7 @@ export default function CustomNavbar() {
       icon: <LuMailbox />,
       links: [{ value: 'orders' }, { value: 'lockers' }],
     },
+    { value: 'map', icon: <LuMap /> },
     { value: 'users', icon: <LuUsers /> },
   ];
 

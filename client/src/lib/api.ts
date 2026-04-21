@@ -19,7 +19,9 @@ api.interceptors.request.use(async (config) => {
 
 export async function get<T>(route: string, { page, ...req }: Request) {
   try {
-    const params = { ...req, skip: (page - 1) * PAGE_SIZE, take: PAGE_SIZE };
+    const params = page
+      ? { ...req, skip: (page - 1) * PAGE_SIZE, take: PAGE_SIZE }
+      : req;
     const res = await api.get<Response<T>>(route, { params });
     return res.data;
   } catch (error) {
