@@ -36,5 +36,6 @@ export const PAGE_TABS_MAP = {
   },
   users: {
     main: { public: true },
+    all: { roles: [Role.ADMIN] },
   },
 };
