@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from './user.entity';
-import { CreateUserDto } from './user.dto';
+import { CreateUserDto, UpdateUserRoleDto } from './user.dto';
 import { UserError } from './user-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
@@ -60,6 +60,22 @@ export class UsersService {
     await this.resetToken(userId);
   }
 
+  async addUserRole(userId: number, dto: UpdateUserRoleDto): Promise<void> {
+    const user = await this.throwIfUserNotFound(userId);
+    if (user.roles.includes(dto.role)) {
+      throw new BadRequestException(UserError.ALREADY_HAVE_ROLE);
+    }
+    await this.addRole(user, dto);
+  }
+
+  async removeUserRole(userId: number, dto: UpdateUserRoleDto): Promise<void> {
+    const user = await this.throwIfUserNotFound(userId);
+    if (!user.roles.includes(dto.role)) {
+      throw new BadRequestException(UserError.NOT_HAVE_ROLE);
+    }
+    await this.removeRole(user, dto);
+  }
+
   async throwIfNickAlreadyUsed(nick: string): Promise<void> {
     const user = await this.findUserByNick(nick);
     if (user) {
@@ -109,6 +125,24 @@ export class UsersService {
       await this.usersRepository.update({ id }, { token: '' });
     } catch (error) {
       throw new InternalServerErrorException(UserError.RESET_TOKEN_FAILED);
+    }
+  }
+
+  private async addRole(user: User, dto: UpdateUserRoleDto): Promise<void> {
+    try {
+      user.roles.push(dto.role);
+      await this.usersRepository.save(user);
+    } catch (error) {
+      throw new InternalServerErrorException(UserError.ADD_ROLE_FAILED);
+    }
+  }
+
+  private async removeRole(user: User, dto: UpdateUserRoleDto): Promise<void> {
+    try {
+      user.roles = user.roles.filter((role) => role !== dto.role);
+      await this.usersRepository.save(user);
+    } catch (error) {
+      throw new InternalServerErrorException(UserError.REMOVE_ROLE_FAILED);
     }
   }
 
