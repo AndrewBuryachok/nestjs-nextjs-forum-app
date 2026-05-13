@@ -35,6 +35,7 @@ describe('App', () => {
 
   let admin: Tokens;
   let user: Tokens;
+  let users: number[];
   let cards: number[];
   let transactions: number[];
   let shops: number[];
@@ -95,7 +96,24 @@ describe('App', () => {
       return request(app.getHttpServer())
         .get('/users/all')
         .set('Authorization', `Bearer ${admin.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
+        .then((res) => (users = res.body.data.map((user) => user.id)));
+    });
+
+    it('POST /users/:userId/roles', () => {
+      return request(app.getHttpServer())
+        .post(`/users/${users[0]}/roles`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({ role: Role.ADMIN })
+        .expect(201);
+    });
+
+    it('DELETE /users/:userId/roles', () => {
+      return request(app.getHttpServer())
+        .delete(`/users/${users[0]}/roles`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({ role: Role.ADMIN })
+        .expect(200);
     });
 
     it('GET /users/all/select', () => {
