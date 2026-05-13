@@ -91,6 +91,13 @@ describe('App', () => {
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
 
+    it('GET /users/all', () => {
+      return request(app.getHttpServer())
+        .get('/users/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
     it('GET /users/all/select', () => {
       return request(app.getHttpServer())
         .get('/users/all/select')

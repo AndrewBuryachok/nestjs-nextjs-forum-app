@@ -23,6 +23,12 @@ export class UsersService {
     return { data, total };
   }
 
+  async getAllUsers(req: Request): Promise<Response<User>> {
+    const [data, total] =
+      await this.getUsersQueryBuilder(req).getManyAndCount();
+    return { data, total };
+  }
+
   selectAllUsers(): Promise<User[]> {
     return this.selectUsersQueryBuilder().getMany();
   }
