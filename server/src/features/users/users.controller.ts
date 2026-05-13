@@ -1,8 +1,9 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
-import { Public } from '../../common/decorators';
+import { Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
+import { Role } from '../../common/enums';
 
 @Controller('users')
 export class UsersController {
@@ -12,6 +13,12 @@ export class UsersController {
   @Get()
   getMainUsers(@Query() req: Request): Promise<Response<User>> {
     return this.usersService.getMainUsers(req);
+  }
+
+  @Roles([Role.ADMIN])
+  @Get('all')
+  getAllUsers(@Query() req: Request): Promise<Response<User>> {
+    return this.usersService.getAllUsers(req);
   }
 
   @Public()
