@@ -1,6 +1,15 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
+import { UpdateUserRoleDto, UserIdDto } from './user.dto';
 import { Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -25,5 +34,23 @@ export class UsersController {
   @Get('all/select')
   selectAllUsers(): Promise<User[]> {
     return this.usersService.selectAllUsers();
+  }
+
+  @Roles([Role.ADMIN])
+  @Post(':userId/roles')
+  addUserRole(
+    @Param() { userId }: UserIdDto,
+    @Body() dto: UpdateUserRoleDto,
+  ): Promise<void> {
+    return this.usersService.addUserRole({ ...dto, userId });
+  }
+
+  @Roles([Role.ADMIN])
+  @Delete(':userId/roles')
+  removeUserRole(
+    @Param() { userId }: UserIdDto,
+    @Body() dto: UpdateUserRoleDto,
+  ): Promise<void> {
+    return this.usersService.removeUserRole({ ...dto, userId });
   }
 }

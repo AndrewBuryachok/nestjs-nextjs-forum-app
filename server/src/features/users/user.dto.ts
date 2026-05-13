@@ -1,6 +1,7 @@
-import { IsInt, IsNotEmpty, Min } from 'class-validator';
+import { IsEnum, IsInt, IsNotEmpty, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { AuthDto } from '../auth/auth.dto';
+import { Role } from '../../common/enums';
 
 export class UserIdDto {
   @IsNotEmpty()
@@ -11,3 +12,13 @@ export class UserIdDto {
 }
 
 export class CreateUserDto extends AuthDto {}
+
+export class UpdateUserRoleDto {
+  @IsNotEmpty()
+  @IsEnum(Role)
+  role: Role;
+}
+
+export class ExtUpdateUserRoleDto extends UpdateUserRoleDto {
+  userId: number;
+}
