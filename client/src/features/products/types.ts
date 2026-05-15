@@ -17,4 +17,5 @@ export interface Product extends BaseProduct {
   amount: number;
   price: number;
   createdAt: Date;
+  purchases: number;
 }
