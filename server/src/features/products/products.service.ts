@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -10,7 +12,12 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Product } from './product.entity';
 import { CardsService } from '../cards/cards.service';
 import { ShopsService } from '../shops/shops.service';
-import { CreateProductWithUserDto, EditProductDto } from './product.dto';
+import { PurchasesService } from '../purchases/purchases.service';
+import {
+  CreateProductWithUserDto,
+  EditProductAmountAndPriceDto,
+  EditProductDto,
+} from './product.dto';
 import { ProductError } from './product-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
@@ -21,6 +28,8 @@ export class ProductsService {
     private productsRepository: Repository<Product>,
     private cardsService: CardsService,
     private shopsService: ShopsService,
+    @Inject(forwardRef(() => PurchasesService))
+    private purchasesService: PurchasesService,
   ) {}
 
   async getMainProducts(req: Request): Promise<Response<Product>> {
@@ -49,17 +58,38 @@ export class ProductsService {
     await this.create(dto);
   }
 
+  async editMyProductAmountAndPrice(
+    myId: number,
+    productId: number,
+    dto: EditProductAmountAndPriceDto,
+  ): Promise<void> {
+    await this.throwIfNotProductOwner(productId, myId);
+    await this.throwIfProductNotBought(productId);
+    await this.editAmountAndPrice(productId, dto);
+  }
+
+  async editUserProductAmountAndPrice(
+    productId: number,
+    dto: EditProductAmountAndPriceDto,
+  ): Promise<void> {
+    await this.throwIfProductNotFound(productId);
+    await this.throwIfProductNotBought(productId);
+    await this.editAmountAndPrice(productId, dto);
+  }
+
   async editMyProduct(
     myId: number,
     productId: number,
     dto: EditProductDto,
   ): Promise<void> {
     await this.throwIfNotProductOwner(productId, myId);
+    await this.throwIfProductBought(productId);
     await this.edit(productId, dto);
   }
 
   async editUserProduct(productId: number, dto: EditProductDto): Promise<void> {
     await this.throwIfProductNotFound(productId);
+    await this.throwIfProductBought(productId);
     await this.edit(productId, dto);
   }
 
@@ -115,6 +145,22 @@ export class ProductsService {
     return product;
   }
 
+  async throwIfProductBought(productId: number): Promise<void> {
+    const isProductPurchase =
+      await this.purchasesService.isProductPurchase(productId);
+    if (isProductPurchase) {
+      throw new BadRequestException(ProductError.ALREADY_BOUGHT);
+    }
+  }
+
+  async throwIfProductNotBought(productId: number): Promise<void> {
+    const isProductPurchase =
+      await this.purchasesService.isProductPurchase(productId);
+    if (!isProductPurchase) {
+      throw new BadRequestException(ProductError.NOT_BOUGHT);
+    }
+  }
+
   private findProductById(id: number): Promise<Product | null> {
     return this.productsRepository.findOne({
       relations: { shop: true },
@@ -138,6 +184,22 @@ export class ProductsService {
       return product;
     } catch (error) {
       throw new InternalServerErrorException(ProductError.CREATE_FAILED);
+    }
+  }
+
+  private async editAmountAndPrice(
+    id: number,
+    dto: EditProductAmountAndPriceDto,
+  ): Promise<void> {
+    try {
+      await this.productsRepository.update(
+        { id },
+        { amount: dto.amount, price: dto.price },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(
+        ProductError.EDIT_AMOUNT_AND_PRICE_FAILED,
+      );
     }
   }
 
@@ -206,6 +268,7 @@ export class ProductsService {
       .addSelect(['sellerCard.id', 'sellerCard.name'])
       .innerJoin('product.user', 'sellerUser')
       .addSelect(['sellerUser.id', 'sellerUser.nick', 'sellerUser.avatar'])
+      .loadRelationCountAndMap('product.purchases', 'product.purchases')
       .orderBy('product.id', 'DESC')
       .skip(req.skip)
       .take(req.take);
