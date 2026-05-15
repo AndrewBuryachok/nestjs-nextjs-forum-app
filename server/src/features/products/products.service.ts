@@ -10,7 +10,11 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Product } from './product.entity';
 import { CardsService } from '../cards/cards.service';
 import { ShopsService } from '../shops/shops.service';
-import { CreateProductWithUserDto, EditProductDto } from './product.dto';
+import {
+  CreateProductWithUserDto,
+  EditProductAmountAndPriceDto,
+  EditProductDto,
+} from './product.dto';
 import { ProductError } from './product-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
@@ -49,28 +53,51 @@ export class ProductsService {
     await this.create(dto);
   }
 
+  async editMyProductAmountAndPrice(
+    myId: number,
+    productId: number,
+    dto: EditProductAmountAndPriceDto,
+  ): Promise<void> {
+    await this.throwIfNotProductOwner(productId, myId);
+    await this.throwIfProductNotBought(productId);
+    await this.editAmountAndPrice(productId, dto);
+  }
+
+  async editUserProductAmountAndPrice(
+    productId: number,
+    dto: EditProductAmountAndPriceDto,
+  ): Promise<void> {
+    await this.throwIfProductNotFound(productId);
+    await this.throwIfProductNotBought(productId);
+    await this.editAmountAndPrice(productId, dto);
+  }
+
   async editMyProduct(
     myId: number,
     productId: number,
     dto: EditProductDto,
   ): Promise<void> {
     await this.throwIfNotProductOwner(productId, myId);
+    await this.throwIfProductBought(productId);
     await this.edit(productId, dto);
   }
 
   async editUserProduct(productId: number, dto: EditProductDto): Promise<void> {
     await this.throwIfProductNotFound(productId);
+    await this.throwIfProductBought(productId);
     await this.edit(productId, dto);
   }
 
   async deleteMyProduct(myId: number, productId: number): Promise<void> {
     await this.throwIfNotProductOwner(productId, myId);
-    await this.delete(productId);
+    const hasProductPurchase = await this.hasProductPurchase(productId);
+    await this.delete(productId, !hasProductPurchase);
   }
 
   async deleteUserProduct(productId: number): Promise<void> {
     await this.throwIfProductNotFound(productId);
-    await this.delete(productId);
+    const hasProductPurchase = await this.hasProductPurchase(productId);
+    await this.delete(productId, !hasProductPurchase);
   }
 
   async buyProduct(productId: number, amount: number): Promise<void> {
@@ -115,6 +142,24 @@ export class ProductsService {
     return product;
   }
 
+  async throwIfProductBought(productId: number): Promise<void> {
+    const hasProductPurchase = await this.hasProductPurchase(productId);
+    if (hasProductPurchase) {
+      throw new BadRequestException(ProductError.ALREADY_BOUGHT);
+    }
+  }
+
+  async throwIfProductNotBought(productId: number): Promise<void> {
+    const hasProductPurchase = await this.hasProductPurchase(productId);
+    if (!hasProductPurchase) {
+      throw new BadRequestException(ProductError.NOT_BOUGHT);
+    }
+  }
+
+  private hasProductPurchase(productId: number): Promise<boolean> {
+    return this.productsRepository.manager.existsBy('purchases', { productId });
+  }
+
   private findProductById(id: number): Promise<Product | null> {
     return this.productsRepository.findOne({
       relations: { shop: true },
@@ -141,6 +186,22 @@ export class ProductsService {
     }
   }
 
+  private async editAmountAndPrice(
+    id: number,
+    dto: EditProductAmountAndPriceDto,
+  ): Promise<void> {
+    try {
+      await this.productsRepository.update(
+        { id },
+        { amount: dto.amount, price: dto.price },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(
+        ProductError.EDIT_AMOUNT_AND_PRICE_FAILED,
+      );
+    }
+  }
+
   private async edit(id: number, dto: EditProductDto): Promise<void> {
     try {
       await this.productsRepository.update(
@@ -159,9 +220,13 @@ export class ProductsService {
     }
   }
 
-  private async delete(id: number): Promise<void> {
+  private async delete(id: number, force: boolean): Promise<void> {
     try {
-      await this.productsRepository.softDelete({ id });
+      if (force) {
+        await this.productsRepository.delete({ id });
+      } else {
+        await this.productsRepository.softDelete({ id });
+      }
     } catch (error) {
       throw new InternalServerErrorException(ProductError.DELETE_FAILED);
     }
@@ -206,6 +271,7 @@ export class ProductsService {
       .addSelect(['sellerCard.id', 'sellerCard.name'])
       .innerJoin('product.user', 'sellerUser')
       .addSelect(['sellerUser.id', 'sellerUser.nick', 'sellerUser.avatar'])
+      .loadRelationCountAndMap('product.purchases', 'product.purchases')
       .orderBy('product.id', 'DESC')
       .skip(req.skip)
       .take(req.take);
