@@ -440,6 +440,22 @@ describe('App', () => {
         .expect(201);
     });
 
+    it('PATCH /products/:productId/amount-and-price', () => {
+      return request(app.getHttpServer())
+        .patch(`/products/${products[0]}/amount-and-price`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ amount: 18, price: 10 })
+        .expect(200);
+    });
+
+    it('PATCH /products/all/:productId/amount-and-price', () => {
+      return request(app.getHttpServer())
+        .patch(`/products/all/${products[1]}/amount-and-price`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({ amount: 18, price: 10 })
+        .expect(200);
+    });
+
     it('GET /purchases/my', () => {
       return request(app.getHttpServer())
         .get('/purchases/my')

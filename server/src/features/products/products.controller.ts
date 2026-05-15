@@ -13,6 +13,7 @@ import { Product } from './product.entity';
 import {
   CreateProductDto,
   CreateProductWithUserDto,
+  EditProductAmountAndPriceDto,
   EditProductDto,
   ProductIdDto,
 } from './product.dto';
@@ -56,6 +57,28 @@ export class ProductsController {
   @Post('all')
   createUserProduct(@Body() dto: CreateProductWithUserDto): Promise<void> {
     return this.productsService.createProduct(dto);
+  }
+
+  @Patch(':productId/amount-and-price')
+  editMyProductAmountAndPrice(
+    @MyId() myId: number,
+    @Param() { productId }: ProductIdDto,
+    @Body() dto: EditProductAmountAndPriceDto,
+  ): Promise<void> {
+    return this.productsService.editMyProductAmountAndPrice(
+      myId,
+      productId,
+      dto,
+    );
+  }
+
+  @Roles([Role.ADMIN])
+  @Patch('all/:productId/amount-and-price')
+  editUserProductAmountAndPrice(
+    @Param() { productId }: ProductIdDto,
+    @Body() dto: EditProductAmountAndPriceDto,
+  ): Promise<void> {
+    return this.productsService.editUserProductAmountAndPrice(productId, dto);
   }
 
   @Patch(':productId')
