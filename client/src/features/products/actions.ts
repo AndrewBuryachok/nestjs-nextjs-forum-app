@@ -6,6 +6,7 @@ import {
   createProductSchema,
   createProductWithUserSchema,
   deleteProductSchema,
+  editProductAmountAndPriceSchema,
   editProductSchema,
 } from './schema';
 import { actionClient } from '@/lib/safe-action';
@@ -21,6 +22,18 @@ export const createUserProductAction = actionClient
   .inputSchema(createProductWithUserSchema)
   .action(({ parsedInput: body }) => {
     return send('POST', '/products/all', body);
+  });
+
+export const editMyProductAmountAndPriceAction = actionClient
+  .inputSchema(editProductAmountAndPriceSchema)
+  .action(({ parsedInput: { productId, ...body } }) => {
+    return send('PATCH', `/products/${productId}/amount-and-price`, body);
+  });
+
+export const editUserProductAmountAndPriceAction = actionClient
+  .inputSchema(editProductAmountAndPriceSchema)
+  .action(({ parsedInput: { productId, ...body } }) => {
+    return send('PATCH', `/products/all/${productId}/amount-and-price`, body);
   });
 
 export const editMyProductAction = actionClient
