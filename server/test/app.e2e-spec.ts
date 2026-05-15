@@ -430,6 +430,22 @@ describe('App', () => {
         .expect(201);
     });
 
+    it('PATCH /goods/:goodId/amount-and-price', () => {
+      return request(app.getHttpServer())
+        .patch(`/goods/${goods[0]}/amount-and-price`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ amount: 18, price: 10 })
+        .expect(200);
+    });
+
+    it('PATCH /goods/all/:goodId/amount-and-price', () => {
+      return request(app.getHttpServer())
+        .patch(`/goods/all/${goods[1]}/amount-and-price`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({ amount: 18, price: 10 })
+        .expect(200);
+    });
+
     it('GET /purchases/my', () => {
       return request(app.getHttpServer())
         .get('/purchases/my')

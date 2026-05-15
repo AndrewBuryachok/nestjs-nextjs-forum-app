@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -9,11 +11,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Good } from './good.entity';
 import { ShopsService } from '../shops/shops.service';
+import { PurchasesService } from '../purchases/purchases.service';
 import { TransactionsService } from '../transactions/transactions.service';
 import {
   BuyGoodDto,
   DeleteGoodDto,
   ExtCreateGoodDto,
+  ExtEditGoodAmountAndPriceDto,
   ExtEditGoodDto,
 } from './good.dto';
 import { GoodError } from './good-errors.enum';
@@ -25,6 +29,8 @@ export class GoodsService {
     @InjectRepository(Good)
     private goodsRepository: Repository<Good>,
     private shopsService: ShopsService,
+    @Inject(forwardRef(() => PurchasesService))
+    private purchasesService: PurchasesService,
     private transactionsService: TransactionsService,
   ) {}
 
@@ -58,8 +64,17 @@ export class GoodsService {
     await this.create(dto);
   }
 
+  async editGoodAmountAndPrice(
+    dto: ExtEditGoodAmountAndPriceDto,
+  ): Promise<void> {
+    await this.throwIfNotGoodOwner(dto.goodId, dto.myId, dto.isAll);
+    await this.throwIfGoodNotBought(dto.goodId);
+    await this.editAmountAndPrice(dto.goodId, dto);
+  }
+
   async editGood(dto: ExtEditGoodDto): Promise<void> {
     await this.throwIfNotGoodOwner(dto.goodId, dto.myId, dto.isAll);
+    await this.throwIfGoodBought(dto.goodId);
     await this.edit(dto.goodId, dto);
   }
 
@@ -115,6 +130,20 @@ export class GoodsService {
     return good;
   }
 
+  async throwIfGoodBought(goodId: number): Promise<void> {
+    const isGoodPurchase = await this.purchasesService.isGoodPurchase(goodId);
+    if (isGoodPurchase) {
+      throw new BadRequestException(GoodError.ALREADY_BOUGHT);
+    }
+  }
+
+  async throwIfGoodNotBought(goodId: number): Promise<void> {
+    const isGoodPurchase = await this.purchasesService.isGoodPurchase(goodId);
+    if (!isGoodPurchase) {
+      throw new BadRequestException(GoodError.NOT_BOUGHT);
+    }
+  }
+
   private findGoodById(id: number): Promise<Good | null> {
     return this.goodsRepository.findOneBy({ id });
   }
@@ -134,6 +163,22 @@ export class GoodsService {
       return good;
     } catch (error) {
       throw new InternalServerErrorException(GoodError.CREATE_FAILED);
+    }
+  }
+
+  private async editAmountAndPrice(
+    id: number,
+    dto: ExtEditGoodAmountAndPriceDto,
+  ): Promise<void> {
+    try {
+      await this.goodsRepository.update(
+        { id },
+        { amount: dto.amount, price: dto.price },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(
+        GoodError.EDIT_AMOUNT_AND_PRICE_FAILED,
+      );
     }
   }
 
@@ -200,6 +245,7 @@ export class GoodsService {
       .addSelect(['sellerAccount.id', 'sellerAccount.name'])
       .innerJoin('sellerCard.user', 'sellerUser')
       .addSelect(['sellerUser.id', 'sellerUser.nick', 'sellerUser.avatar'])
+      .loadRelationCountAndMap('good.purchases', 'good.purchases')
       .orderBy('good.id', 'DESC')
       .skip(req.skip)
       .take(req.take);

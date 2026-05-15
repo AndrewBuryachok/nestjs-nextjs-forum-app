@@ -20,7 +20,26 @@ export class GoodIdDto {
   goodId: number;
 }
 
-export class EditGoodDto {
+export class EditGoodAmountAndPriceDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  @Max(27)
+  amount: number;
+
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  price: number;
+}
+
+export class ExtEditGoodAmountAndPriceDto extends EditGoodAmountAndPriceDto {
+  goodId: number;
+  myId: number;
+  isAll: boolean;
+}
+
+export class EditGoodDto extends EditGoodAmountAndPriceDto {
   @IsNotEmpty()
   @IsEnum(Item)
   item: Item;
@@ -33,23 +52,12 @@ export class EditGoodDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
-  @Max(27)
-  amount: number;
-
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
   @Max(64)
   batch: number;
 
   @IsNotEmpty()
   @IsEnum(Unit)
   unit: Unit;
-
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  price: number;
 }
 
 export class ExtEditGoodDto extends EditGoodDto {

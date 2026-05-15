@@ -1,4 +1,6 @@
 import {
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -16,6 +18,7 @@ export class PurchasesService {
   constructor(
     @InjectRepository(Purchase)
     private purchasesRepository: Repository<Purchase>,
+    @Inject(forwardRef(() => GoodsService))
     private goodsService: GoodsService,
   ) {}
 
@@ -63,8 +66,17 @@ export class PurchasesService {
     return purchase;
   }
 
+  async isGoodPurchase(goodId: number): Promise<boolean> {
+    const purchase = await this.findPurchaseByGood(goodId);
+    return !!purchase;
+  }
+
   private findPurchaseById(id: number): Promise<Purchase | null> {
     return this.purchasesRepository.findOneBy({ id });
+  }
+
+  private findPurchaseByGood(goodId: number): Promise<Purchase | null> {
+    return this.purchasesRepository.findOneBy({ goodId });
   }
 
   private async create(

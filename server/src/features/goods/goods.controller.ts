@@ -10,7 +10,12 @@ import {
 } from '@nestjs/common';
 import { GoodsService } from './goods.service';
 import { Good } from './good.entity';
-import { CreateGoodDto, EditGoodDto, GoodIdDto } from './good.dto';
+import {
+  CreateGoodDto,
+  EditGoodAmountAndPriceDto,
+  EditGoodDto,
+  GoodIdDto,
+} from './good.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -54,6 +59,35 @@ export class GoodsController {
     @Body() dto: CreateGoodDto,
   ): Promise<void> {
     return this.goodsService.createGood({ ...dto, myId, isAll: true });
+  }
+
+  @Patch(':goodId/amount-and-price')
+  editMyGoodAmountAndPrice(
+    @MyId() myId: number,
+    @Param() { goodId }: GoodIdDto,
+    @Body() dto: EditGoodAmountAndPriceDto,
+  ): Promise<void> {
+    return this.goodsService.editGoodAmountAndPrice({
+      ...dto,
+      goodId,
+      myId,
+      isAll: false,
+    });
+  }
+
+  @Roles([Role.ADMIN])
+  @Patch('all/:goodId/amount-and-price')
+  editUserGoodAmountAndPrice(
+    @MyId() myId: number,
+    @Param() { goodId }: GoodIdDto,
+    @Body() dto: EditGoodAmountAndPriceDto,
+  ): Promise<void> {
+    return this.goodsService.editGoodAmountAndPrice({
+      ...dto,
+      goodId,
+      myId,
+      isAll: true,
+    });
   }
 
   @Patch(':goodId')
