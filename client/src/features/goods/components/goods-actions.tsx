@@ -3,6 +3,10 @@ import { Good } from '../types';
 import { viewGoodAction } from '../actions/view-good-action';
 import { buyMyGoodAction, buyUserGoodAction } from '../actions/buy-good-action';
 import {
+  editMyGoodAmountAndPriceAction,
+  editUserGoodAmountAndPriceAction,
+} from '../actions/edit-good-amount-and-price-action';
+import {
   editMyGoodAction,
   editUserGoodAction,
 } from '../actions/edit-good-action';
@@ -20,8 +24,17 @@ type Props = {
 export default function GoodsActions(props: Props) {
   const actions = {
     main: [buyMyGoodAction],
-    my: [editMyGoodAction, deleteMyGoodAction],
-    all: [buyUserGoodAction, editUserGoodAction, deleteUserGoodAction],
+    my: [
+      props.good.purchases ? editMyGoodAmountAndPriceAction : editMyGoodAction,
+      deleteMyGoodAction,
+    ],
+    all: [
+      buyUserGoodAction,
+      props.good.purchases
+        ? editUserGoodAmountAndPriceAction
+        : editUserGoodAction,
+      deleteUserGoodAction,
+    ],
   }[props.tab];
 
   return (

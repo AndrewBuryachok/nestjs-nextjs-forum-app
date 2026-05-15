@@ -14,14 +14,21 @@ export const createGoodSchema = z.object({
 
 export type CreateGoodType = z.infer<typeof createGoodSchema>;
 
-export const editGoodSchema = z.object({
+export const editGoodAmountAndPriceSchema = z.object({
   goodId: z.number().int().min(1),
+  amount: z.number().int().min(1).max(27),
+  price: z.number().int().min(1),
+});
+
+export type EditGoodAmountAndPriceType = z.infer<
+  typeof editGoodAmountAndPriceSchema
+>;
+
+export const editGoodSchema = editGoodAmountAndPriceSchema.extend({
   item: z.enum(Item),
   description: z.string().max(32),
-  amount: z.number().int().min(1).max(27),
   batch: z.number().int().min(1).max(64),
   unit: z.enum(Unit),
-  price: z.number().int().min(1),
 });
 
 export type EditGoodType = z.infer<typeof editGoodSchema>;

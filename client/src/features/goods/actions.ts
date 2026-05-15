@@ -4,6 +4,7 @@ import {
   buyGoodSchema,
   createGoodSchema,
   deleteGoodSchema,
+  editGoodAmountAndPriceSchema,
   editGoodSchema,
 } from './schema';
 import { actionClient } from '@/lib/safe-action';
@@ -19,6 +20,18 @@ export const createUserGoodAction = actionClient
   .inputSchema(createGoodSchema)
   .action(({ parsedInput: body }) => {
     return send('POST', '/goods/all', body);
+  });
+
+export const editMyGoodAmountAndPriceAction = actionClient
+  .inputSchema(editGoodAmountAndPriceSchema)
+  .action(({ parsedInput: { goodId, ...body } }) => {
+    return send('PATCH', `/goods/${goodId}/amount-and-price`, body);
+  });
+
+export const editUserGoodAmountAndPriceAction = actionClient
+  .inputSchema(editGoodAmountAndPriceSchema)
+  .action(({ parsedInput: { goodId, ...body } }) => {
+    return send('PATCH', `/goods/all/${goodId}/amount-and-price`, body);
   });
 
 export const editMyGoodAction = actionClient

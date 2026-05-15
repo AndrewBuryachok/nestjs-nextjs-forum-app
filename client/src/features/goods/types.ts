@@ -15,4 +15,5 @@ export interface Good extends BaseGood {
   amount: number;
   price: number;
   createdAt: Date;
+  purchases: number;
 }
