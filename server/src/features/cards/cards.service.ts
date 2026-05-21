@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Transactional } from 'typeorm-transactional';
 import { Card } from './card.entity';
 import { CardUser } from './card-user.entity';
 import { UsersService } from '../users/users.service';
@@ -211,6 +212,7 @@ export class CardsService {
     return this.cardsUsersRepository.findBy({ cardId });
   }
 
+  @Transactional()
   private async create(dto: CreateCardWithUserDto): Promise<Card> {
     try {
       const card = this.cardsRepository.create({
