@@ -2,6 +2,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { Provider } from '@/components/ui/provider';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/providers/auth-provider';
+import { MqttProvider } from '@/providers/mqtt-provider';
 import { DialogProvider } from '@/providers/dialog-provider';
 import { verifySession } from '@/lib/session';
 
@@ -18,7 +19,9 @@ export default async function RootLayout(props: Props) {
         <NextIntlClientProvider>
           <Provider>
             <AuthProvider user={session && session.user}>
-              <DialogProvider>{props.children}</DialogProvider>
+              <MqttProvider>
+                <DialogProvider>{props.children}</DialogProvider>
+              </MqttProvider>
             </AuthProvider>
             <Toaster />
           </Provider>

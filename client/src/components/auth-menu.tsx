@@ -30,7 +30,7 @@ export default function AuthMenu() {
             <LuUser />
           </IconButton>
         ) : (
-          <CustomAvatar user={user} />
+          <CustomAvatar withoutCircle user={user} />
         )}
       </Menu.Trigger>
       <Portal>
