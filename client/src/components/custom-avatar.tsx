@@ -1,8 +1,10 @@
 import { Avatar } from '@chakra-ui/react';
 import { BaseUser } from '@/features/users/types';
+import OnlineCircle from './online-circle';
 
 type Props = {
   user: BaseUser;
+  withoutOnline?: boolean;
 };
 
 export default function CustomAvatar(props: Props) {
@@ -14,6 +16,7 @@ export default function CustomAvatar(props: Props) {
     <Avatar.Root borderRadius='sm' size='xs'>
       <Avatar.Fallback name={props.user.nick} />
       <Avatar.Image borderRadius='sm' imageRendering='pixelated' src={src} />
+      {!props.withoutOnline && <OnlineCircle userId={props.user.id} />}
     </Avatar.Root>
   );
 }

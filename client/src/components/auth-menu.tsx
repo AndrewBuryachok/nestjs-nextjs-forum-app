@@ -20,7 +20,7 @@ export default function AuthMenu() {
     <Menu.Root positioning={{ placement: 'bottom-end' }}>
       <Menu.Trigger asChild={!user} cursor='pointer' focusRing='none'>
         {user ? (
-          <CustomAvatar user={user} />
+          <CustomAvatar withoutOnline user={user} />
         ) : (
           <IconButton size='xs' variant='ghost'>
             <LuUser />
