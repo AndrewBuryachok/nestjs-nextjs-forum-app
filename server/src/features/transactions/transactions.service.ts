@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { Transactional } from 'typeorm-transactional';
 import { Transaction } from './transaction.entity';
 import { CardsService } from '../cards/cards.service';
 import {
@@ -82,6 +83,7 @@ export class TransactionsService {
     await this.createTransferTransaction(dto);
   }
 
+  @Transactional()
   private async createTransferTransaction(
     dto: CreateTransferWithUserDto,
   ): Promise<void> {
@@ -98,6 +100,7 @@ export class TransactionsService {
     await this.createTransfer(dto);
   }
 
+  @Transactional()
   async createIncreaseTransaction(
     dto: CreateTransactionWithDescriptionDto,
     executorUserId?: number,
@@ -110,6 +113,7 @@ export class TransactionsService {
     await this.createIncrease(dto, executorUserId);
   }
 
+  @Transactional()
   async createDecreaseTransaction(
     dto: CreateTransactionWithDescriptionDto,
     executorUserId?: number,
@@ -122,6 +126,7 @@ export class TransactionsService {
     await this.createDecrease(dto, executorUserId);
   }
 
+  @Transactional()
   async deleteTransaction(transactionId: number): Promise<void> {
     const transaction = await this.throwIfTransactionNotFound(transactionId);
     if (transaction.receiverUserId && transaction.receiverCardId) {
