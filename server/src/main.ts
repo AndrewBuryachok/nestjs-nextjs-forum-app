@@ -1,9 +1,11 @@
 import morgan from 'morgan';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
+import { initializeTransactionalContext } from 'typeorm-transactional';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
+  initializeTransactionalContext();
   const app = await NestFactory.create(AppModule);
   morgan.token('user', (req) => req['user']?.nick ?? '-');
   morgan.token('body', (req) => {

@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Transactional } from 'typeorm-transactional';
 import { Order } from './order.entity';
 import { CardsService } from '../cards/cards.service';
 import { TransactionsService } from '../transactions/transactions.service';
@@ -60,6 +61,7 @@ export class OrdersService {
     return { data, total };
   }
 
+  @Transactional()
   async createOrder(dto: CreateOrderWithUserDto): Promise<void> {
     await this.lockersService.throwIfLockerNotFound(dto.lockerId);
     await this.transactionsService.createDecreaseTransaction({
@@ -85,6 +87,7 @@ export class OrdersService {
     await this.editOrder(order, dto);
   }
 
+  @Transactional()
   private async editOrder(order: Order, dto: EditOrderDto): Promise<void> {
     this.throwIfOrderNotCreated(order);
     if (order.sum < dto.sum) {
@@ -116,6 +119,7 @@ export class OrdersService {
     await this.deleteOrder(order);
   }
 
+  @Transactional()
   private async deleteOrder(order: Order): Promise<void> {
     this.throwIfOrderNotCreated(order);
     await this.transactionsService.createIncreaseTransaction({
@@ -192,6 +196,7 @@ export class OrdersService {
     await this.completeOrder(order);
   }
 
+  @Transactional()
   private async completeOrder(order: Order): Promise<void> {
     this.throwIfOrderNotExecuted(order);
     await this.transactionsService.createIncreaseTransaction({
