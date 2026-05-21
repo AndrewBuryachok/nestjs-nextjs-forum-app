@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Transactional } from 'typeorm-transactional';
 import { Order } from './order.entity';
 import { LockersService } from '../lockers/lockers.service';
 import { CardsService } from '../cards/cards.service';
@@ -63,6 +64,7 @@ export class OrdersService {
     return { data, total };
   }
 
+  @Transactional()
   async createOrder(dto: ExtCreateOrderDto): Promise<void> {
     await this.lockersService.throwIfLockerNotFound(dto.lockerId);
     const card = await this.cardsService.throwIfNotCardUser(
@@ -79,6 +81,7 @@ export class OrdersService {
     await this.create(dto);
   }
 
+  @Transactional()
   async editOrder(dto: ExtEditOrderDto): Promise<void> {
     const order = await this.throwIfNotOrderCustomer(
       dto.orderId,
@@ -105,6 +108,7 @@ export class OrdersService {
     await this.edit(dto.orderId, dto);
   }
 
+  @Transactional()
   async deleteOrder(dto: DeleteOrderDto): Promise<void> {
     const order = await this.throwIfNotOrderCustomer(
       dto.orderId,
@@ -148,6 +152,7 @@ export class OrdersService {
     await this.execute(dto.orderId);
   }
 
+  @Transactional()
   async completeOrder(dto: CompleteOrderDto): Promise<void> {
     const order = await this.throwIfNotOrderCustomer(
       dto.orderId,

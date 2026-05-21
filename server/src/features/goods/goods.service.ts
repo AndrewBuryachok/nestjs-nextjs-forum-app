@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Transactional } from 'typeorm-transactional';
 import { Good } from './good.entity';
 import { ShopsService } from '../shops/shops.service';
 import { PurchasesService } from '../purchases/purchases.service';
@@ -83,6 +84,7 @@ export class GoodsService {
     await this.delete(dto.goodId);
   }
 
+  @Transactional()
   async buyGood(dto: BuyGoodDto): Promise<number> {
     const good = await this.throwIfGoodNotFound(dto.goodId);
     if (good.amount < dto.amount) {

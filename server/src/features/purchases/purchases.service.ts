@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { Transactional } from 'typeorm-transactional';
 import { Purchase } from './purchase.entity';
 import { GoodsService } from '../goods/goods.service';
 import { DeletePurchaseDto, ExtCreatePurchaseDto } from './purchase.dto';
@@ -47,11 +48,13 @@ export class PurchasesService {
     return { data, total };
   }
 
+  @Transactional()
   async createPurchase(dto: ExtCreatePurchaseDto): Promise<void> {
     const price = await this.goodsService.buyGood(dto);
     await this.create(dto, price);
   }
 
+  @Transactional()
   async deletePurchase(dto: DeletePurchaseDto): Promise<void> {
     const purchase = await this.throwIfPurchaseNotFound(dto.purchaseId);
     await this.goodsService.unbuyGood(purchase.goodId, purchase.amount);
