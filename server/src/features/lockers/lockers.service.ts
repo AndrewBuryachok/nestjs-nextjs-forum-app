@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Locker } from './locker.entity';
 import { UsersService } from '../users/users.service';
 import { CreateLockerWithUserDto, EditLockerDto } from './locker.dto';
@@ -28,7 +28,7 @@ export class LockersService {
 
   async getMyLockers(myId: number, req: Request): Promise<Response<Locker>> {
     const [data, total] = await this.getLockersQueryBuilder(req)
-      .where('ownerUser.id = :myId', { myId })
+      .andWhere('ownerUser.id = :myId', { myId })
       .getManyAndCount();
     return { data, total };
   }
@@ -148,6 +148,11 @@ export class LockersService {
       ])
       .innerJoin('locker.user', 'ownerUser')
       .addSelect(['ownerUser.id', 'ownerUser.nick', 'ownerUser.avatar'])
+      .where(
+        new Brackets(
+          (qb) => req.id && qb.where('locker.id = :id', { id: req.id }),
+        ),
+      )
       .orderBy('locker.id', 'DESC')
       .skip(req.skip)
       .take(req.take);

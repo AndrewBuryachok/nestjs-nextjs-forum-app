@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Shop } from './shop.entity';
 import { CardsService } from '../cards/cards.service';
 import { CreateShopWithUserDto, EditShopDto } from './shop.dto';
@@ -29,7 +29,7 @@ export class ShopsService {
   async getMyShops(myId: number, req: Request): Promise<Response<Shop>> {
     const [data, total] = await this.getShopsQueryBuilder(req)
       .innerJoin('ownerCard.cardUsers', 'ownerCardUsers')
-      .where('ownerCardUsers.userId = :myId', { myId })
+      .andWhere('ownerCardUsers.userId = :myId', { myId })
       .getManyAndCount();
     return { data, total };
   }
@@ -148,6 +148,11 @@ export class ShopsService {
       .addSelect(['ownerUser.id', 'ownerUser.nick', 'ownerUser.avatar'])
       .innerJoin('shop.card', 'ownerCard')
       .addSelect(['ownerCard.id', 'ownerCard.name'])
+      .where(
+        new Brackets(
+          (qb) => req.id && qb.where('shop.id = :id', { id: req.id }),
+        ),
+      )
       .orderBy('shop.id', 'DESC')
       .skip(req.skip)
       .take(req.take);

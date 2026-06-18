@@ -32,7 +32,7 @@ export class TransactionsService {
     const [data, total] = await this.getTransactionsQueryBuilder(req)
       .leftJoin('senderCard.cardUsers', 'senderCardUsers')
       .leftJoin('receiverCard.cardUsers', 'receiverCardUsers')
-      .where(
+      .andWhere(
         new Brackets((qb) =>
           qb
             .where('senderCardUsers.userId = :myId')
@@ -260,6 +260,11 @@ export class TransactionsService {
       ])
       .leftJoin('transaction.receiverCard', 'receiverCard')
       .addSelect(['receiverCard.id', 'receiverCard.name'])
+      .where(
+        new Brackets(
+          (qb) => req.id && qb.where('transaction.id = :id', { id: req.id }),
+        ),
+      )
       .orderBy('transaction.id', 'DESC')
       .skip(req.skip)
       .take(req.take);
