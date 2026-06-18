@@ -29,7 +29,7 @@ export class PurchasesService {
     const [data, total] = await this.getPurchasesQueryBuilder(req)
       .leftJoin('sellerCard.cardUsers', 'sellerCardUsers')
       .leftJoin('buyerCard.cardUsers', 'buyerCardUsers')
-      .where(
+      .andWhere(
         new Brackets((qb) =>
           qb
             .where('sellerCardUsers.userId = :myId')
@@ -141,6 +141,11 @@ export class PurchasesService {
       .addSelect(['buyerUser.id', 'buyerUser.nick', 'buyerUser.avatar'])
       .innerJoin('purchase.card', 'buyerCard')
       .addSelect(['buyerCard.id', 'buyerCard.name'])
+      .where(
+        new Brackets(
+          (qb) => req.id && qb.where('purchase.id = :id', { id: req.id }),
+        ),
+      )
       .orderBy('purchase.id', 'DESC')
       .skip(req.skip)
       .take(req.take);

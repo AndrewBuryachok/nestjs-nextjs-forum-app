@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { Order } from './order.entity';
 import { CardsService } from '../cards/cards.service';
@@ -34,7 +34,7 @@ export class OrdersService {
 
   async getMainOrders(req: Request): Promise<Response<Order>> {
     const [data, total] = await this.getOrdersQueryBuilder(req)
-      .where('order.status = :status', { status: Status.CREATED })
+      .andWhere('order.status = :status', { status: Status.CREATED })
       .getManyAndCount();
     return { data, total };
   }
@@ -42,7 +42,7 @@ export class OrdersService {
   async getMyOrders(myId: number, req: Request): Promise<Response<Order>> {
     const [data, total] = await this.getOrdersQueryBuilder(req)
       .innerJoin('customerCard.cardUsers', 'customerCardUsers')
-      .where('customerCardUsers.userId = :myId', { myId })
+      .andWhere('customerCardUsers.userId = :myId', { myId })
       .getManyAndCount();
     return { data, total };
   }
@@ -50,7 +50,7 @@ export class OrdersService {
   async getTakenOrders(myId: number, req: Request): Promise<Response<Order>> {
     const [data, total] = await this.getOrdersQueryBuilder(req)
       .leftJoin('executorCard.cardUsers', 'executorCardUsers')
-      .where('executorCardUsers.userId = :myId', { myId })
+      .andWhere('executorCardUsers.userId = :myId', { myId })
       .getManyAndCount();
     return { data, total };
   }
@@ -421,6 +421,11 @@ export class OrdersService {
       ])
       .leftJoin('order.executorCard', 'executorCard')
       .addSelect(['executorCard.id', 'executorCard.name'])
+      .where(
+        new Brackets(
+          (qb) => req.id && qb.where('order.id = :id', { id: req.id }),
+        ),
+      )
       .orderBy('order.id', 'DESC')
       .skip(req.skip)
       .take(req.take);

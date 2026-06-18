@@ -13,4 +13,10 @@ export class Request {
   @Min(1)
   @Type(() => Number)
   take?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
+  id?: number;
 }
