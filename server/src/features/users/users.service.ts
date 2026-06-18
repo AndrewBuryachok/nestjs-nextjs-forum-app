@@ -34,6 +34,12 @@ export class UsersService {
     return this.selectUsersQueryBuilder().getMany();
   }
 
+  selectOneUser(userId: number): Promise<User> {
+    return this.selectUsersQueryBuilder()
+      .where('user.id = :userId', { userId })
+      .getOneOrFail();
+  }
+
   selectUsersByIds(ids: number[]): Promise<User[]> {
     return this.selectUsersQueryBuilder()
       .where('user.id = ANY (:ids)', { ids })
