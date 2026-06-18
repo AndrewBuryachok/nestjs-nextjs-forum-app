@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDto, UpdateUserRoleDto } from './user.dto';
 import { UserError } from './user-errors.enum';
@@ -169,6 +169,11 @@ export class UsersService {
         'user.roles',
         'user.createdAt',
       ])
+      .where(
+        new Brackets(
+          (qb) => req.id && qb.where('user.id = :id', { id: req.id }),
+        ),
+      )
       .orderBy('user.id', 'DESC')
       .skip(req.skip)
       .take(req.take);
