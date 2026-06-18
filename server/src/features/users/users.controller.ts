@@ -36,6 +36,12 @@ export class UsersController {
     return this.usersService.selectAllUsers();
   }
 
+  @Public()
+  @Get(':userId/select')
+  selectOneUser(@Param() { userId }: UserIdDto): Promise<User> {
+    return this.usersService.selectOneUser(userId);
+  }
+
   @Roles([Role.ADMIN])
   @Post(':userId/roles')
   addUserRole(
