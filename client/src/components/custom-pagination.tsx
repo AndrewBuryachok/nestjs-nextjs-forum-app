@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { ButtonGroup, IconButton, Pagination } from '@chakra-ui/react';
 import { PAGE_SIZE } from '@/constants/pagination';
 
@@ -12,6 +12,18 @@ type Props = {
 
 export default function CustomPagination(props: Props) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const createHref = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    if (page === 1) {
+      params.delete('page');
+    } else {
+      params.set('page', String(page));
+    }
+    const query = params.toString();
+    return query ? `${pathname}?${query}` : pathname;
+  };
 
   return (
     <Pagination.Root count={props.total} page={props.page} pageSize={PAGE_SIZE}>
@@ -19,9 +31,7 @@ export default function CustomPagination(props: Props) {
         <Pagination.Items
           render={(page) => (
             <IconButton asChild>
-              <Link href={page.value === 1 ? pathname : `?page=${page.value}`}>
-                {page.value}
-              </Link>
+              <Link href={createHref(page.value)}>{page.value}</Link>
             </IconButton>
           )}
         />
