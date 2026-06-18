@@ -8,7 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Product } from './product.entity';
 import { CardsService } from '../cards/cards.service';
 import { ShopsService } from '../shops/shops.service';
@@ -34,7 +34,7 @@ export class ProductsService {
 
   async getMainProducts(req: Request): Promise<Response<Product>> {
     const [data, total] = await this.getProductsQueryBuilder(req)
-      .where('product.amount > 0')
+      .andWhere('product.amount > 0')
       .getManyAndCount();
     return { data, total };
   }
@@ -42,7 +42,7 @@ export class ProductsService {
   async getMyProducts(myId: number, req: Request): Promise<Response<Product>> {
     const [data, total] = await this.getProductsQueryBuilder(req)
       .innerJoin('sellerCard.cardUsers', 'sellerCardUsers')
-      .where('sellerCardUsers.userId = :myId', { myId })
+      .andWhere('sellerCardUsers.userId = :myId', { myId })
       .getManyAndCount();
     return { data, total };
   }
@@ -269,6 +269,11 @@ export class ProductsService {
       .innerJoin('product.user', 'sellerUser')
       .addSelect(['sellerUser.id', 'sellerUser.nick', 'sellerUser.avatar'])
       .loadRelationCountAndMap('product.purchases', 'product.purchases')
+      .where(
+        new Brackets(
+          (qb) => req.id && qb.where('product.id = :id', { id: req.id }),
+        ),
+      )
       .orderBy('product.id', 'DESC')
       .skip(req.skip)
       .take(req.take);
