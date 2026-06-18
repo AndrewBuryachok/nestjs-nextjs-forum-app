@@ -39,6 +39,15 @@ export async function select<T>(route: string) {
   }
 }
 
+export async function fetch<T>(route: string) {
+  try {
+    const res = await api.get<T>(route);
+    return res.data;
+  } catch (error) {
+    return null;
+  }
+}
+
 export async function send<T, U>(
   method: 'POST' | 'PATCH' | 'DELETE',
   route: string,
