@@ -8,8 +8,10 @@ import {
   Toast,
   createToaster,
 } from "@chakra-ui/react"
+import NotificationAvatar from "../notification-avatar"
 
 export const toaster = createToaster({
+  max: 1,
   placement: "bottom-end",
   pauseOnPageIdle: true,
 })
@@ -20,7 +22,9 @@ export const Toaster = () => {
       <ChakraToaster toaster={toaster} insetInline={{ mdDown: "4" }}>
         {(toast) => (
           <Toast.Root width={{ md: "sm" }}>
-            {toast.type === "loading" ? (
+            {toast.meta?.userId !== undefined ? (
+              <NotificationAvatar withoutCircle userId={Number(toast.meta.userId)} />
+            ) : toast.type === "loading" ? (
               <Spinner size="sm" color="blue.solid" />
             ) : (
               <Toast.Indicator />
