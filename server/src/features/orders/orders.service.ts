@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { Order } from './order.entity';
+import { MqttService } from '../mqtt/mqtt.service';
 import { CardsService } from '../cards/cards.service';
 import { TransactionsService } from '../transactions/transactions.service';
 import { LockersService } from '../lockers/lockers.service';
@@ -20,13 +21,14 @@ import {
 } from './order.dto';
 import { OrderError } from './order-errors.enum';
 import { Request, Response } from '../../common/interfaces';
-import { Status } from '../../common/enums';
+import { Notification, Status } from '../../common/enums';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectRepository(Order)
     private ordersRepository: Repository<Order>,
+    private mqttService: MqttService,
     private cardsService: CardsService,
     private transactionsService: TransactionsService,
     private lockersService: LockersService,
@@ -154,6 +156,12 @@ export class OrdersService {
     const order = await this.throwIfOrderNotFound(orderId);
     this.throwIfOrderNotCreated(order);
     await this.take(orderId, dto);
+    this.mqttService.publishNotification(
+      dto.userId,
+      order.customerUserId,
+      orderId,
+      Notification.TAKE_ORDER,
+    );
   }
 
   async cancelMyOrder(myId: number, orderId: number): Promise<void> {
@@ -169,6 +177,12 @@ export class OrdersService {
   private async cancelOrder(order: Order): Promise<void> {
     this.throwIfOrderNotTaken(order);
     await this.cancel(order.id);
+    this.mqttService.publishNotification(
+      order.executorUserId!,
+      order.customerUserId,
+      order.id,
+      Notification.CANCEL_ORDER,
+    );
   }
 
   async executeMyOrder(myId: number, orderId: number): Promise<void> {
@@ -184,6 +198,12 @@ export class OrdersService {
   private async executeOrder(order: Order): Promise<void> {
     this.throwIfOrderNotTaken(order);
     await this.execute(order.id);
+    this.mqttService.publishNotification(
+      order.executorUserId!,
+      order.customerUserId,
+      order.id,
+      Notification.EXECUTE_ORDER,
+    );
   }
 
   async completeMyOrder(myId: number, orderId: number): Promise<void> {
@@ -214,6 +234,12 @@ export class OrdersService {
       description: 'виконання замовлення',
     });
     await this.complete(order.id);
+    this.mqttService.publishNotification(
+      order.customerUserId,
+      order.executorUserId!,
+      order.id,
+      Notification.COMPLETE_ORDER,
+    );
   }
 
   async throwIfOrderNotFound(orderId: number): Promise<Order> {
