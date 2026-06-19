@@ -1,7 +1,7 @@
 import { Box, Flex } from '@chakra-ui/react';
 import CustomContainer from './custom-container';
 import NavbarDrawer from './navbar-drawer';
-import AuthMenu from './auth-menu';
+import NotificationsDrawerAuthMenu from './notifications-drawer-auth-menu';
 
 export default function CustomHeader() {
   return (
@@ -16,7 +16,7 @@ export default function CustomHeader() {
       <CustomContainer>
         <Flex justify='space-between'>
           <NavbarDrawer />
-          <AuthMenu />
+          <NotificationsDrawerAuthMenu />
         </Flex>
       </CustomContainer>
     </Box>
