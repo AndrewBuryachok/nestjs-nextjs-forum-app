@@ -1,11 +1,13 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import mqtt from 'mqtt';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useAuthContext } from './auth-provider';
 import {
   createClient,
   getMainUsersTopic,
   getMyNotificationsTopic,
+  publishNotification,
   publishUser,
 } from '@/lib/mqtt';
 
@@ -13,6 +15,7 @@ type MqttContextType = {
   isLoading: boolean;
   users: Set<number>;
   notifications: Map<string, Date>;
+  clearNotification: (key: string) => void;
 };
 
 const MqttContext = createContext<MqttContextType | null>(null);
@@ -22,6 +25,7 @@ type Props = {
 };
 
 export function MqttProvider(props: Props) {
+  const clientRef = useRef<mqtt.MqttClient | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [users, setUsers] = useState<Set<number>>(new Set());
   const [notifications, setNotifications] = useState<Map<string, Date>>(
@@ -34,7 +38,8 @@ export function MqttProvider(props: Props) {
     setIsLoading(true);
     setUsers(new Set());
     setNotifications(new Map());
-    const client = createClient(user?.id);
+    clientRef.current = createClient(user?.id);
+    const client = clientRef.current;
     client.on('connect', () => {
       client.subscribe(getMainUsersTopic());
       if (user) {
@@ -84,11 +89,21 @@ export function MqttProvider(props: Props) {
         publishUser(client, user.id, false);
       }
       client.end();
+      clientRef.current = null;
     };
   }, [user?.id]);
 
+  const clearNotification = (key: string) => {
+    const client = clientRef.current;
+    if (client) {
+      publishNotification(client, key);
+    }
+  };
+
   return (
-    <MqttContext.Provider value={{ isLoading, users, notifications }}>
+    <MqttContext.Provider
+      value={{ isLoading, users, notifications, clearNotification }}
+    >
       {props.children}
     </MqttContext.Provider>
   );
