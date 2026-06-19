@@ -1,6 +1,6 @@
 import { Box } from '@chakra-ui/react';
 import NavbarDrawer from './navbar-drawer';
-import AuthMenu from './auth-menu';
+import NotificationsDrawerAuthMenu from './notifications-drawer-auth-menu';
 import CustomZoomPanPinch from './custom-zoom-pan-pinch';
 
 type Props = {
@@ -14,7 +14,7 @@ export default function SvgLayout(props: Props) {
         <NavbarDrawer />
       </Box>
       <Box position='absolute' top='4' right='4' zIndex='sticky'>
-        <AuthMenu />
+        <NotificationsDrawerAuthMenu />
       </Box>
       <CustomZoomPanPinch>
         <svg height='100dvh' width='100dvw'>
