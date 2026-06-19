@@ -7,17 +7,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { Purchase } from './purchase.entity';
+import { MqttService } from '../mqtt/mqtt.service';
 import { TransactionsService } from '../transactions/transactions.service';
 import { ProductsService } from '../products/products.service';
 import { CreatePurchaseWithUserDto } from './purchase.dto';
 import { PurchaseError } from './purchase-errors.enum';
 import { Request, Response } from '../../common/interfaces';
+import { Notification } from '../../common/enums';
 
 @Injectable()
 export class PurchasesService {
   constructor(
     @InjectRepository(Purchase)
     private purchasesRepository: Repository<Purchase>,
+    private mqttService: MqttService,
     private transactionsService: TransactionsService,
     private productsService: ProductsService,
   ) {}
@@ -62,7 +65,21 @@ export class PurchasesService {
       description: 'купівля товару',
     });
     await this.productsService.buyProduct(dto.productId, dto.amount);
-    await this.create(dto, product.price);
+    const purchase = await this.create(dto, product.price);
+    this.mqttService.publishNotification(
+      dto.userId,
+      product.userId,
+      purchase.id,
+      Notification.CREATE_PURCHASE,
+    );
+    if (product.amount === dto.amount) {
+      this.mqttService.publishNotification(
+        0,
+        product.userId,
+        dto.productId,
+        Notification.END_PRODUCT,
+      );
+    }
   }
 
   @Transactional()

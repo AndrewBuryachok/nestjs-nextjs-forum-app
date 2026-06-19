@@ -11,6 +11,14 @@ import { Tokens } from '../src/common/interfaces';
 import { hashData } from '../src/common/utils';
 import { Item, Role, Unit } from '../src/common/enums';
 
+jest.mock('mqtt', () => ({
+  connect: () => ({
+    on: () => {},
+    publish: () => {},
+    end: () => {},
+  }),
+}));
+
 describe('App', () => {
   let app: INestApplication<App>;
 

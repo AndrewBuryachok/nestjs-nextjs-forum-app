@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { Transaction } from './transaction.entity';
+import { MqttService } from '../mqtt/mqtt.service';
 import { CardsService } from '../cards/cards.service';
 import {
   CreateTransactionDto,
@@ -16,12 +17,14 @@ import {
 } from './transaction.dto';
 import { TransactionError } from './transaction-errors.enum';
 import { Request, Response } from '../../common/interfaces';
+import { Notification } from '../../common/enums';
 
 @Injectable()
 export class TransactionsService {
   constructor(
     @InjectRepository(Transaction)
     private transactionsRepository: Repository<Transaction>,
+    private mqttService: MqttService,
     private cardsService: CardsService,
   ) {}
 
@@ -97,7 +100,13 @@ export class TransactionsService {
       dto.receiverUserId,
       dto.sum,
     );
-    await this.createTransfer(dto);
+    const transaction = await this.createTransfer(dto);
+    this.mqttService.publishNotification(
+      dto.senderUserId,
+      dto.receiverUserId,
+      transaction.id,
+      Notification.TRANSFER_TRANSACTION,
+    );
   }
 
   @Transactional()
@@ -105,12 +114,17 @@ export class TransactionsService {
     dto: CreateTransactionWithDescriptionDto,
     executorUserId?: number,
   ): Promise<void> {
-    await this.cardsService.increaseCardBalance(
+    const userId = await this.cardsService.increaseCardBalance(
       dto.cardId,
       dto.userId,
       dto.sum,
     );
-    await this.createIncrease(dto, executorUserId);
+    const transaction = await this.createIncrease(dto, executorUserId);
+    this.publishCreateTransactionNotification(
+      executorUserId ?? dto.userId,
+      userId,
+      transaction.id,
+    );
   }
 
   @Transactional()
@@ -118,12 +132,30 @@ export class TransactionsService {
     dto: CreateTransactionWithDescriptionDto,
     executorUserId?: number,
   ): Promise<void> {
-    await this.cardsService.decreaseCardBalance(
+    const userId = await this.cardsService.decreaseCardBalance(
       dto.cardId,
       dto.userId,
       dto.sum,
     );
-    await this.createDecrease(dto, executorUserId);
+    const transaction = await this.createDecrease(dto, executorUserId);
+    this.publishCreateTransactionNotification(
+      executorUserId ?? dto.userId,
+      userId,
+      transaction.id,
+    );
+  }
+
+  private publishCreateTransactionNotification(
+    fromUserId: number,
+    toUserId: number,
+    id: number,
+  ): void {
+    this.mqttService.publishNotification(
+      fromUserId,
+      toUserId,
+      id,
+      Notification.CREATE_TRANSACTION,
+    );
   }
 
   @Transactional()
