@@ -2,7 +2,10 @@
 
 import mqtt from 'mqtt';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuthContext } from './auth-provider';
+import { toaster } from '@/components/ui/toaster';
+import NotificationNick from '@/components/notification-nick';
 import {
   createClient,
   getMainUsersTopic,
@@ -25,6 +28,8 @@ type Props = {
 };
 
 export function MqttProvider(props: Props) {
+  const t = useTranslations();
+
   const clientRef = useRef<mqtt.MqttClient | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [users, setUsers] = useState<Set<number>>(new Set());
@@ -53,7 +58,7 @@ export function MqttProvider(props: Props) {
       setUsers(new Set());
       setNotifications(new Map());
     });
-    client.on('message', (topic, payload) => {
+    client.on('message', (topic, payload, packet) => {
       const parts = topic.split('/');
       const type = parts[1];
       if (type === 'users') {
@@ -82,6 +87,14 @@ export function MqttProvider(props: Props) {
           }
           return next;
         });
+        if (payload.length && !packet.retain) {
+          const [page, _, action, userId] = parts.slice(3);
+          toaster.info({
+            title: <NotificationNick userId={Number(userId)} />,
+            description: t(`notifications.${page}.${action}`),
+            meta: { userId },
+          });
+        }
       }
     });
     return () => {
