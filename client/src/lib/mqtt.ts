@@ -12,6 +12,10 @@ export function getMyUsersTopic(userId: number) {
   return `${BASE_TOPIC}/users/${userId}`;
 }
 
+export function getMyNotificationsTopic(userId: number) {
+  return `${BASE_TOPIC}/notifications/${userId}/+/+/+/+`;
+}
+
 export function createClient(userId?: number) {
   const will = userId
     ? { topic: getMyUsersTopic(userId), payload: '', retain: true }
