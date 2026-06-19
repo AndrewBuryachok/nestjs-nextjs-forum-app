@@ -42,3 +42,7 @@ export function publishUser(
     status ? new Date().toISOString() : '',
   );
 }
+
+export function publishNotification(client: mqtt.MqttClient, key: string) {
+  publish(client, `${BASE_TOPIC}/notifications/${key}`, '');
+}

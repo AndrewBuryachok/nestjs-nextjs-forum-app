@@ -1,7 +1,17 @@
 'use client';
 
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { Skeleton, SkeletonText, Timeline } from '@chakra-ui/react';
+import {
+  Button,
+  ButtonGroup,
+  HStack,
+  Skeleton,
+  SkeletonText,
+  Stack,
+  Timeline,
+  useDrawerContext,
+} from '@chakra-ui/react';
 import { useMqttContext } from '@/providers/mqtt-provider';
 import CustomEmptyState from './custom-empty-state';
 import NotificationAvatar from './notification-avatar';
@@ -12,7 +22,13 @@ import { parseNotification } from '@/lib/notifications';
 export default function NotificationsTimeline() {
   const t = useTranslations();
 
-  const { notifications, isLoading } = useMqttContext();
+  const { setOpen: setDrawerOpen } = useDrawerContext();
+
+  const closeDrawer = () => setDrawerOpen(false);
+
+  const { notifications, isLoading, clearNotification } = useMqttContext();
+
+  const clearAll = () => notifications.keys().forEach(clearNotification);
 
   if (isLoading) {
     return (
@@ -24,6 +40,10 @@ export default function NotificationsTimeline() {
             </Timeline.Connector>
             <Timeline.Content>
               <SkeletonText noOfLines={2} />
+              <HStack>
+                <Skeleton h='8' w='24' />
+                <Skeleton h='8' w='24' />
+              </HStack>
             </Timeline.Content>
           </Timeline.Item>
         ))}
@@ -40,23 +60,39 @@ export default function NotificationsTimeline() {
     .sort((a, b) => b.date.getTime() - a.date.getTime());
 
   return (
-    <Timeline.Root>
-      {parsedNotifications.map((n) => (
-        <Timeline.Item key={n.key}>
-          <Timeline.Connector>
-            <NotificationAvatar userId={n.fromUserId} />
-          </Timeline.Connector>
-          <Timeline.Content>
-            <Timeline.Title>
-              <NotificationNick userId={n.fromUserId} />
-              <CustomText muted value={n.date.toLocaleTimeString('uk')} />
-            </Timeline.Title>
-            <Timeline.Description>
-              {t(`notifications.${n.page}.${n.action}`)}
-            </Timeline.Description>
-          </Timeline.Content>
-        </Timeline.Item>
-      ))}
-    </Timeline.Root>
+    <Stack>
+      <Button colorPalette='red' size='xs' variant='ghost' onClick={clearAll}>
+        {t('buttons.markAllAsRead')}
+      </Button>
+      <Timeline.Root>
+        {parsedNotifications.map((n) => (
+          <Timeline.Item key={n.key}>
+            <Timeline.Connector>
+              <NotificationAvatar userId={n.fromUserId} />
+            </Timeline.Connector>
+            <Timeline.Content>
+              <Timeline.Title>
+                <NotificationNick userId={n.fromUserId} />
+                <CustomText muted value={n.date.toLocaleTimeString('uk')} />
+              </Timeline.Title>
+              <Timeline.Description>
+                {t(`notifications.${n.page}.${n.action}`)}
+              </Timeline.Description>
+              <ButtonGroup size='xs' variant='ghost'>
+                <Button asChild colorPalette='blue' onClick={closeDrawer}>
+                  <Link href={n.link}>{t('actions.view')}</Link>
+                </Button>
+                <Button
+                  colorPalette='red'
+                  onClick={() => clearNotification(n.key)}
+                >
+                  {t('actions.delete')}
+                </Button>
+              </ButtonGroup>
+            </Timeline.Content>
+          </Timeline.Item>
+        ))}
+      </Timeline.Root>
+    </Stack>
   );
 }
