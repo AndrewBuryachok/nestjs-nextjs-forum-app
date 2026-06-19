@@ -8,6 +8,7 @@ import CustomAvatar from './custom-avatar';
 
 type Props = {
   userId: number;
+  withoutCircle?: boolean;
 };
 
 export default function NotificationAvatar(props: Props) {
@@ -33,5 +34,5 @@ export default function NotificationAvatar(props: Props) {
     );
   }
 
-  return <CustomAvatar user={user} />;
+  return <CustomAvatar withoutCircle={props.withoutCircle} user={user} />;
 }
