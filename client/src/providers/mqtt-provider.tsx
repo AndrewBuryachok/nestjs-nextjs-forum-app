@@ -94,6 +94,7 @@ export function MqttProvider(props: Props) {
             description: t(`notifications.${page}.${action}`),
             meta: { userId },
           });
+          new Audio('/sound.mp3').play().catch(() => {});
         }
       }
     });
