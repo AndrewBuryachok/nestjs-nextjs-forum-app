@@ -1,5 +1,6 @@
 'use client';
 
+import { Fragment } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import {
@@ -14,6 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { useMqttContext } from '@/providers/mqtt-provider';
 import CustomEmptyState from './custom-empty-state';
+import CustomSeparator from './custom-separator';
 import NotificationAvatar from './notification-avatar';
 import NotificationNick from './notification-nick';
 import CustomText from './custom-text';
@@ -59,40 +61,49 @@ export default function NotificationsTimeline() {
     .map(([key, date]) => parseNotification(key, date))
     .sort((a, b) => b.date.getTime() - a.date.getTime());
 
+  const groupedNotifications = Object.entries(
+    Object.groupBy(parsedNotifications, (n) => n.date.toLocaleDateString('uk')),
+  );
+
   return (
     <Stack>
       <Button colorPalette='red' size='xs' variant='ghost' onClick={clearAll}>
         {t('buttons.markAllAsRead')}
       </Button>
-      <Timeline.Root>
-        {parsedNotifications.map((n) => (
-          <Timeline.Item key={n.key}>
-            <Timeline.Connector>
-              <NotificationAvatar userId={n.fromUserId} />
-            </Timeline.Connector>
-            <Timeline.Content>
-              <Timeline.Title>
-                <NotificationNick userId={n.fromUserId} />
-                <CustomText muted value={n.date.toLocaleTimeString('uk')} />
-              </Timeline.Title>
-              <Timeline.Description>
-                {t(`notifications.${n.page}.${n.action}`)}
-              </Timeline.Description>
-              <ButtonGroup size='xs' variant='ghost'>
-                <Button asChild colorPalette='blue' onClick={closeDrawer}>
-                  <Link href={n.link}>{t('actions.view')}</Link>
-                </Button>
-                <Button
-                  colorPalette='red'
-                  onClick={() => clearNotification(n.key)}
-                >
-                  {t('actions.delete')}
-                </Button>
-              </ButtonGroup>
-            </Timeline.Content>
-          </Timeline.Item>
-        ))}
-      </Timeline.Root>
+      {groupedNotifications.map(([key, value]) => (
+        <Fragment key={key}>
+          <CustomSeparator value={key} />
+          <Timeline.Root>
+            {value?.map((n) => (
+              <Timeline.Item key={n.key}>
+                <Timeline.Connector>
+                  <NotificationAvatar userId={n.fromUserId} />
+                </Timeline.Connector>
+                <Timeline.Content>
+                  <Timeline.Title>
+                    <NotificationNick userId={n.fromUserId} />
+                    <CustomText muted value={n.date.toLocaleTimeString('uk')} />
+                  </Timeline.Title>
+                  <Timeline.Description>
+                    {t(`notifications.${n.page}.${n.action}`)}
+                  </Timeline.Description>
+                  <ButtonGroup size='xs' variant='ghost'>
+                    <Button asChild colorPalette='blue' onClick={closeDrawer}>
+                      <Link href={n.link}>{t('actions.view')}</Link>
+                    </Button>
+                    <Button
+                      colorPalette='red'
+                      onClick={() => clearNotification(n.key)}
+                    >
+                      {t('actions.delete')}
+                    </Button>
+                  </ButtonGroup>
+                </Timeline.Content>
+              </Timeline.Item>
+            ))}
+          </Timeline.Root>
+        </Fragment>
+      ))}
     </Stack>
   );
 }
