@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl';
 import {
   LuBanknote,
+  LuBellOff,
   LuCreditCard,
   LuMailbox,
   LuShoppingBag,
@@ -13,7 +14,7 @@ import { PAGE_TABS_MAP } from '@/config/navigation';
 import { EmptyState } from './ui/empty-state';
 
 type Props = {
-  page: keyof typeof PAGE_TABS_MAP;
+  page: keyof typeof PAGE_TABS_MAP | 'notifications';
 };
 
 export default function CustomEmptyState(props: Props) {
@@ -22,6 +23,7 @@ export default function CustomEmptyState(props: Props) {
   const icon = {
     cards: <LuCreditCard />,
     lockers: <LuMailbox />,
+    notifications: <LuBellOff />,
     orders: <LuShoppingBag />,
     products: <LuShoppingBasket />,
     purchases: <LuShoppingCart />,
