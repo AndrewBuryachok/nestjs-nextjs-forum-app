@@ -10,6 +10,7 @@ import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { Card } from './card.entity';
 import { CardUser } from './card-user.entity';
+import { MqttService } from '../mqtt/mqtt.service';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
 import {
@@ -19,6 +20,7 @@ import {
 } from './card.dto';
 import { CardError } from './card-errors.enum';
 import { Request, Response } from '../../common/interfaces';
+import { Notification } from '../../common/enums';
 
 @Injectable()
 export class CardsService {
@@ -27,6 +29,7 @@ export class CardsService {
     private cardsRepository: Repository<Card>,
     @InjectRepository(CardUser)
     private cardsUsersRepository: Repository<CardUser>,
+    private mqttService: MqttService,
     private usersService: UsersService,
   ) {}
 
@@ -115,6 +118,12 @@ export class CardsService {
       throw new BadRequestException(CardError.USER_ALREADY_IN);
     }
     await this.addUser(card.id, userId);
+    this.mqttService.publishNotification(
+      card.userId,
+      userId,
+      card.id,
+      Notification.ADD_CARD_USER,
+    );
   }
 
   async removeMyCardUser(
@@ -143,27 +152,35 @@ export class CardsService {
       throw new BadRequestException(CardError.USER_NOT_IN);
     }
     await this.removeUser(card.id, userId);
+    this.mqttService.publishNotification(
+      card.userId,
+      userId,
+      card.id,
+      Notification.REMOVE_CARD_USER,
+    );
   }
 
   async increaseCardBalance(
     cardId: number,
     userId: number,
     sum: number,
-  ): Promise<void> {
-    await this.throwIfNotCardUser(cardId, userId);
+  ): Promise<number> {
+    const card = await this.throwIfNotCardUser(cardId, userId);
     await this.increaseBalance(cardId, sum);
+    return card.userId;
   }
 
   async decreaseCardBalance(
     cardId: number,
     userId: number,
     sum: number,
-  ): Promise<void> {
+  ): Promise<number> {
     const card = await this.throwIfNotCardUser(cardId, userId);
     if (card.balance < sum) {
       throw new BadRequestException(CardError.NOT_ENOUGH_BALANCE);
     }
     await this.decreaseBalance(cardId, sum);
+    return card.userId;
   }
 
   async throwIfCardNotFound(cardId: number): Promise<Card> {

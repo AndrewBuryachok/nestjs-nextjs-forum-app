@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { addTransactionalDataSource } from 'typeorm-transactional';
+import { MqttModule } from './features/mqtt/mqtt.module';
 import { AuthModule } from './features/auth/auth.module';
 import { UsersModule } from './features/users/users.module';
 import { CardsModule } from './features/cards/cards.module';
@@ -39,6 +40,7 @@ import { AtGuard, RolesGuard } from './common/guards';
         return addTransactionalDataSource(new DataSource(options));
       },
     }),
+    MqttModule,
     AuthModule,
     UsersModule,
     CardsModule,
