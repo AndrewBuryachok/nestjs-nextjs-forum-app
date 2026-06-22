@@ -7,16 +7,19 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Shop } from './shop.entity';
+import { MqttService } from '../mqtt/mqtt.service';
 import { CardsService } from '../cards/cards.service';
 import { CreateShopWithUserDto, EditShopDto } from './shop.dto';
 import { ShopError } from './shop-errors.enum';
 import { Request, Response } from '../../common/interfaces';
+import { Notification } from '../../common/enums';
 
 @Injectable()
 export class ShopsService {
   constructor(
     @InjectRepository(Shop)
     private shopsRepository: Repository<Shop>,
+    private mqttService: MqttService,
     private cardsService: CardsService,
   ) {}
 
@@ -50,7 +53,13 @@ export class ShopsService {
 
   async createShop(dto: CreateShopWithUserDto): Promise<void> {
     await this.cardsService.throwIfNotCardUser(dto.cardId, dto.userId);
-    await this.create(dto);
+    const shop = await this.create(dto);
+    this.mqttService.publishNotification(
+      dto.userId,
+      0,
+      shop.id,
+      Notification.CREATE_SHOP,
+    );
   }
 
   async editMyShop(
