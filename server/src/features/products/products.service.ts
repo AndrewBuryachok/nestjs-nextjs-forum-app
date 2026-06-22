@@ -10,6 +10,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Product } from './product.entity';
+import { MqttService } from '../mqtt/mqtt.service';
 import { CardsService } from '../cards/cards.service';
 import { ShopsService } from '../shops/shops.service';
 import { PurchasesService } from '../purchases/purchases.service';
@@ -20,12 +21,14 @@ import {
 } from './product.dto';
 import { ProductError } from './product-errors.enum';
 import { Request, Response } from '../../common/interfaces';
+import { Notification } from '../../common/enums';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private productsRepository: Repository<Product>,
+    private mqttService: MqttService,
     private cardsService: CardsService,
     private shopsService: ShopsService,
     @Inject(forwardRef(() => PurchasesService))
@@ -55,7 +58,13 @@ export class ProductsService {
 
   async createProduct(dto: CreateProductWithUserDto): Promise<void> {
     await this.shopsService.throwIfNotShopOwner(dto.shopId, dto.userId);
-    await this.create(dto);
+    const product = await this.create(dto);
+    this.mqttService.publishNotification(
+      dto.userId,
+      0,
+      product.id,
+      Notification.CREATE_PRODUCT,
+    );
   }
 
   async editMyProductAmountAndPrice(

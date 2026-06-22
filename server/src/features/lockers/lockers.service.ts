@@ -7,16 +7,19 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Locker } from './locker.entity';
+import { MqttService } from '../mqtt/mqtt.service';
 import { UsersService } from '../users/users.service';
 import { CreateLockerWithUserDto, EditLockerDto } from './locker.dto';
 import { LockerError } from './locker-errors.enum';
 import { Request, Response } from '../../common/interfaces';
+import { Notification } from '../../common/enums';
 
 @Injectable()
 export class LockersService {
   constructor(
     @InjectRepository(Locker)
     private lockersRepository: Repository<Locker>,
+    private mqttService: MqttService,
     private usersService: UsersService,
   ) {}
 
@@ -45,7 +48,13 @@ export class LockersService {
 
   async createLocker(dto: CreateLockerWithUserDto): Promise<void> {
     await this.usersService.throwIfUserNotFound(dto.userId);
-    await this.create(dto);
+    const locker = await this.create(dto);
+    this.mqttService.publishNotification(
+      dto.userId,
+      0,
+      locker.id,
+      Notification.CREATE_LOCKER,
+    );
   }
 
   async editMyLocker(
