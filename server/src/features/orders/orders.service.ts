@@ -72,7 +72,13 @@ export class OrdersService {
       sum: dto.sum,
       description: 'створення замовлення',
     });
-    await this.create(dto);
+    const order = await this.create(dto);
+    this.mqttService.publishNotification(
+      dto.userId,
+      0,
+      order.id,
+      Notification.CREATE_ORDER,
+    );
   }
 
   async editMyOrder(
