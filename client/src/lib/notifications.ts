@@ -10,7 +10,7 @@ export function parseNotification(key: string, date: Date) {
     id: Number(id),
     page,
     action,
-    link: `/${page}/${tab}?id=${id}`,
+    link: `/${page}/${tab}?id=${id}`.replace('/main', ''),
     date,
   };
 }
