@@ -10,6 +10,7 @@ import {
   createClient,
   getMainUsersTopic,
   getMyNotificationsTopic,
+  getPublicNotificationsTopic,
   publishNotification,
   publishUser,
 } from '@/lib/mqtt';
@@ -47,6 +48,7 @@ export function MqttProvider(props: Props) {
     const client = clientRef.current;
     client.on('connect', () => {
       client.subscribe(getMainUsersTopic());
+      client.subscribe(getPublicNotificationsTopic());
       if (user) {
         client.subscribe(getMyNotificationsTopic(user.id));
         publishUser(client, user.id, true);
@@ -108,9 +110,17 @@ export function MqttProvider(props: Props) {
   }, [user?.id]);
 
   const clearNotification = (key: string) => {
-    const client = clientRef.current;
-    if (client) {
-      publishNotification(client, key);
+    if (Number(key.split('/')[0])) {
+      const client = clientRef.current;
+      if (client) {
+        publishNotification(client, key);
+      }
+    } else {
+      setNotifications((prev) => {
+        const next = new Map(prev);
+        next.delete(key);
+        return next;
+      });
     }
   };
 

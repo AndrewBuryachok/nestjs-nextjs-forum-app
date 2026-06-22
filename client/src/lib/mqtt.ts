@@ -12,6 +12,10 @@ export function getMyUsersTopic(userId: number) {
   return `${BASE_TOPIC}/users/${userId}`;
 }
 
+export function getPublicNotificationsTopic() {
+  return `${BASE_TOPIC}/notifications/0/+/+/+/+`;
+}
+
 export function getMyNotificationsTopic(userId: number) {
   return `${BASE_TOPIC}/notifications/${userId}/+/+/+/+`;
 }
