@@ -21,16 +21,20 @@ import NotificationNick from './notification-nick';
 import CustomText from './custom-text';
 import { parseNotification } from '@/lib/notifications';
 
-export default function NotificationsTimeline() {
+type Props = {
+  notifications: Map<string, Date>;
+};
+
+export default function NotificationsTimeline(props: Props) {
   const t = useTranslations();
 
   const { setOpen: setDrawerOpen } = useDrawerContext();
 
   const closeDrawer = () => setDrawerOpen(false);
 
-  const { notifications, isLoading, clearNotification } = useMqttContext();
+  const { isLoading, clearNotification } = useMqttContext();
 
-  const clearAll = () => notifications.keys().forEach(clearNotification);
+  const clearAll = () => props.notifications.keys().forEach(clearNotification);
 
   if (isLoading) {
     return (
@@ -53,11 +57,11 @@ export default function NotificationsTimeline() {
     );
   }
 
-  if (!notifications.size) {
+  if (!props.notifications.size) {
     return <CustomEmptyState page='notifications' />;
   }
 
-  const parsedNotifications = Array.from(notifications.entries())
+  const parsedNotifications = Array.from(props.notifications.entries())
     .map(([key, date]) => parseNotification(key, date))
     .sort((a, b) => b.date.getTime() - a.date.getTime());
 

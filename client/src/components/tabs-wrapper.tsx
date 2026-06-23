@@ -4,6 +4,7 @@ import { Tabs } from '@chakra-ui/react';
 type Props = {
   label: string;
   value: string[];
+  end?: (index: number) => React.ReactNode;
   render: (index: number) => React.ReactNode;
 };
 
@@ -16,6 +17,7 @@ export default function TabsWrapper(props: Props) {
         {props.value.map((tab, index) => (
           <Tabs.Trigger key={tab} value={tab}>
             {t(`${props.label}.${tab}`)}
+            {props.end && props.end(index)}
           </Tabs.Trigger>
         ))}
       </Tabs.List>
