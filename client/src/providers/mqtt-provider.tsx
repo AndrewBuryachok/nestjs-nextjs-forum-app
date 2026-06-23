@@ -10,8 +10,10 @@ import {
   createClient,
   getMainUsersTopic,
   getMyNotificationsTopic,
+  getMyUnnotificationsTopic,
   getPublicNotificationsTopic,
   publishNotification,
+  publishUnnotification,
   publishUser,
 } from '@/lib/mqtt';
 
@@ -34,8 +36,11 @@ export function MqttProvider(props: Props) {
   const clientRef = useRef<mqtt.MqttClient | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [users, setUsers] = useState<Set<number>>(new Set());
-  const [notifications, setNotifications] = useState<Map<string, Date>>(
+  const [allNotifications, setAllNotifications] = useState<Map<string, Date>>(
     new Map(),
+  );
+  const [unnotifications, setUnnotifications] = useState<Set<string>>(
+    new Set(),
   );
 
   const { user } = useAuthContext();
@@ -43,7 +48,8 @@ export function MqttProvider(props: Props) {
   useEffect(() => {
     setIsLoading(true);
     setUsers(new Set());
-    setNotifications(new Map());
+    setAllNotifications(new Map());
+    setUnnotifications(new Set());
     clientRef.current = createClient(user?.id);
     const client = clientRef.current;
     client.on('connect', () => {
@@ -51,6 +57,7 @@ export function MqttProvider(props: Props) {
       client.subscribe(getPublicNotificationsTopic());
       if (user) {
         client.subscribe(getMyNotificationsTopic(user.id));
+        client.subscribe(getMyUnnotificationsTopic(user.id));
         publishUser(client, user.id, true);
       }
       setIsLoading(false);
@@ -58,7 +65,8 @@ export function MqttProvider(props: Props) {
     client.on('offline', () => {
       setIsLoading(true);
       setUsers(new Set());
-      setNotifications(new Map());
+      setAllNotifications(new Map());
+      setUnnotifications(new Set());
     });
     client.on('message', (topic, payload, packet) => {
       const parts = topic.split('/');
@@ -80,7 +88,7 @@ export function MqttProvider(props: Props) {
       }
       if (type === 'notifications') {
         const notification = parts.slice(2).join('/');
-        setNotifications((prev) => {
+        setAllNotifications((prev) => {
           const next = new Map(prev);
           if (payload.length) {
             next.set(notification, new Date(payload.toString()));
@@ -99,6 +107,18 @@ export function MqttProvider(props: Props) {
           new Audio('/sound.mp3').play().catch(() => {});
         }
       }
+      if (type === 'unnotifications') {
+        const notification = `0/${parts.slice(3).join('/')}`;
+        setUnnotifications((prev) => {
+          const next = new Set(prev);
+          if (payload.length) {
+            next.add(notification);
+          } else {
+            next.delete(notification);
+          }
+          return next;
+        });
+      }
     });
     return () => {
       if (user) {
@@ -109,14 +129,24 @@ export function MqttProvider(props: Props) {
     };
   }, [user?.id]);
 
+  const notifications = new Map(
+    [...allNotifications].filter(([key]) => !unnotifications.has(key)),
+  );
+
   const clearNotification = (key: string) => {
-    if (Number(key.split('/')[0])) {
+    const [userId, ...rest] = key.split('/');
+    if (Number(userId)) {
       const client = clientRef.current;
       if (client) {
         publishNotification(client, key);
       }
+    } else if (user) {
+      const client = clientRef.current;
+      if (client) {
+        publishUnnotification(client, `${user.id}/${rest.join('/')}`);
+      }
     } else {
-      setNotifications((prev) => {
+      setAllNotifications((prev) => {
         const next = new Map(prev);
         next.delete(key);
         return next;

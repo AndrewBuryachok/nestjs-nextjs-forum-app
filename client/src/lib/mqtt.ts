@@ -20,11 +20,15 @@ export function getMyNotificationsTopic(userId: number) {
   return `${BASE_TOPIC}/notifications/${userId}/+/+/+/+`;
 }
 
+export function getMyUnnotificationsTopic(userId: number) {
+  return `${BASE_TOPIC}/unnotifications/${userId}/+/+/+/+`;
+}
+
 export function createClient(userId?: number) {
   const will = userId
     ? { topic: getMyUsersTopic(userId), payload: '', retain: true }
     : undefined;
-  return mqtt.connect(BASE_URL, { will });
+  return mqtt.connect(BASE_URL, { protocolVersion: 5, will });
 }
 
 export function publish(
@@ -32,7 +36,10 @@ export function publish(
   topic: string,
   payload: string,
 ) {
-  client.publish(topic, payload, { retain: true });
+  const properties = payload
+    ? { messageExpiryInterval: 3 * 24 * 60 * 60 }
+    : undefined;
+  client.publish(topic, payload, { retain: true, properties });
 }
 
 export function publishUser(
@@ -49,4 +56,12 @@ export function publishUser(
 
 export function publishNotification(client: mqtt.MqttClient, key: string) {
   publish(client, `${BASE_TOPIC}/notifications/${key}`, '');
+}
+
+export function publishUnnotification(client: mqtt.MqttClient, key: string) {
+  publish(
+    client,
+    `${BASE_TOPIC}/unnotifications/${key}`,
+    new Date().toISOString(),
+  );
 }
