@@ -10,7 +10,12 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
-import { EditUserProfileDto, UpdateUserRoleDto, UserIdDto } from './user.dto';
+import {
+  ChangeUserPasswordDto,
+  EditUserProfileDto,
+  UpdateUserRoleDto,
+  UserIdDto,
+} from './user.dto';
 import { Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -50,6 +55,15 @@ export class UsersController {
     @Body() dto: EditUserProfileDto,
   ): Promise<void> {
     return this.usersService.editUserProfile(userId, dto);
+  }
+
+  @Roles([Role.ADMIN])
+  @Patch(':userId/password')
+  changeUserPassword(
+    @Param() { userId }: UserIdDto,
+    @Body() dto: ChangeUserPasswordDto,
+  ): Promise<void> {
+    return this.usersService.changeUserPassword(userId, dto);
   }
 
   @Roles([Role.ADMIN])

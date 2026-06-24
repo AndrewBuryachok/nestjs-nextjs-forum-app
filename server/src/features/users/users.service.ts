@@ -8,12 +8,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from './user.entity';
 import {
+  ChangeUserPasswordDto,
   CreateUserDto,
   EditUserProfileDto,
   UpdateUserRoleDto,
 } from './user.dto';
 import { UserError } from './user-errors.enum';
 import { Request, Response } from '../../common/interfaces';
+import { hashData } from '../../common/utils';
 
 @Injectable()
 export class UsersService {
@@ -76,6 +78,15 @@ export class UsersService {
   ): Promise<void> {
     await this.throwIfUserNotFound(userId);
     await this.editProfile(userId, dto);
+  }
+
+  async changeUserPassword(
+    userId: number,
+    dto: ChangeUserPasswordDto,
+  ): Promise<void> {
+    await this.throwIfUserNotFound(userId);
+    const password = await hashData(dto.password);
+    await this.changePassword(userId, { password });
   }
 
   async addUserRole(userId: number, dto: UpdateUserRoleDto): Promise<void> {
@@ -154,6 +165,17 @@ export class UsersService {
       await this.usersRepository.update({ id }, { avatar: dto.avatar });
     } catch (error) {
       throw new InternalServerErrorException(UserError.EDIT_PROFILE_FAILED);
+    }
+  }
+
+  private async changePassword(
+    id: number,
+    dto: ChangeUserPasswordDto,
+  ): Promise<void> {
+    try {
+      await this.usersRepository.update({ id }, { password: dto.password });
+    } catch (error) {
+      throw new InternalServerErrorException(UserError.CHANGE_PASSWORD_FAILED);
     }
   }
 

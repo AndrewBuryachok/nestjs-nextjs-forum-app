@@ -118,6 +118,14 @@ describe('App', () => {
         .expect(200);
     });
 
+    it('PATCH /users/:userId/password', () => {
+      return request(app.getHttpServer())
+        .patch(`/users/${users[0]}/password`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({ password: 'P@ssw0rd' })
+        .expect(200);
+    });
+
     it('POST /users/:userId/roles', () => {
       return request(app.getHttpServer())
         .post(`/users/${users[0]}/roles`)
