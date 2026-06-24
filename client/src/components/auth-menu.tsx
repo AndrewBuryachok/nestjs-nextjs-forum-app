@@ -2,13 +2,14 @@
 
 import { useTranslations } from 'next-intl';
 import { IconButton, Menu, Portal } from '@chakra-ui/react';
-import { LuLogIn, LuLogOut, LuUser, LuUserPen } from 'react-icons/lu';
+import { LuLock, LuLogIn, LuLogOut, LuUser, LuUserPen } from 'react-icons/lu';
 import { useAuthContext } from '@/providers/auth-provider';
 import { useDialogContext } from '@/providers/dialog-provider';
 import CustomAvatar from './custom-avatar';
 import AuthFormWithTabs from '@/features/auth/forms/auth-form-with-tabs';
 import LogoutForm from '@/features/auth/forms/logout-form';
 import EditMyProfileForm from '@/features/users/forms/edit-my-profile-form';
+import ChangeMyPasswordForm from '@/features/users/forms/change-my-password-form';
 
 export default function AuthMenu() {
   const t = useTranslations();
@@ -27,6 +28,12 @@ export default function AuthMenu() {
     openDialog({
       title: t('actions.edit') + ' ' + t('dialogs.profile'),
       body: <EditMyProfileForm />,
+    });
+
+  const openPasswordDialog = () =>
+    openDialog({
+      title: t('actions.change') + ' ' + t('dialogs.password'),
+      body: <ChangeMyPasswordForm />,
     });
 
   return (
@@ -53,6 +60,10 @@ export default function AuthMenu() {
                 <Menu.Item value='profile' onClick={openProfileDialog}>
                   <LuUserPen />
                   {t('actions.edit')} {t('dialogs.profile')}
+                </Menu.Item>
+                <Menu.Item value='password' onClick={openPasswordDialog}>
+                  <LuLock />
+                  {t('actions.change')} {t('dialogs.password')}
                 </Menu.Item>
                 <Menu.Item value='logout' onClick={openLogoutDialog}>
                   <LuLogOut />
