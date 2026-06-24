@@ -1,6 +1,10 @@
 'use server';
 
-import { editUserProfileSchema, updateUserRoleSchema } from './schema';
+import {
+  changeUserPasswordSchema,
+  editUserProfileSchema,
+  updateUserRoleSchema,
+} from './schema';
 import { actionClient } from '@/lib/safe-action';
 import { send } from '@/lib/api';
 
@@ -8,6 +12,12 @@ export const editUserProfileAction = actionClient
   .inputSchema(editUserProfileSchema)
   .action(({ parsedInput: { userId, ...body } }) => {
     return send('PATCH', `/users/${userId}/profile`, body);
+  });
+
+export const changeUserPasswordAction = actionClient
+  .inputSchema(changeUserPasswordSchema)
+  .action(({ parsedInput: { userId, ...body } }) => {
+    return send('PATCH', `/users/${userId}/password`, body);
   });
 
 export const addUserRoleAction = actionClient
