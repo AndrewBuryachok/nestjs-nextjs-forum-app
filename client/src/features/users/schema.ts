@@ -1,9 +1,14 @@
 import { z } from 'zod';
 import { Role } from '@/constants/roles';
 
-export const editUserProfileSchema = z.object({
-  userId: z.number().int().min(1),
+export const editMyProfileSchema = z.object({
   avatar: z.string().min(3).max(16).or(z.literal('')),
+});
+
+export type EditMyProfileType = z.infer<typeof editMyProfileSchema>;
+
+export const editUserProfileSchema = editMyProfileSchema.extend({
+  userId: z.number().int().min(1),
 });
 
 export type EditUserProfileType = z.infer<typeof editUserProfileSchema>;
