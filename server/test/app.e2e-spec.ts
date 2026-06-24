@@ -110,6 +110,14 @@ describe('App', () => {
         .then((res) => (users = res.body.data.map((user) => user.id)));
     });
 
+    it('PATCH /users/me/profile', () => {
+      return request(app.getHttpServer())
+        .patch('/users/me/profile')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ avatar: '' })
+        .expect(200);
+    });
+
     it('PATCH /users/:userId/profile', () => {
       return request(app.getHttpServer())
         .patch(`/users/${users[0]}/profile`)
