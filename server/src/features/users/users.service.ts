@@ -7,7 +7,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from './user.entity';
-import { CreateUserDto, UpdateUserRoleDto } from './user.dto';
+import {
+  CreateUserDto,
+  EditUserProfileDto,
+  UpdateUserRoleDto,
+} from './user.dto';
 import { UserError } from './user-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
@@ -64,6 +68,14 @@ export class UsersService {
 
   async resetUserToken(userId: number): Promise<void> {
     await this.resetToken(userId);
+  }
+
+  async editUserProfile(
+    userId: number,
+    dto: EditUserProfileDto,
+  ): Promise<void> {
+    await this.throwIfUserNotFound(userId);
+    await this.editProfile(userId, dto);
   }
 
   async addUserRole(userId: number, dto: UpdateUserRoleDto): Promise<void> {
@@ -131,6 +143,17 @@ export class UsersService {
       await this.usersRepository.update({ id }, { token: '' });
     } catch (error) {
       throw new InternalServerErrorException(UserError.RESET_TOKEN_FAILED);
+    }
+  }
+
+  private async editProfile(
+    id: number,
+    dto: EditUserProfileDto,
+  ): Promise<void> {
+    try {
+      await this.usersRepository.update({ id }, { avatar: dto.avatar });
+    } catch (error) {
+      throw new InternalServerErrorException(UserError.EDIT_PROFILE_FAILED);
     }
   }
 
