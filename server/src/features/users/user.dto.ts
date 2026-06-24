@@ -1,4 +1,13 @@
-import { IsEnum, IsInt, IsNotEmpty, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsString,
+  MaxLength,
+  Min,
+  MinLength,
+  ValidateIf,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { AuthDto } from '../auth/auth.dto';
 import { Role } from '../../common/enums';
@@ -12,6 +21,15 @@ export class UserIdDto {
 }
 
 export class CreateUserDto extends AuthDto {}
+
+export class EditUserProfileDto {
+  @ValidateIf((_, value) => value !== '')
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(3)
+  @MaxLength(16)
+  avatar: string;
+}
 
 export class UpdateUserRoleDto {
   @IsNotEmpty()

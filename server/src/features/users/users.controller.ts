@@ -4,12 +4,13 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
-import { UpdateUserRoleDto, UserIdDto } from './user.dto';
+import { EditUserProfileDto, UpdateUserRoleDto, UserIdDto } from './user.dto';
 import { Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -40,6 +41,15 @@ export class UsersController {
   @Get(':userId/select')
   selectOneUser(@Param() { userId }: UserIdDto): Promise<User> {
     return this.usersService.selectOneUser(userId);
+  }
+
+  @Roles([Role.ADMIN])
+  @Patch(':userId/profile')
+  editUserProfile(
+    @Param() { userId }: UserIdDto,
+    @Body() dto: EditUserProfileDto,
+  ): Promise<void> {
+    return this.usersService.editUserProfile(userId, dto);
   }
 
   @Roles([Role.ADMIN])
