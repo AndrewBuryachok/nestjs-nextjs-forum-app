@@ -2,12 +2,13 @@
 
 import { useTranslations } from 'next-intl';
 import { IconButton, Menu, Portal } from '@chakra-ui/react';
-import { LuLogIn, LuLogOut, LuUser } from 'react-icons/lu';
+import { LuLogIn, LuLogOut, LuUser, LuUserPen } from 'react-icons/lu';
 import { useAuthContext } from '@/providers/auth-provider';
 import { useDialogContext } from '@/providers/dialog-provider';
 import CustomAvatar from './custom-avatar';
 import AuthFormWithTabs from '@/features/auth/forms/auth-form-with-tabs';
 import LogoutForm from '@/features/auth/forms/logout-form';
+import EditMyProfileForm from '@/features/users/forms/edit-my-profile-form';
 
 export default function AuthMenu() {
   const t = useTranslations();
@@ -21,6 +22,12 @@ export default function AuthMenu() {
 
   const openLogoutDialog = () =>
     openDialog({ title: t('dialogs.logout'), body: <LogoutForm /> });
+
+  const openProfileDialog = () =>
+    openDialog({
+      title: t('actions.edit') + ' ' + t('dialogs.profile'),
+      body: <EditMyProfileForm />,
+    });
 
   return (
     <Menu.Root positioning={{ placement: 'bottom-end' }}>
@@ -42,10 +49,16 @@ export default function AuthMenu() {
                 {t('dialogs.login')}
               </Menu.Item>
             ) : (
-              <Menu.Item value='logout' onClick={openLogoutDialog}>
-                <LuLogOut />
-                {t('dialogs.logout')}
-              </Menu.Item>
+              <>
+                <Menu.Item value='profile' onClick={openProfileDialog}>
+                  <LuUserPen />
+                  {t('actions.edit')} {t('dialogs.profile')}
+                </Menu.Item>
+                <Menu.Item value='logout' onClick={openLogoutDialog}>
+                  <LuLogOut />
+                  {t('dialogs.logout')}
+                </Menu.Item>
+              </>
             )}
           </Menu.Content>
         </Menu.Positioner>
