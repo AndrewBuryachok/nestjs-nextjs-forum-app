@@ -31,6 +31,14 @@ export class EditUserProfileDto {
   avatar: string;
 }
 
+export class ChangeUserPasswordDto {
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(8)
+  @MaxLength(32)
+  password: string;
+}
+
 export class UpdateUserRoleDto {
   @IsNotEmpty()
   @IsEnum(Role)

@@ -7,6 +7,7 @@ export enum UserError {
   SET_TOKEN_FAILED = 'users.set_token_failed',
   RESET_TOKEN_FAILED = 'users.reset_token_failed',
   EDIT_PROFILE_FAILED = 'users.edit_profile_failed',
+  CHANGE_PASSWORD_FAILED = 'users.change_password_failed',
   ADD_ROLE_FAILED = 'users.add_role_failed',
   REMOVE_ROLE_FAILED = 'users.remove_role_failed',
 }
