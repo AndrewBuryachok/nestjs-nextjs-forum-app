@@ -1,6 +1,7 @@
 'use server';
 
 import {
+  changeMyPasswordSchema,
   changeUserPasswordSchema,
   editMyProfileSchema,
   editUserProfileSchema,
@@ -27,6 +28,12 @@ export const editUserProfileAction = actionClient
   .inputSchema(editUserProfileSchema)
   .action(({ parsedInput: { userId, ...body } }) => {
     return send('PATCH', `/users/${userId}/profile`, body);
+  });
+
+export const changeMyPasswordAction = actionClient
+  .inputSchema(changeMyPasswordSchema)
+  .action(({ parsedInput: body }) => {
+    return send('PATCH', '/users/me/password', body);
   });
 
 export const changeUserPasswordAction = actionClient
