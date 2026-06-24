@@ -16,7 +16,7 @@ import {
   UpdateUserRoleDto,
   UserIdDto,
 } from './user.dto';
-import { Public, Roles } from '../../common/decorators';
+import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
 
@@ -46,6 +46,14 @@ export class UsersController {
   @Get(':userId/select')
   selectOneUser(@Param() { userId }: UserIdDto): Promise<User> {
     return this.usersService.selectOneUser(userId);
+  }
+
+  @Patch('me/profile')
+  editMyProfile(
+    @MyId() myId: number,
+    @Body() dto: EditUserProfileDto,
+  ): Promise<void> {
+    return this.usersService.editUserProfile(myId, dto);
   }
 
   @Roles([Role.ADMIN])
