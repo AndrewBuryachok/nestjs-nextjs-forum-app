@@ -20,6 +20,8 @@ async function bootstrap() {
   morgan.token('body', (req) => {
     const body = { ...req['body'] };
     delete body.password;
+    delete body.oldPassword;
+    delete body.newPassword;
     return JSON.stringify(body);
   });
   morgan.token('result', (req, res) => {
