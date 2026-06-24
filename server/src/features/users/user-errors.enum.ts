@@ -1,5 +1,6 @@
 export enum UserError {
   NICK_ALREADY_USED = 'users.nick_already_used',
+  INVALID_PASSWORD = 'users.invalid_password',
   ALREADY_HAVE_ROLE = 'users.already_have_role',
   NOT_HAVE_ROLE = 'users.not_have_role',
   NOT_FOUND = 'users.not_found',

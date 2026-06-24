@@ -126,6 +126,14 @@ describe('App', () => {
         .expect(200);
     });
 
+    it('PATCH /users/me/password', () => {
+      return request(app.getHttpServer())
+        .patch('/users/me/password')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ oldPassword: 'P@ssw0rd', newPassword: 'P@ssw0rd' })
+        .expect(200);
+    });
+
     it('PATCH /users/:userId/password', () => {
       return request(app.getHttpServer())
         .patch(`/users/${users[0]}/password`)

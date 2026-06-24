@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from './user.entity';
 import {
+  ChangeMyPasswordDto,
   ChangeUserPasswordDto,
   CreateUserDto,
   EditUserProfileDto,
@@ -15,7 +16,7 @@ import {
 } from './user.dto';
 import { UserError } from './user-errors.enum';
 import { Request, Response } from '../../common/interfaces';
-import { hashData } from '../../common/utils';
+import { compareData, hashData } from '../../common/utils';
 
 @Injectable()
 export class UsersService {
@@ -78,6 +79,18 @@ export class UsersService {
   ): Promise<void> {
     await this.throwIfUserNotFound(userId);
     await this.editProfile(userId, dto);
+  }
+
+  async changeMyPassword(
+    myId: number,
+    dto: ChangeMyPasswordDto,
+  ): Promise<void> {
+    const user = await this.throwIfUserNotFound(myId);
+    if (!(await compareData(dto.oldPassword, user.password))) {
+      throw new BadRequestException(UserError.INVALID_PASSWORD);
+    }
+    const password = await hashData(dto.newPassword);
+    await this.changePassword(myId, { password });
   }
 
   async changeUserPassword(

@@ -11,6 +11,7 @@ import {
 import { UsersService } from './users.service';
 import { User } from './user.entity';
 import {
+  ChangeMyPasswordDto,
   ChangeUserPasswordDto,
   EditUserProfileDto,
   UpdateUserRoleDto,
@@ -63,6 +64,14 @@ export class UsersController {
     @Body() dto: EditUserProfileDto,
   ): Promise<void> {
     return this.usersService.editUserProfile(userId, dto);
+  }
+
+  @Patch('me/password')
+  changeMyPassword(
+    @MyId() myId: number,
+    @Body() dto: ChangeMyPasswordDto,
+  ): Promise<void> {
+    return this.usersService.changeMyPassword(myId, dto);
   }
 
   @Roles([Role.ADMIN])
