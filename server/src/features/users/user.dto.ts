@@ -31,6 +31,20 @@ export class EditUserProfileDto {
   avatar: string;
 }
 
+export class ChangeMyPasswordDto {
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(8)
+  @MaxLength(32)
+  oldPassword: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(8)
+  @MaxLength(32)
+  newPassword: string;
+}
+
 export class ChangeUserPasswordDto {
   @IsNotEmpty()
   @IsString()
