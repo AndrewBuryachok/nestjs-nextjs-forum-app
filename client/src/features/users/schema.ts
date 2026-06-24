@@ -8,6 +8,13 @@ export const editUserProfileSchema = z.object({
 
 export type EditUserProfileType = z.infer<typeof editUserProfileSchema>;
 
+export const changeUserPasswordSchema = z.object({
+  userId: z.number().int().min(1),
+  password: z.string().min(8).max(32),
+});
+
+export type ChangeUserPasswordType = z.infer<typeof changeUserPasswordSchema>;
+
 export const updateUserRoleSchema = z.object({
   userId: z.number().int().min(1),
   role: z.enum(Role),
