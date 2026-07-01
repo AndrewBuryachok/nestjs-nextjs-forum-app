@@ -297,6 +297,17 @@ export class TransactionsService {
           (qb) => req.id && qb.where('transaction.id = :id', { id: req.id }),
         ),
       )
+      .andWhere(
+        new Brackets(
+          (qb) =>
+            req.user &&
+            qb
+              .where('transaction.executorUserId = :userId')
+              .orWhere('transaction.senderUserId = :userId')
+              .orWhere('transaction.receiverUserId = :userId'),
+        ),
+        { userId: req.user },
+      )
       .orderBy('transaction.id', 'DESC')
       .skip(req.skip)
       .take(req.take);

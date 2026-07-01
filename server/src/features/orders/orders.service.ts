@@ -458,6 +458,16 @@ export class OrdersService {
           (qb) => req.id && qb.where('order.id = :id', { id: req.id }),
         ),
       )
+      .andWhere(
+        new Brackets(
+          (qb) =>
+            req.user &&
+            qb
+              .where('order.customerUserId = :userId')
+              .orWhere('order.executorUserId = :userId'),
+        ),
+        { userId: req.user },
+      )
       .orderBy('order.id', 'DESC')
       .skip(req.skip)
       .take(req.take);
