@@ -163,6 +163,16 @@ export class PurchasesService {
           (qb) => req.id && qb.where('purchase.id = :id', { id: req.id }),
         ),
       )
+      .andWhere(
+        new Brackets(
+          (qb) =>
+            req.user &&
+            qb
+              .where('purchase.userId = :userId')
+              .orWhere('product.userId = :userId'),
+        ),
+        { userId: req.user },
+      )
       .orderBy('purchase.id', 'DESC')
       .skip(req.skip)
       .take(req.take);

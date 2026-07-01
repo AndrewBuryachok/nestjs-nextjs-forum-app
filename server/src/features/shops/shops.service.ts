@@ -162,6 +162,12 @@ export class ShopsService {
           (qb) => req.id && qb.where('shop.id = :id', { id: req.id }),
         ),
       )
+      .andWhere(
+        new Brackets(
+          (qb) =>
+            req.user && qb.where('shop.userId = :userId', { userId: req.user }),
+        ),
+      )
       .orderBy('shop.id', 'DESC')
       .skip(req.skip)
       .take(req.take);

@@ -232,6 +232,12 @@ export class UsersService {
           (qb) => req.id && qb.where('user.id = :id', { id: req.id }),
         ),
       )
+      .andWhere(
+        new Brackets(
+          (qb) =>
+            req.user && qb.where('user.id = :userId', { userId: req.user }),
+        ),
+      )
       .orderBy('user.id', 'DESC')
       .skip(req.skip)
       .take(req.take);
