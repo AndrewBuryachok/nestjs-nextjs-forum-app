@@ -320,6 +320,12 @@ export class CardsService {
           (qb) => req.id && qb.where('card.id = :id', { id: req.id }),
         ),
       )
+      .andWhere(
+        new Brackets(
+          (qb) =>
+            req.user && qb.where('card.userId = :userId', { userId: req.user }),
+        ),
+      )
       .orderBy('card.id', 'DESC')
       .skip(req.skip)
       .take(req.take);

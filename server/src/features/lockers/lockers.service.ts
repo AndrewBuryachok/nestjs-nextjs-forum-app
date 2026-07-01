@@ -162,6 +162,13 @@ export class LockersService {
           (qb) => req.id && qb.where('locker.id = :id', { id: req.id }),
         ),
       )
+      .andWhere(
+        new Brackets(
+          (qb) =>
+            req.user &&
+            qb.where('locker.userId = :userId', { userId: req.user }),
+        ),
+      )
       .orderBy('locker.id', 'DESC')
       .skip(req.skip)
       .take(req.take);
