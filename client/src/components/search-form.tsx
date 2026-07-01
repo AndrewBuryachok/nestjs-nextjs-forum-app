@@ -7,8 +7,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Field, NumberInput } from '@chakra-ui/react';
 import { requestSchema } from '@/types/request';
 import { searchSchema, SearchType } from '@/types/search';
+import { useSelectAllUsers } from '@/features/users/hooks';
 import { useDialogContext } from '@/providers/dialog-provider';
 import CustomForm from '@/components/custom-form';
+import UsersCombobox from '@/features/users/components/users-combobox';
 
 export default function SearchForm() {
   const t = useTranslations();
@@ -39,6 +41,8 @@ export default function SearchForm() {
     closeDialog();
   });
 
+  const users = useSelectAllUsers();
+
   return (
     <CustomForm
       disabled={form.formState.isSubmitting || !form.formState.isDirty}
@@ -63,6 +67,23 @@ export default function SearchForm() {
           )}
         />
         <Field.ErrorText>{form.formState.errors.id?.message}</Field.ErrorText>
+      </Field.Root>
+      <Field.Root invalid={!!form.formState.errors.user}>
+        <Field.Label>{t('columns.user')}</Field.Label>
+        <Controller
+          control={form.control}
+          name='user'
+          render={({ field }) => (
+            <UsersCombobox
+              data={users.data}
+              loading={users.isLoading}
+              placeholder={t('columns.user')}
+              value={field.value ?? 0}
+              setValue={field.onChange}
+            />
+          )}
+        />
+        <Field.ErrorText>{form.formState.errors.user?.message}</Field.ErrorText>
       </Field.Root>
     </CustomForm>
   );
