@@ -10,6 +10,7 @@ export default function CustomNavbar() {
       links: [
         { value: 'cards', my: true },
         { value: 'transactions', my: true },
+        { value: 'invoices', my: true },
       ],
     },
     {
