@@ -4,6 +4,7 @@ import {
   LuBellOff,
   LuCreditCard,
   LuMailbox,
+  LuReceipt,
   LuShoppingBag,
   LuShoppingBasket,
   LuShoppingCart,
@@ -22,6 +23,7 @@ export default function CustomEmptyState(props: Props) {
 
   const icon = {
     cards: <LuCreditCard />,
+    invoices: <LuReceipt />,
     lockers: <LuMailbox />,
     notifications: <LuBellOff />,
     orders: <LuShoppingBag />,
