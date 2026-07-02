@@ -341,6 +341,22 @@ describe('App', () => {
     });
   });
 
+  describe('Invoices', () => {
+    it('GET /invoices/my', () => {
+      return request(app.getHttpServer())
+        .get('/invoices/my')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /invoices/all', () => {
+      return request(app.getHttpServer())
+        .get('/invoices/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+  });
+
   describe('Shops', () => {
     it('POST /shops', () => {
       return request(app.getHttpServer())

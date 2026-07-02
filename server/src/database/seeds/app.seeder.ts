@@ -6,6 +6,7 @@ import { User } from '../../features/users/user.entity';
 import { Card } from '../../features/cards/card.entity';
 import { CardUser } from '../../features/cards/card-user.entity';
 import { Transaction } from '../../features/transactions/transaction.entity';
+import { Invoice } from '../../features/invoices/invoice.entity';
 import { Shop } from '../../features/shops/shop.entity';
 import { Product } from '../../features/products/product.entity';
 import { Purchase } from '../../features/purchases/purchase.entity';
@@ -118,6 +119,41 @@ export default class AppSeeder implements Seeder {
     }
     transactions.push(...transfers);
     this.logger.log(`Generated ${transfers.length} Transfers`);
+    this.logger.log('Generating Invoices...');
+    const invoiceFactory = factoryManager.get(Invoice);
+    const invoices: Invoice[] = [];
+    for (let i = 0; i < 40; i++) {
+      const sum = faker.number.int({ min: 1, max: 1000 });
+      const senderCard = faker.helpers.arrayElement(cards);
+      const receiverCard = faker.helpers.arrayElement(
+        cards.filter((card) => card.balance >= sum),
+      );
+      const senderUser = randomUserOf(senderCard);
+      const receiverUser = randomUserOf(receiverCard);
+      const invoice = await invoiceFactory.make({
+        senderUser,
+        senderCard,
+        receiverUser,
+        sum,
+      });
+      if (faker.datatype.boolean()) {
+        invoice.receiverCard = receiverCard;
+        invoice.paidAt = new Date();
+        receiverCard.balance -= sum;
+        senderCard.balance += sum;
+        const transfer = await transactionFactory.make({
+          senderUser: receiverUser,
+          senderCard: receiverCard,
+          receiverUser: senderUser,
+          receiverCard: senderCard,
+          sum,
+          description: 'сплата інвойсу',
+        });
+        transactions.push(transfer);
+      }
+      invoices.push(invoice);
+    }
+    this.logger.log(`Generated ${invoices.length} Invoices`);
     this.logger.log('Generating Shops...');
     const shopFactory = factoryManager.get(Shop);
     const shops: Shop[] = [];
@@ -254,6 +290,9 @@ export default class AppSeeder implements Seeder {
     this.logger.log('Saving Transactions...');
     await dataSource.getRepository(Transaction).save(transactions);
     this.logger.log(`Saved ${transactions.length} Transactions`);
+    this.logger.log('Saving Invoices...');
+    await dataSource.getRepository(Invoice).save(invoices);
+    this.logger.log(`Saved ${invoices.length} Invoices`);
     this.logger.log('Saving Shops...');
     await dataSource.getRepository(Shop).save(shops);
     this.logger.log(`Saved ${shops.length} Shops`);
