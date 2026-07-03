@@ -342,6 +342,33 @@ describe('App', () => {
   });
 
   describe('Invoices', () => {
+    it('POST /invoices', () => {
+      return request(app.getHttpServer())
+        .post('/invoices')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          senderCardId: cards[0],
+          receiverUserId: user.user.id,
+          sum: 10,
+          description: '',
+        })
+        .expect(201);
+    });
+
+    it('POST /invoices/all', () => {
+      return request(app.getHttpServer())
+        .post('/invoices/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          senderUserId: user.user.id,
+          senderCardId: cards[0],
+          receiverUserId: user.user.id,
+          sum: 10,
+          description: '',
+        })
+        .expect(201);
+    });
+
     it('GET /invoices/my', () => {
       return request(app.getHttpServer())
         .get('/invoices/my')

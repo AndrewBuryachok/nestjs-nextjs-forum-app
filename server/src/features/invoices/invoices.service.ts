@@ -1,14 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Invoice } from './invoice.entity';
+import { MqttService } from '../mqtt/mqtt.service';
+import { CardsService } from '../cards/cards.service';
+import { CreateInvoiceWithUserDto } from './invoice.dto';
+import { InvoiceError } from './invoice-errors.enum';
 import { Request, Response } from '../../common/interfaces';
+import { Notification } from '../../common/enums';
 
 @Injectable()
 export class InvoicesService {
   constructor(
     @InjectRepository(Invoice)
     private invoicesRepository: Repository<Invoice>,
+    private mqttService: MqttService,
+    private cardsService: CardsService,
   ) {}
 
   async getMyInvoices(myId: number, req: Request): Promise<Response<Invoice>> {
@@ -32,6 +39,36 @@ export class InvoicesService {
     const [data, total] =
       await this.getInvoicesQueryBuilder(req).getManyAndCount();
     return { data, total };
+  }
+
+  async createInvoice(dto: CreateInvoiceWithUserDto): Promise<void> {
+    await this.cardsService.throwIfNotCardUser(
+      dto.senderCardId,
+      dto.senderUserId,
+    );
+    const invoice = await this.create(dto);
+    this.mqttService.publishNotification(
+      dto.senderUserId,
+      dto.receiverUserId,
+      invoice.id,
+      Notification.CREATE_INVOICE,
+    );
+  }
+
+  private async create(dto: CreateInvoiceWithUserDto): Promise<Invoice> {
+    try {
+      const invoice = this.invoicesRepository.create({
+        senderUserId: dto.senderUserId,
+        senderCardId: dto.senderCardId,
+        receiverUserId: dto.receiverUserId,
+        sum: dto.sum,
+        description: dto.description,
+      });
+      await this.invoicesRepository.save(invoice);
+      return invoice;
+    } catch (error) {
+      throw new InternalServerErrorException(InvoiceError.CREATE_FAILED);
+    }
   }
 
   private getInvoicesQueryBuilder(req: Request): SelectQueryBuilder<Invoice> {
