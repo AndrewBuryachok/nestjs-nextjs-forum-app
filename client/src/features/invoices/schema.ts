@@ -16,3 +16,17 @@ export const createInvoiceWithUserSchema = createInvoiceSchema.extend({
 export type CreateInvoiceWithUserType = z.infer<
   typeof createInvoiceWithUserSchema
 >;
+
+export const editInvoiceSchema = z.object({
+  invoiceId: z.number().int().min(1),
+  sum: z.number().int().min(1),
+  description: z.string().max(32),
+});
+
+export type EditInvoiceType = z.infer<typeof editInvoiceSchema>;
+
+export const deleteInvoiceSchema = z.object({
+  invoiceId: z.number().int().min(1),
+});
+
+export type DeleteInvoiceType = z.infer<typeof deleteInvoiceSchema>;
