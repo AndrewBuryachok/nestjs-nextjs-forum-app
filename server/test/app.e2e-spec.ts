@@ -48,6 +48,7 @@ describe('App', () => {
   let users: number[];
   let cards: number[];
   let transactions: number[];
+  let invoices: number[];
   let shops: number[];
   let products: number[];
   let purchases: number[];
@@ -373,7 +374,8 @@ describe('App', () => {
       return request(app.getHttpServer())
         .get('/invoices/my')
         .set('Authorization', `Bearer ${user.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
+        .then((res) => (invoices = res.body.data.map((invoice) => invoice.id)));
     });
 
     it('GET /invoices/all', () => {
@@ -381,6 +383,36 @@ describe('App', () => {
         .get('/invoices/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('PATCH /invoices/:invoiceId', () => {
+      return request(app.getHttpServer())
+        .patch(`/invoices/${invoices[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ sum: 10, description: '' })
+        .expect(200);
+    });
+
+    it('PATCH /invoices/all/:invoiceId', () => {
+      return request(app.getHttpServer())
+        .patch(`/invoices/all/${invoices[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({ sum: 10, description: '' })
+        .expect(200);
+    });
+
+    it('DELETE /invoices/:invoiceId', () => {
+      return request(app.getHttpServer())
+        .delete(`/invoices/${invoices[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(200);
+    });
+
+    it('DELETE /invoices/all/:invoiceId', () => {
+      return request(app.getHttpServer())
+        .delete(`/invoices/all/${invoices[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(200);
     });
   });
 

@@ -1,7 +1,21 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { InvoicesService } from './invoices.service';
 import { Invoice } from './invoice.entity';
-import { CreateInvoiceDto, CreateInvoiceWithUserDto } from './invoice.dto';
+import {
+  CreateInvoiceDto,
+  CreateInvoiceWithUserDto,
+  EditInvoiceDto,
+  InvoiceIdDto,
+} from './invoice.dto';
 import { MyId, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -36,5 +50,37 @@ export class InvoicesController {
   @Post('all')
   createUserInvoice(@Body() dto: CreateInvoiceWithUserDto): Promise<void> {
     return this.invoicesService.createInvoice(dto);
+  }
+
+  @Patch(':invoiceId')
+  editMyInvoice(
+    @MyId() myId: number,
+    @Param() { invoiceId }: InvoiceIdDto,
+    @Body() dto: EditInvoiceDto,
+  ): Promise<void> {
+    return this.invoicesService.editMyInvoice(myId, invoiceId, dto);
+  }
+
+  @Roles([Role.ADMIN])
+  @Patch('all/:invoiceId')
+  editUserInvoice(
+    @Param() { invoiceId }: InvoiceIdDto,
+    @Body() dto: EditInvoiceDto,
+  ): Promise<void> {
+    return this.invoicesService.editUserInvoice(invoiceId, dto);
+  }
+
+  @Delete(':invoiceId')
+  deleteMyInvoice(
+    @MyId() myId: number,
+    @Param() { invoiceId }: InvoiceIdDto,
+  ): Promise<void> {
+    return this.invoicesService.deleteMyInvoice(myId, invoiceId);
+  }
+
+  @Roles([Role.ADMIN])
+  @Delete('all/:invoiceId')
+  deleteUserInvoice(@Param() { invoiceId }: InvoiceIdDto): Promise<void> {
+    return this.invoicesService.deleteUserInvoice(invoiceId);
   }
 }
