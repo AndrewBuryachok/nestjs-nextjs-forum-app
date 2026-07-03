@@ -6,18 +6,17 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
-export class CreateInvoiceDto {
+export class InvoiceIdDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
-  senderCardId: number;
+  @Type(() => Number)
+  invoiceId: number;
+}
 
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  receiverUserId: number;
-
+export class EditInvoiceDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
@@ -27,6 +26,18 @@ export class CreateInvoiceDto {
   @IsString()
   @MaxLength(32)
   description: string;
+}
+
+export class CreateInvoiceDto extends EditInvoiceDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  senderCardId: number;
+
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  receiverUserId: number;
 }
 
 export class CreateInvoiceWithUserDto extends CreateInvoiceDto {
