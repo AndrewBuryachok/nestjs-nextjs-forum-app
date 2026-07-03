@@ -1,10 +1,16 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Invoice } from './invoice.entity';
 import { MqttService } from '../mqtt/mqtt.service';
 import { CardsService } from '../cards/cards.service';
-import { CreateInvoiceWithUserDto } from './invoice.dto';
+import { CreateInvoiceWithUserDto, EditInvoiceDto } from './invoice.dto';
 import { InvoiceError } from './invoice-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 import { Notification } from '../../common/enums';
@@ -55,6 +61,72 @@ export class InvoicesService {
     );
   }
 
+  async editMyInvoice(
+    myId: number,
+    invoiceId: number,
+    dto: EditInvoiceDto,
+  ): Promise<void> {
+    const invoice = await this.throwIfNotInvoiceSender(invoiceId, myId);
+    await this.editInvoice(invoice, dto);
+  }
+
+  async editUserInvoice(invoiceId: number, dto: EditInvoiceDto): Promise<void> {
+    const invoice = await this.throwIfInvoiceNotFound(invoiceId);
+    await this.editInvoice(invoice, dto);
+  }
+
+  private async editInvoice(
+    invoice: Invoice,
+    dto: EditInvoiceDto,
+  ): Promise<void> {
+    this.throwIfInvoiceAlreadyPaid(invoice);
+    await this.edit(invoice.id, dto);
+  }
+
+  async deleteMyInvoice(myId: number, invoiceId: number): Promise<void> {
+    const invoice = await this.throwIfNotInvoiceSender(invoiceId, myId);
+    await this.deleteInvoice(invoice);
+  }
+
+  async deleteUserInvoice(invoiceId: number): Promise<void> {
+    const invoice = await this.throwIfInvoiceNotFound(invoiceId);
+    await this.deleteInvoice(invoice);
+  }
+
+  private async deleteInvoice(invoice: Invoice): Promise<void> {
+    this.throwIfInvoiceAlreadyPaid(invoice);
+    await this.delete(invoice.id);
+  }
+
+  async throwIfInvoiceNotFound(invoiceId: number): Promise<Invoice> {
+    const invoice = await this.findInvoiceById(invoiceId);
+    if (!invoice) {
+      throw new NotFoundException(InvoiceError.NOT_FOUND);
+    }
+    return invoice;
+  }
+
+  async throwIfNotInvoiceSender(
+    invoiceId: number,
+    userId: number,
+  ): Promise<Invoice> {
+    const invoice = await this.throwIfInvoiceNotFound(invoiceId);
+    if (invoice.senderUserId !== userId) {
+      throw new ForbiddenException(InvoiceError.NOT_SENDER);
+    }
+    return invoice;
+  }
+
+  private throwIfInvoiceAlreadyPaid(invoice: Invoice): void {
+    if (invoice.paidAt) {
+      throw new BadRequestException(InvoiceError.ALREADY_PAID);
+    }
+  }
+
+  private findInvoiceById(id: number): Promise<Invoice | null> {
+    return this.invoicesRepository.findOneBy({ id });
+  }
+
   private async create(dto: CreateInvoiceWithUserDto): Promise<Invoice> {
     try {
       const invoice = this.invoicesRepository.create({
@@ -68,6 +140,25 @@ export class InvoicesService {
       return invoice;
     } catch (error) {
       throw new InternalServerErrorException(InvoiceError.CREATE_FAILED);
+    }
+  }
+
+  private async edit(id: number, dto: EditInvoiceDto): Promise<void> {
+    try {
+      await this.invoicesRepository.update(
+        { id },
+        { sum: dto.sum, description: dto.description },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(InvoiceError.EDIT_FAILED);
+    }
+  }
+
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.invoicesRepository.delete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(InvoiceError.DELETE_FAILED);
     }
   }
 
