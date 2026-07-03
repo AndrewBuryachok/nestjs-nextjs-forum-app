@@ -3,6 +3,9 @@ export const NOTIFICATION_TABS_MAP = {
     add: 'my',
     remove: 'my',
   },
+  invoices: {
+    create: 'my',
+  },
   lockers: {
     create: 'main',
   },
