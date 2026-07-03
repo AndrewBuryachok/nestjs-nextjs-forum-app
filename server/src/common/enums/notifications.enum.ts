@@ -3,6 +3,7 @@ export enum Notification {
   REMOVE_CARD_USER = 'remove cards',
   CREATE_TRANSACTION = 'create transactions',
   TRANSFER_TRANSACTION = 'transfer transactions',
+  CREATE_INVOICE = 'create invoices',
   CREATE_SHOP = 'create shops',
   CREATE_PRODUCT = 'create products',
   END_PRODUCT = 'end products',
