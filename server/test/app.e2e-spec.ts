@@ -356,6 +356,33 @@ describe('App', () => {
         .expect(201);
     });
 
+    it('POST /invoices', () => {
+      return request(app.getHttpServer())
+        .post('/invoices')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          senderCardId: cards[0],
+          receiverUserId: user.user.id,
+          sum: 10,
+          description: '',
+        })
+        .expect(201);
+    });
+
+    it('POST /invoices/all', () => {
+      return request(app.getHttpServer())
+        .post('/invoices/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          senderUserId: user.user.id,
+          senderCardId: cards[0],
+          receiverUserId: user.user.id,
+          sum: 10,
+          description: '',
+        })
+        .expect(201);
+    });
+
     it('POST /invoices/all', () => {
       return request(app.getHttpServer())
         .post('/invoices/all')
@@ -413,6 +440,22 @@ describe('App', () => {
         .delete(`/invoices/all/${invoices[1]}`)
         .set('Authorization', `Bearer ${admin.access}`)
         .expect(200);
+    });
+
+    it('POST /invoices/:invoiceId', () => {
+      return request(app.getHttpServer())
+        .post(`/invoices/${invoices[2]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ cardId: cards[0] })
+        .expect(201);
+    });
+
+    it('POST /invoices/all/:invoiceId', () => {
+      return request(app.getHttpServer())
+        .post(`/invoices/all/${invoices[3]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({ cardId: cards[0] })
+        .expect(201);
     });
   });
 
