@@ -30,3 +30,10 @@ export const deleteInvoiceSchema = z.object({
 });
 
 export type DeleteInvoiceType = z.infer<typeof deleteInvoiceSchema>;
+
+export const payInvoiceSchema = z.object({
+  invoiceId: z.number().int().min(1),
+  cardId: z.number().int().min(1),
+});
+
+export type PayInvoiceType = z.infer<typeof payInvoiceSchema>;
