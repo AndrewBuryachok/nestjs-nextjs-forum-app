@@ -5,6 +5,7 @@ import {
   createInvoiceWithUserSchema,
   deleteInvoiceSchema,
   editInvoiceSchema,
+  payInvoiceSchema,
 } from './schema';
 import { actionClient } from '@/lib/safe-action';
 import { send } from '@/lib/api';
@@ -43,4 +44,16 @@ export const deleteUserInvoiceAction = actionClient
   .inputSchema(deleteInvoiceSchema)
   .action(({ parsedInput: { invoiceId } }) => {
     return send('DELETE', `/invoices/all/${invoiceId}`);
+  });
+
+export const payMyInvoiceAction = actionClient
+  .inputSchema(payInvoiceSchema)
+  .action(({ parsedInput: { invoiceId, ...body } }) => {
+    return send('POST', `/invoices/${invoiceId}`, body);
+  });
+
+export const payUserInvoiceAction = actionClient
+  .inputSchema(payInvoiceSchema)
+  .action(({ parsedInput: { invoiceId, ...body } }) => {
+    return send('POST', `/invoices/all/${invoiceId}`, body);
   });
