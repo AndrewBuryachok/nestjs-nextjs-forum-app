@@ -4,6 +4,7 @@ export enum Notification {
   CREATE_TRANSACTION = 'create transactions',
   TRANSFER_TRANSACTION = 'transfer transactions',
   CREATE_INVOICE = 'create invoices',
+  PAY_INVOICE = 'pay invoices',
   CREATE_SHOP = 'create shops',
   CREATE_PRODUCT = 'create products',
   END_PRODUCT = 'end products',
