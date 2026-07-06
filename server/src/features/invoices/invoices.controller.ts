@@ -15,6 +15,7 @@ import {
   CreateInvoiceWithUserDto,
   EditInvoiceDto,
   InvoiceIdDto,
+  PayInvoiceDto,
 } from './invoice.dto';
 import { MyId, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
@@ -82,5 +83,23 @@ export class InvoicesController {
   @Delete('all/:invoiceId')
   deleteUserInvoice(@Param() { invoiceId }: InvoiceIdDto): Promise<void> {
     return this.invoicesService.deleteUserInvoice(invoiceId);
+  }
+
+  @Post(':invoiceId')
+  payMyInvoice(
+    @MyId() myId: number,
+    @Param() { invoiceId }: InvoiceIdDto,
+    @Body() dto: PayInvoiceDto,
+  ): Promise<void> {
+    return this.invoicesService.payMyInvoice(myId, invoiceId, dto);
+  }
+
+  @Roles([Role.ADMIN])
+  @Post('all/:invoiceId')
+  payUserInvoice(
+    @Param() { invoiceId }: InvoiceIdDto,
+    @Body() dto: PayInvoiceDto,
+  ): Promise<void> {
+    return this.invoicesService.payUserInvoice(invoiceId, dto);
   }
 }
