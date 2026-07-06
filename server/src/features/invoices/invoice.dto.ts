@@ -46,3 +46,10 @@ export class CreateInvoiceWithUserDto extends CreateInvoiceDto {
   @Min(1)
   senderUserId: number;
 }
+
+export class PayInvoiceDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  cardId: number;
+}

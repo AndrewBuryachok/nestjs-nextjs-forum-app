@@ -7,10 +7,16 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { Transactional } from 'typeorm-transactional';
 import { Invoice } from './invoice.entity';
 import { MqttService } from '../mqtt/mqtt.service';
 import { CardsService } from '../cards/cards.service';
-import { CreateInvoiceWithUserDto, EditInvoiceDto } from './invoice.dto';
+import { TransactionsService } from '../transactions/transactions.service';
+import {
+  CreateInvoiceWithUserDto,
+  EditInvoiceDto,
+  PayInvoiceDto,
+} from './invoice.dto';
 import { InvoiceError } from './invoice-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 import { Notification } from '../../common/enums';
@@ -22,6 +28,7 @@ export class InvoicesService {
     private invoicesRepository: Repository<Invoice>,
     private mqttService: MqttService,
     private cardsService: CardsService,
+    private transactionsService: TransactionsService,
   ) {}
 
   async getMyInvoices(myId: number, req: Request): Promise<Response<Invoice>> {
@@ -98,6 +105,43 @@ export class InvoicesService {
     await this.delete(invoice.id);
   }
 
+  async payMyInvoice(
+    myId: number,
+    invoiceId: number,
+    dto: PayInvoiceDto,
+  ): Promise<void> {
+    const invoice = await this.throwIfNotInvoiceReceiver(invoiceId, myId);
+    await this.payInvoice(invoice, dto);
+  }
+
+  async payUserInvoice(invoiceId: number, dto: PayInvoiceDto): Promise<void> {
+    const invoice = await this.throwIfInvoiceNotFound(invoiceId);
+    await this.payInvoice(invoice, dto);
+  }
+
+  @Transactional()
+  private async payInvoice(
+    invoice: Invoice,
+    dto: PayInvoiceDto,
+  ): Promise<void> {
+    this.throwIfInvoiceAlreadyPaid(invoice);
+    await this.transactionsService.createUserTransferTransaction({
+      senderUserId: invoice.receiverUserId,
+      senderCardId: dto.cardId,
+      receiverUserId: invoice.senderUserId,
+      receiverCardId: invoice.senderCardId,
+      sum: invoice.sum,
+      description: 'сплата інвойсу',
+    });
+    await this.pay(invoice.id, dto);
+    this.mqttService.publishNotification(
+      invoice.receiverUserId,
+      invoice.senderUserId,
+      invoice.id,
+      Notification.PAY_INVOICE,
+    );
+  }
+
   async throwIfInvoiceNotFound(invoiceId: number): Promise<Invoice> {
     const invoice = await this.findInvoiceById(invoiceId);
     if (!invoice) {
@@ -113,6 +157,17 @@ export class InvoicesService {
     const invoice = await this.throwIfInvoiceNotFound(invoiceId);
     if (invoice.senderUserId !== userId) {
       throw new ForbiddenException(InvoiceError.NOT_SENDER);
+    }
+    return invoice;
+  }
+
+  async throwIfNotInvoiceReceiver(
+    invoiceId: number,
+    userId: number,
+  ): Promise<Invoice> {
+    const invoice = await this.throwIfInvoiceNotFound(invoiceId);
+    if (invoice.receiverUserId !== userId) {
+      throw new ForbiddenException(InvoiceError.NOT_RECEIVER);
     }
     return invoice;
   }
@@ -159,6 +214,17 @@ export class InvoicesService {
       await this.invoicesRepository.delete({ id });
     } catch (error) {
       throw new InternalServerErrorException(InvoiceError.DELETE_FAILED);
+    }
+  }
+
+  private async pay(id: number, dto: PayInvoiceDto): Promise<void> {
+    try {
+      await this.invoicesRepository.update(
+        { id },
+        { receiverCardId: dto.cardId, paidAt: new Date() },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(InvoiceError.PAY_FAILED);
     }
   }
 
