@@ -206,6 +206,7 @@ export default class AppSeeder implements Seeder {
         type: TransactionType.BUY_PRODUCT,
         sum: amount * product.price,
         description: product.description,
+        item: product.item,
       });
       transactions.push(transfer);
       product.amount -= amount;
@@ -254,6 +255,7 @@ export default class AppSeeder implements Seeder {
         type: TransactionType.CREATE_ORDER,
         sum,
         description: order.description,
+        item: order.item,
       });
       transactions.push(transaction);
       if (order.status !== Status.CREATED) {
@@ -268,6 +270,7 @@ export default class AppSeeder implements Seeder {
           type: TransactionType.COMPLETE_ORDER,
           sum,
           description: order.description,
+          item: order.item,
         });
         transactions.push(transaction);
         executorCard.balance += sum;
@@ -279,6 +282,7 @@ export default class AppSeeder implements Seeder {
           type: TransactionType.EXECUTE_ORDER,
           sum,
           description: order.description,
+          item: order.item,
         });
         transactions.push(transfer);
       }

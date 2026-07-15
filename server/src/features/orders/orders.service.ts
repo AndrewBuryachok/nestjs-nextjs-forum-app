@@ -72,6 +72,7 @@ export class OrdersService {
       type: TransactionType.CREATE_ORDER,
       sum: dto.sum,
       description: dto.description,
+      item: dto.item,
     });
     const order = await this.create(dto);
     this.mqttService.publishNotification(
@@ -106,6 +107,7 @@ export class OrdersService {
         type: TransactionType.EDIT_ORDER,
         sum: dto.sum - order.sum,
         description: dto.description,
+        item: dto.item,
       });
     }
     if (order.sum > dto.sum) {
@@ -115,6 +117,7 @@ export class OrdersService {
         type: TransactionType.EDIT_ORDER,
         sum: order.sum - dto.sum,
         description: dto.description,
+        item: dto.item,
       });
     }
     await this.edit(order.id, dto);
@@ -139,6 +142,7 @@ export class OrdersService {
       type: TransactionType.DELETE_ORDER,
       sum: order.sum,
       description: order.description,
+      item: order.item,
     });
     await this.delete(order.id);
   }
@@ -235,6 +239,7 @@ export class OrdersService {
       type: TransactionType.COMPLETE_ORDER,
       sum: order.sum,
       description: order.description,
+      item: order.item,
     });
     await this.transactionsService.createTransferTransaction({
       senderUserId: order.customerUserId,
@@ -244,6 +249,7 @@ export class OrdersService {
       type: TransactionType.EXECUTE_ORDER,
       sum: order.sum,
       description: order.description,
+      item: order.item,
     });
     await this.complete(order.id);
     this.mqttService.publishNotification(
