@@ -19,7 +19,7 @@ import {
 } from './invoice.dto';
 import { InvoiceError } from './invoice-errors.enum';
 import { Request, Response } from '../../common/interfaces';
-import { Notification } from '../../common/enums';
+import { Notification, TransactionType } from '../../common/enums';
 
 @Injectable()
 export class InvoicesService {
@@ -125,13 +125,14 @@ export class InvoicesService {
     dto: PayInvoiceDto,
   ): Promise<void> {
     this.throwIfInvoiceAlreadyPaid(invoice);
-    await this.transactionsService.createUserTransferTransaction({
+    await this.transactionsService.createTransferTransaction({
       senderUserId: invoice.receiverUserId,
       senderCardId: dto.cardId,
       receiverUserId: invoice.senderUserId,
       receiverCardId: invoice.senderCardId,
+      type: TransactionType.PAY_INVOICE,
       sum: invoice.sum,
-      description: 'сплата інвойсу',
+      description: invoice.description,
     });
     await this.pay(invoice.id, dto);
     this.mqttService.publishNotification(

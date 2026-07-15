@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Card } from '../cards/card.entity';
+import { TransactionType } from '../../common/enums';
 
 @Entity('transactions')
 export class Transaction {
@@ -48,6 +49,9 @@ export class Transaction {
   @ManyToOne(() => Card, { nullable: true })
   @JoinColumn({ name: 'receiver_card_id' })
   receiverCard?: Card;
+
+  @Column({ type: 'enum', enum: TransactionType })
+  type: TransactionType;
 
   @Column()
   sum: number;

@@ -13,7 +13,7 @@ import { ProductsService } from '../products/products.service';
 import { CreatePurchaseWithUserDto } from './purchase.dto';
 import { PurchaseError } from './purchase-errors.enum';
 import { Request, Response } from '../../common/interfaces';
-import { Notification } from '../../common/enums';
+import { Notification, TransactionType } from '../../common/enums';
 
 @Injectable()
 export class PurchasesService {
@@ -56,13 +56,14 @@ export class PurchasesService {
       dto.productId,
       dto.amount,
     );
-    await this.transactionsService.createUserTransferTransaction({
+    await this.transactionsService.createTransferTransaction({
       senderUserId: dto.userId,
       senderCardId: dto.cardId,
       receiverUserId: product.userId,
       receiverCardId: product.shop.cardId,
+      type: TransactionType.BUY_PRODUCT,
       sum: dto.amount * product.price,
-      description: 'купівля товару',
+      description: product.description,
     });
     await this.productsService.buyProduct(dto.productId, dto.amount);
     const purchase = await this.create(dto, product.price);
