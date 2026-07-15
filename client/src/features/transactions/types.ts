@@ -1,6 +1,7 @@
 import { BaseUser } from '../users/types';
 import { BaseCard } from '../cards/types';
 import { TransactionType } from '@/constants/transaction-types';
+import { Item } from '@/constants/items';
 
 export interface Transaction {
   id: number;
@@ -12,5 +13,6 @@ export interface Transaction {
   type: TransactionType;
   sum: number;
   description: string;
+  item?: Item;
   createdAt: Date;
 }
