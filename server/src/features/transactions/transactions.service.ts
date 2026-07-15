@@ -11,13 +11,12 @@ import { MqttService } from '../mqtt/mqtt.service';
 import { CardsService } from '../cards/cards.service';
 import {
   CreateTransactionDto,
-  CreateTransactionWithDescriptionDto,
-  CreateTransferDto,
-  CreateTransferWithUserDto,
+  CreateTransactionWithTypeAndDescriptionDto,
+  CreateTransferWithUserAndTypeDto,
 } from './transaction.dto';
 import { TransactionError } from './transaction-errors.enum';
 import { Request, Response } from '../../common/interfaces';
-import { Notification } from '../../common/enums';
+import { Notification, TransactionType } from '../../common/enums';
 
 @Injectable()
 export class TransactionsService {
@@ -58,7 +57,7 @@ export class TransactionsService {
     dto: CreateTransactionDto,
   ): Promise<void> {
     await this.createIncreaseTransaction(
-      { ...dto, description: 'поповнення карти' },
+      { ...dto, type: TransactionType.DEPOSIT, description: '' },
       myId,
     );
   }
@@ -68,27 +67,14 @@ export class TransactionsService {
     dto: CreateTransactionDto,
   ): Promise<void> {
     await this.createDecreaseTransaction(
-      { ...dto, description: 'зняття готівки' },
+      { ...dto, type: TransactionType.WITHDRAW, description: '' },
       myId,
     );
   }
 
-  async createMyTransferTransaction(
-    myId: number,
-    dto: CreateTransferDto,
-  ): Promise<void> {
-    await this.createTransferTransaction({ ...dto, senderUserId: myId });
-  }
-
-  async createUserTransferTransaction(
-    dto: CreateTransferWithUserDto,
-  ): Promise<void> {
-    await this.createTransferTransaction(dto);
-  }
-
   @Transactional()
-  private async createTransferTransaction(
-    dto: CreateTransferWithUserDto,
+  async createTransferTransaction(
+    dto: CreateTransferWithUserAndTypeDto,
   ): Promise<void> {
     await this.cardsService.decreaseCardBalance(
       dto.senderCardId,
@@ -111,7 +97,7 @@ export class TransactionsService {
 
   @Transactional()
   async createIncreaseTransaction(
-    dto: CreateTransactionWithDescriptionDto,
+    dto: CreateTransactionWithTypeAndDescriptionDto,
     executorUserId?: number,
   ): Promise<void> {
     const userId = await this.cardsService.increaseCardBalance(
@@ -129,7 +115,7 @@ export class TransactionsService {
 
   @Transactional()
   async createDecreaseTransaction(
-    dto: CreateTransactionWithDescriptionDto,
+    dto: CreateTransactionWithTypeAndDescriptionDto,
     executorUserId?: number,
   ): Promise<void> {
     const userId = await this.cardsService.decreaseCardBalance(
@@ -193,7 +179,7 @@ export class TransactionsService {
   }
 
   private async createIncrease(
-    dto: CreateTransactionWithDescriptionDto,
+    dto: CreateTransactionWithTypeAndDescriptionDto,
     executorUserId?: number,
   ): Promise<Transaction> {
     try {
@@ -201,6 +187,7 @@ export class TransactionsService {
         executorUserId,
         receiverUserId: dto.userId,
         receiverCardId: dto.cardId,
+        type: dto.type,
         sum: dto.sum,
         description: dto.description,
       });
@@ -214,7 +201,7 @@ export class TransactionsService {
   }
 
   private async createDecrease(
-    dto: CreateTransactionWithDescriptionDto,
+    dto: CreateTransactionWithTypeAndDescriptionDto,
     executorUserId?: number,
   ): Promise<Transaction> {
     try {
@@ -222,6 +209,7 @@ export class TransactionsService {
         executorUserId,
         senderUserId: dto.userId,
         senderCardId: dto.cardId,
+        type: dto.type,
         sum: dto.sum,
         description: dto.description,
       });
@@ -235,7 +223,7 @@ export class TransactionsService {
   }
 
   private async createTransfer(
-    dto: CreateTransferWithUserDto,
+    dto: CreateTransferWithUserAndTypeDto,
   ): Promise<Transaction> {
     try {
       const transaction = this.transactionsRepository.create({
@@ -243,6 +231,7 @@ export class TransactionsService {
         senderCardId: dto.senderCardId,
         receiverUserId: dto.receiverUserId,
         receiverCardId: dto.receiverCardId,
+        type: dto.type,
         sum: dto.sum,
         description: dto.description,
       });
@@ -270,6 +259,7 @@ export class TransactionsService {
       .createQueryBuilder('transaction')
       .select([
         'transaction.id',
+        'transaction.type',
         'transaction.sum',
         'transaction.description',
         'transaction.createdAt',

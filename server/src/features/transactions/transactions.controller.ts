@@ -17,7 +17,7 @@ import {
 } from './transaction.dto';
 import { MyId, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
-import { Role } from '../../common/enums';
+import { Role, TransactionType } from '../../common/enums';
 
 @Controller('transactions')
 export class TransactionsController {
@@ -60,7 +60,11 @@ export class TransactionsController {
     @MyId() myId: number,
     @Body() dto: CreateTransferDto,
   ): Promise<void> {
-    return this.transactionsService.createMyTransferTransaction(myId, dto);
+    return this.transactionsService.createTransferTransaction({
+      ...dto,
+      senderUserId: myId,
+      type: TransactionType.TRANSFER,
+    });
   }
 
   @Roles([Role.ADMIN])
@@ -68,7 +72,10 @@ export class TransactionsController {
   createUserTransferTransaction(
     @Body() dto: CreateTransferWithUserDto,
   ): Promise<void> {
-    return this.transactionsService.createUserTransferTransaction(dto);
+    return this.transactionsService.createTransferTransaction({
+      ...dto,
+      type: TransactionType.TRANSFER,
+    });
   }
 
   @Roles([Role.ADMIN])
