@@ -12,7 +12,7 @@ import { Product } from '../../features/products/product.entity';
 import { Purchase } from '../../features/purchases/purchase.entity';
 import { Locker } from '../../features/lockers/locker.entity';
 import { Order } from '../../features/orders/order.entity';
-import { Status } from '../../common/enums';
+import { Status, TransactionType } from '../../common/enums';
 
 export default class AppSeeder implements Seeder {
   private logger = new Logger(AppSeeder.name);
@@ -74,8 +74,9 @@ export default class AppSeeder implements Seeder {
           executorUser,
           receiverUser,
           receiverCard,
+          type: TransactionType.DEPOSIT,
           sum,
-          description: 'deposit',
+          description: '',
         });
         transactions.push(transaction);
       } else {
@@ -88,8 +89,9 @@ export default class AppSeeder implements Seeder {
           executorUser,
           senderUser,
           senderCard,
+          type: TransactionType.WITHDRAW,
           sum,
-          description: 'withdraw',
+          description: '',
         });
         transactions.push(transaction);
       }
@@ -112,6 +114,7 @@ export default class AppSeeder implements Seeder {
         senderCard,
         receiverUser,
         receiverCard,
+        type: TransactionType.TRANSFER,
         sum,
         description: faker.lorem.words(2),
       });
@@ -146,8 +149,9 @@ export default class AppSeeder implements Seeder {
           senderCard: receiverCard,
           receiverUser: senderUser,
           receiverCard: senderCard,
+          type: TransactionType.PAY_INVOICE,
           sum,
-          description: 'сплата інвойсу',
+          description: invoice.description,
         });
         transactions.push(transfer);
       }
@@ -199,8 +203,9 @@ export default class AppSeeder implements Seeder {
         senderCard: card,
         receiverUser: product.user,
         receiverCard: product.shop.card,
+        type: TransactionType.BUY_PRODUCT,
         sum: amount * product.price,
-        description: 'купівля товару',
+        description: product.description,
       });
       transactions.push(transfer);
       product.amount -= amount;
@@ -246,8 +251,9 @@ export default class AppSeeder implements Seeder {
       const transaction = await transactionFactory.make({
         senderUser: customerUser,
         senderCard: customerCard,
+        type: TransactionType.CREATE_ORDER,
         sum,
-        description: 'створення замовлення',
+        description: order.description,
       });
       transactions.push(transaction);
       if (order.status !== Status.CREATED) {
@@ -259,8 +265,9 @@ export default class AppSeeder implements Seeder {
         const transaction = await transactionFactory.make({
           receiverUser: customerUser,
           receiverCard: customerCard,
+          type: TransactionType.COMPLETE_ORDER,
           sum,
-          description: 'завершення замовлення',
+          description: order.description,
         });
         transactions.push(transaction);
         executorCard.balance += sum;
@@ -269,8 +276,9 @@ export default class AppSeeder implements Seeder {
           senderCard: customerCard,
           receiverUser: executorUser,
           receiverCard: executorCard,
+          type: TransactionType.EXECUTE_ORDER,
           sum,
-          description: 'виконання замовлення',
+          description: order.description,
         });
         transactions.push(transfer);
       }

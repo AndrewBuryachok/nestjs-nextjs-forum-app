@@ -21,7 +21,7 @@ import {
 } from './order.dto';
 import { OrderError } from './order-errors.enum';
 import { Request, Response } from '../../common/interfaces';
-import { Notification, Status } from '../../common/enums';
+import { Notification, Status, TransactionType } from '../../common/enums';
 
 @Injectable()
 export class OrdersService {
@@ -69,8 +69,9 @@ export class OrdersService {
     await this.transactionsService.createDecreaseTransaction({
       userId: dto.userId,
       cardId: dto.cardId,
+      type: TransactionType.CREATE_ORDER,
       sum: dto.sum,
-      description: 'створення замовлення',
+      description: dto.description,
     });
     const order = await this.create(dto);
     this.mqttService.publishNotification(
@@ -102,16 +103,18 @@ export class OrdersService {
       await this.transactionsService.createDecreaseTransaction({
         userId: order.customerUserId,
         cardId: order.customerCardId,
+        type: TransactionType.EDIT_ORDER,
         sum: dto.sum - order.sum,
-        description: 'редагування замовлення',
+        description: dto.description,
       });
     }
     if (order.sum > dto.sum) {
       await this.transactionsService.createIncreaseTransaction({
         userId: order.customerUserId,
         cardId: order.customerCardId,
+        type: TransactionType.EDIT_ORDER,
         sum: order.sum - dto.sum,
-        description: 'редагування замовлення',
+        description: dto.description,
       });
     }
     await this.edit(order.id, dto);
@@ -133,8 +136,9 @@ export class OrdersService {
     await this.transactionsService.createIncreaseTransaction({
       userId: order.customerUserId,
       cardId: order.customerCardId,
+      type: TransactionType.DELETE_ORDER,
       sum: order.sum,
-      description: 'видалення замовлення',
+      description: order.description,
     });
     await this.delete(order.id);
   }
@@ -228,16 +232,18 @@ export class OrdersService {
     await this.transactionsService.createIncreaseTransaction({
       userId: order.customerUserId,
       cardId: order.customerCardId,
+      type: TransactionType.COMPLETE_ORDER,
       sum: order.sum,
-      description: 'завершення замовлення',
+      description: order.description,
     });
-    await this.transactionsService.createUserTransferTransaction({
+    await this.transactionsService.createTransferTransaction({
       senderUserId: order.customerUserId,
       senderCardId: order.customerCardId,
       receiverUserId: order.executorUserId!,
       receiverCardId: order.executorCardId!,
+      type: TransactionType.EXECUTE_ORDER,
       sum: order.sum,
-      description: 'виконання замовлення',
+      description: order.description,
     });
     await this.complete(order.id);
     this.mqttService.publishNotification(
