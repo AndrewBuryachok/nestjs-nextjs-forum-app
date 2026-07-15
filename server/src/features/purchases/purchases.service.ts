@@ -64,6 +64,7 @@ export class PurchasesService {
       type: TransactionType.BUY_PRODUCT,
       sum: dto.amount * product.price,
       description: product.description,
+      item: product.item,
     });
     await this.productsService.buyProduct(dto.productId, dto.amount);
     const purchase = await this.create(dto, product.price);

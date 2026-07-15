@@ -190,6 +190,7 @@ export class TransactionsService {
         type: dto.type,
         sum: dto.sum,
         description: dto.description,
+        item: dto.item,
       });
       await this.transactionsRepository.save(transaction);
       return transaction;
@@ -212,6 +213,7 @@ export class TransactionsService {
         type: dto.type,
         sum: dto.sum,
         description: dto.description,
+        item: dto.item,
       });
       await this.transactionsRepository.save(transaction);
       return transaction;
@@ -234,6 +236,7 @@ export class TransactionsService {
         type: dto.type,
         sum: dto.sum,
         description: dto.description,
+        item: dto.item,
       });
       await this.transactionsRepository.save(transaction);
       return transaction;
@@ -262,6 +265,7 @@ export class TransactionsService {
         'transaction.type',
         'transaction.sum',
         'transaction.description',
+        'transaction.item',
         'transaction.createdAt',
       ])
       .leftJoin('transaction.executorUser', 'executorUser')
