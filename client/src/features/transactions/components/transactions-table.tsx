@@ -59,6 +59,7 @@ export default function TransactionsTable(props: Props) {
             <TransactionText
               type={transaction.type}
               description={transaction.description}
+              item={transaction.item}
             />
           ),
         },

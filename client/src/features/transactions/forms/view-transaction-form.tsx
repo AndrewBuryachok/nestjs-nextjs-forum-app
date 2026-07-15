@@ -1,11 +1,12 @@
 import { useTranslations } from 'next-intl';
-import { Field, Input } from '@chakra-ui/react';
+import { Field, Input, InputGroup } from '@chakra-ui/react';
 import { Transaction } from '../types';
 import ViewForm from '@/components/view-form';
 import CardInput from '@/components/card-input';
 import UserInput from '@/components/user-input';
 import BankInput from '@/components/bank-input';
 import CurrencyInput from '@/components/currency-input';
+import ItemInput from '@/components/item-input';
 import DateInput from '@/components/date-input';
 
 type Props = {
@@ -58,6 +59,12 @@ export default function ViewTransactionForm(props: Props) {
           value={t(`transactionTypes.${props.transaction.type}`)}
         />
       </Field.Root>
+      {props.transaction.item && (
+        <Field.Root>
+          <Field.Label>{t('columns.item')}</Field.Label>
+          <ItemInput item={props.transaction.item} />
+        </Field.Root>
+      )}
       <Field.Root>
         <Field.Label>{t('columns.description')}</Field.Label>
         <Input readOnly value={props.transaction.description || '-'} />
