@@ -5,7 +5,7 @@ import CustomAvatarWithCard from '@/components/custom-avatar-with-card';
 import CustomAvatarWithUser from '@/components/custom-avatar-with-user';
 import BankIconWithText from '@/components/bank-icon-with-text';
 import CurrencyText from '@/components/currency-text';
-import CustomText from '@/components/custom-text';
+import TransactionText from '@/components/transaction-text';
 import DateText from '@/components/date-text';
 import TransactionsActions from './transactions-actions';
 
@@ -56,7 +56,10 @@ export default function TransactionsTable(props: Props) {
         {
           value: 'description',
           render: (transaction) => (
-            <CustomText muted value={transaction.description || '-'} />
+            <TransactionText
+              type={transaction.type}
+              description={transaction.description}
+            />
           ),
         },
         {
