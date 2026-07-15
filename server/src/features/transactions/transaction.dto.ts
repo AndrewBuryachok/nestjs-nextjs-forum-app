@@ -7,7 +7,7 @@ import {
   Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { TransactionType } from '../../common/enums';
+import { Item, TransactionType } from '../../common/enums';
 
 export class TransactionIdDto {
   @IsNotEmpty()
@@ -37,6 +37,7 @@ export class CreateTransactionDto {
 export class CreateTransactionWithTypeAndDescriptionDto extends CreateTransactionDto {
   type: TransactionType;
   description: string;
+  item?: Item;
 }
 
 export class CreateTransferDto {
@@ -75,4 +76,5 @@ export class CreateTransferWithUserDto extends CreateTransferDto {
 
 export class CreateTransferWithUserAndTypeDto extends CreateTransferWithUserDto {
   type: TransactionType;
+  item?: Item;
 }
