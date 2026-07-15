@@ -48,6 +48,13 @@ export default function ViewTransactionForm(props: Props) {
         )}
       </Field.Root>
       <Field.Root>
+        <Field.Label>{t('columns.type')}</Field.Label>
+        <Input
+          readOnly
+          value={t(`transactionTypes.${props.transaction.type}`)}
+        />
+      </Field.Root>
+      <Field.Root>
         <Field.Label>{t('columns.sum')}</Field.Label>
         <CurrencyInput value={props.transaction.sum} />
       </Field.Root>
