@@ -1,3 +1,4 @@
+import helmet from 'helmet';
 import morgan from 'morgan';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
@@ -8,6 +9,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   initializeTransactionalContext();
   const app = await NestFactory.create(AppModule);
+  app.use(helmet());
   app.use((req, res, next) => {
     const originalJson = res.json.bind(res);
     res.json = (body) => {
