@@ -2,7 +2,7 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './auth.dto';
 import { MyId, MyToken, Public } from '../../common/decorators';
-import { RtGuard } from '../../common/guards';
+import { NickThrottlerGuard, RtGuard } from '../../common/guards';
 import { Tokens } from '../../common/interfaces';
 
 @Controller('auth')
@@ -10,12 +10,14 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Public()
+  @UseGuards(NickThrottlerGuard)
   @Post('register')
   register(@Body() dto: AuthDto): Promise<Tokens> {
     return this.authService.register(dto);
   }
 
   @Public()
+  @UseGuards(NickThrottlerGuard)
   @Post('login')
   login(@Body() dto: AuthDto): Promise<Tokens> {
     return this.authService.login(dto);
