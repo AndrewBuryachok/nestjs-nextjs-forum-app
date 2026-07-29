@@ -1,3 +1,4 @@
+import helmet from 'helmet';
 import morgan from 'morgan';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
@@ -7,6 +8,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   initializeTransactionalContext();
   const app = await NestFactory.create(AppModule);
+  app.use(helmet());
   morgan.token('user', (req) => req['user']?.nick ?? '-');
   morgan.token('body', (req) => {
     const body = { ...req['body'] };
