@@ -59,6 +59,12 @@ export class UsersService {
       .getMany();
   }
 
+  selectUserByNick(nick: string): Promise<User> {
+    return this.selectUsersQueryBuilder()
+      .where('user.nick = :nick', { nick })
+      .getOneOrFail();
+  }
+
   async createUser(dto: CreateUserDto): Promise<User> {
     await this.throwIfNickAlreadyUsed(dto.nick);
     const user = await this.create(dto);
