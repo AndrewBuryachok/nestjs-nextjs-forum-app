@@ -3,6 +3,6 @@ import { Fine } from '../../features/fines/fine.entity';
 
 export default setSeederFactory(Fine, (faker) => {
   const fine = new Fine();
-  fine.description = faker.lorem.words(2);
+  fine.description = 'тестовое описание';
   return fine;
 });
