@@ -1,9 +1,9 @@
 export enum ApplicationError {
-  ALREADY_EXISTS = 'Заявка вже існує',
-  NOT_FOUND = 'Не вдалося знайти заявку',
-  CREATE_FAILED = 'Не вдалося створити заявку',
-  DELETE_FAILED = 'Не вдалося видалити заявку',
-  DELETE_TOWN_FAILED = 'Не вдалося видалити заявки',
-  ACCEPT_FAILED = 'Не вдалося прийняти заявку',
-  REJECT_FAILED = 'Не вдалося відхилити заявку',
+  ALREADY_EXISTS = 'Заявка уже существует',
+  NOT_FOUND = 'Не удалось найти заявку',
+  CREATE_FAILED = 'Не удалось создать заявку',
+  DELETE_FAILED = 'Не удалось удалить заявку',
+  DELETE_TOWN_FAILED = 'Не удалось удалить заявки',
+  ACCEPT_FAILED = 'Не удалось принять заявку',
+  REJECT_FAILED = 'Не удалось отклонить заявку',
 }
