@@ -66,7 +66,7 @@ export default function NotificationsTimeline(props: Props) {
     .sort((a, b) => b.date.getTime() - a.date.getTime());
 
   const groupedNotifications = Object.entries(
-    Object.groupBy(parsedNotifications, (n) => n.date.toLocaleDateString('uk')),
+    Object.groupBy(parsedNotifications, (n) => n.date.toLocaleDateString('ru')),
   );
 
   return (

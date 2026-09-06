@@ -13,8 +13,8 @@ export default function DateInput(props: Props) {
 
   useEffect(() => {
     const value = new Date(props.value);
-    setDate(value.toLocaleDateString('uk'));
-    setTime(value.toLocaleTimeString('uk'));
+    setDate(value.toLocaleDateString('ru'));
+    setTime(value.toLocaleTimeString('ru'));
   }, [props.value]);
 
   if (!date || !time) {
