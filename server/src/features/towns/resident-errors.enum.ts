@@ -1,4 +1,4 @@
 export enum ResidentError {
-  ALREADY_EXISTS = 'Користувач вже в місті',
-  CREATE_FAILED = 'Не вдалося додати жителя',
+  ALREADY_EXISTS = 'Игрок уже в городе',
+  CREATE_FAILED = 'Не удалось добавить жителя',
 }

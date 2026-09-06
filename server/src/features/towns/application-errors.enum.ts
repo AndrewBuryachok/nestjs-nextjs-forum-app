@@ -1,4 +1,4 @@
 export enum ApplicationError {
-  ALREADY_EXISTS = 'Заявка вже існує',
-  CREATE_FAILED = 'Не вдалося створити заявку',
+  ALREADY_EXISTS = 'Заявка уже существует',
+  CREATE_FAILED = 'Не удалось создать заявку',
 }

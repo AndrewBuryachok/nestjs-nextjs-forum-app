@@ -1,4 +1,4 @@
 export enum InvitationError {
-  ALREADY_EXISTS = 'Запрошення вже існує',
-  CREATE_FAILED = 'Не вдалося створити запрошення',
+  ALREADY_EXISTS = 'Приглашение уже существует',
+  CREATE_FAILED = 'Не удалось создать приглашение',
 }
