@@ -14,7 +14,7 @@ export default async function RootLayout(props: Props) {
   const session = await verifySession();
 
   return (
-    <html lang='uk' suppressHydrationWarning>
+    <html lang='ru' suppressHydrationWarning>
       <body>
         <NextIntlClientProvider>
           <Provider>
