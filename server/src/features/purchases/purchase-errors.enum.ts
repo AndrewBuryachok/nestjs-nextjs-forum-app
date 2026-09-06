@@ -1,5 +1,5 @@
 export enum PurchaseError {
-  NOT_FOUND = 'Не вдалося знайти покупку',
-  CREATE_FAILED = 'Не вдалося створити покупку',
-  DELETE_FAILED = 'Не вдалося видалити покупку',
+  NOT_FOUND = 'Не удалось найти покупку',
+  CREATE_FAILED = 'Не удалось создать покупку',
+  DELETE_FAILED = 'Не удалось удалить покупку',
 }

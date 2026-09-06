@@ -102,7 +102,7 @@ export default class AppSeeder implements Seeder {
         receiverCard,
         type: TransactionType.TRANSFER,
         sum,
-        description: faker.lorem.words(2),
+        description: 'тестовое описание',
       });
       transfers.push(transfer);
     }
