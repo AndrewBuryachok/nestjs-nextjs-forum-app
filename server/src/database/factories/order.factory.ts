@@ -5,7 +5,7 @@ import { Item, Status, Unit } from '../../common/enums';
 export default setSeederFactory(Order, (faker) => {
   const order = new Order();
   order.item = faker.helpers.enumValue(Item);
-  order.description = faker.datatype.boolean() ? faker.lorem.words(2) : '';
+  order.description = faker.datatype.boolean() ? 'тестовое описание' : '';
   order.amount = faker.number.int({ min: 1, max: 64 });
   order.unit = faker.helpers.enumValue(Unit);
   order.status = faker.helpers.enumValue(Status);

@@ -15,7 +15,7 @@ const options: DataSourceOptions & SeederOptions = {
   seeds: ['src/database/seeds/**/*.seeder{.ts,.js}'],
   factories: ['src/database/factories/**/*.factory{.ts,.js}'],
   synchronize: true,
-  ssl: true,
+  ssl: { rejectUnauthorized: false },
 };
 
 export const dataSource = new DataSource(options);

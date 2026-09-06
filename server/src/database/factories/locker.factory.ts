@@ -1,3 +1,4 @@
+import { fakerRU } from '@faker-js/faker';
 import { setSeederFactory } from 'typeorm-extension';
 import { Locker } from '../../features/lockers/locker.entity';
 import { World } from '../../common/enums';
@@ -10,7 +11,7 @@ import {
 
 export default setSeederFactory(Locker, (faker) => {
   const locker = new Locker();
-  locker.name = faker.location.city();
+  locker.name = fakerRU.location.city();
   locker.world = faker.helpers.enumValue(World);
   locker.x = faker.number.int({ min: PLACE_X_MIN, max: PLACE_X_MAX });
   locker.y = faker.number.int({ min: PLACE_Y_MIN, max: PLACE_Y_MAX });

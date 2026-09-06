@@ -1,3 +1,4 @@
+import { fakerRU } from '@faker-js/faker';
 import { setSeederFactory } from 'typeorm-extension';
 import { Plot } from '../../features/plots/plot.entity';
 import { World } from '../../common/enums';
@@ -10,7 +11,7 @@ import {
 
 export default setSeederFactory(Plot, (faker) => {
   const plot = new Plot();
-  plot.name = faker.location.city();
+  plot.name = fakerRU.location.city();
   plot.world = faker.helpers.enumValue(World);
   plot.x = faker.number.int({ min: PLACE_X_MIN, max: PLACE_X_MAX });
   plot.y = faker.number.int({ min: PLACE_Y_MIN, max: PLACE_Y_MAX });
