@@ -66,7 +66,7 @@ export default function NotificationsTimeline(props: Props) {
     .sort((a, b) => b.date.getTime() - a.date.getTime());
 
   const groupedNotifications = Object.entries(
-    Object.groupBy(parsedNotifications, (n) => n.date.toLocaleDateString('uk')),
+    Object.groupBy(parsedNotifications, (n) => n.date.toLocaleDateString('ru')),
   );
 
   return (
@@ -86,7 +86,7 @@ export default function NotificationsTimeline(props: Props) {
                 <Timeline.Content>
                   <Timeline.Title>
                     <NotificationNick userId={n.fromUserId} />
-                    <CustomText muted value={n.date.toLocaleTimeString('uk')} />
+                    <CustomText muted value={n.date.toLocaleTimeString('ru')} />
                   </Timeline.Title>
                   <Timeline.Description>
                     {t(`notifications.${n.page}.${n.action}`)}
