@@ -38,7 +38,7 @@ import { AtGuard, RolesGuard } from './common/guards';
         database: configService.getOrThrow('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: true,
-        ssl: true,
+        ssl: { rejectUnauthorized: false },
       }),
       async dataSourceFactory(options) {
         if (!options) {
