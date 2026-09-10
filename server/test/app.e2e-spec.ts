@@ -48,7 +48,7 @@ describe('App', () => {
   let users: number[];
   let cards: number[];
   let transactions: number[];
-  let invoices: number[];
+  let fines: number[];
   let shops: number[];
   let products: number[];
   let purchases: number[];
@@ -342,10 +342,10 @@ describe('App', () => {
     });
   });
 
-  describe('Invoices', () => {
-    it('POST /invoices', () => {
+  describe('Fines', () => {
+    it('POST /fines', () => {
       return request(app.getHttpServer())
-        .post('/invoices')
+        .post('/fines')
         .set('Authorization', `Bearer ${user.access}`)
         .send({
           senderCardId: cards[0],
@@ -356,9 +356,9 @@ describe('App', () => {
         .expect(201);
     });
 
-    it('POST /invoices', () => {
+    it('POST /fines', () => {
       return request(app.getHttpServer())
-        .post('/invoices')
+        .post('/fines')
         .set('Authorization', `Bearer ${user.access}`)
         .send({
           senderCardId: cards[0],
@@ -369,9 +369,9 @@ describe('App', () => {
         .expect(201);
     });
 
-    it('POST /invoices/all', () => {
+    it('POST /fines/all', () => {
       return request(app.getHttpServer())
-        .post('/invoices/all')
+        .post('/fines/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .send({
           senderUserId: user.user.id,
@@ -383,9 +383,9 @@ describe('App', () => {
         .expect(201);
     });
 
-    it('POST /invoices/all', () => {
+    it('POST /fines/all', () => {
       return request(app.getHttpServer())
-        .post('/invoices/all')
+        .post('/fines/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .send({
           senderUserId: user.user.id,
@@ -397,62 +397,62 @@ describe('App', () => {
         .expect(201);
     });
 
-    it('GET /invoices/my', () => {
+    it('GET /fines/my', () => {
       return request(app.getHttpServer())
-        .get('/invoices/my')
+        .get('/fines/my')
         .set('Authorization', `Bearer ${user.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
-        .then((res) => (invoices = res.body.data.map((invoice) => invoice.id)));
+        .then((res) => (fines = res.body.data.map((fine) => fine.id)));
     });
 
-    it('GET /invoices/all', () => {
+    it('GET /fines/all', () => {
       return request(app.getHttpServer())
-        .get('/invoices/all')
+        .get('/fines/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
 
-    it('PATCH /invoices/:invoiceId', () => {
+    it('PATCH /fines/:fineId', () => {
       return request(app.getHttpServer())
-        .patch(`/invoices/${invoices[0]}`)
+        .patch(`/fines/${fines[0]}`)
         .set('Authorization', `Bearer ${user.access}`)
         .send({ sum: 10, description: '' })
         .expect(200);
     });
 
-    it('PATCH /invoices/all/:invoiceId', () => {
+    it('PATCH /fines/all/:fineId', () => {
       return request(app.getHttpServer())
-        .patch(`/invoices/all/${invoices[1]}`)
+        .patch(`/fines/all/${fines[1]}`)
         .set('Authorization', `Bearer ${admin.access}`)
         .send({ sum: 10, description: '' })
         .expect(200);
     });
 
-    it('DELETE /invoices/:invoiceId', () => {
+    it('DELETE /fines/:fineId', () => {
       return request(app.getHttpServer())
-        .delete(`/invoices/${invoices[0]}`)
+        .delete(`/fines/${fines[0]}`)
         .set('Authorization', `Bearer ${user.access}`)
         .expect(200);
     });
 
-    it('DELETE /invoices/all/:invoiceId', () => {
+    it('DELETE /fines/all/:fineId', () => {
       return request(app.getHttpServer())
-        .delete(`/invoices/all/${invoices[1]}`)
+        .delete(`/fines/all/${fines[1]}`)
         .set('Authorization', `Bearer ${admin.access}`)
         .expect(200);
     });
 
-    it('POST /invoices/:invoiceId', () => {
+    it('POST /fines/:fineId', () => {
       return request(app.getHttpServer())
-        .post(`/invoices/${invoices[2]}`)
+        .post(`/fines/${fines[2]}`)
         .set('Authorization', `Bearer ${user.access}`)
         .send({ cardId: cards[0] })
         .expect(201);
     });
 
-    it('POST /invoices/all/:invoiceId', () => {
+    it('POST /fines/all/:fineId', () => {
       return request(app.getHttpServer())
-        .post(`/invoices/all/${invoices[3]}`)
+        .post(`/fines/all/${fines[3]}`)
         .set('Authorization', `Bearer ${admin.access}`)
         .send({ cardId: cards[0] })
         .expect(201);

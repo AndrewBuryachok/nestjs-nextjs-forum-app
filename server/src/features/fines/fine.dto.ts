@@ -8,15 +8,15 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class InvoiceIdDto {
+export class FineIdDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
   @Type(() => Number)
-  invoiceId: number;
+  fineId: number;
 }
 
-export class EditInvoiceDto {
+export class EditFineDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
@@ -28,7 +28,7 @@ export class EditInvoiceDto {
   description: string;
 }
 
-export class CreateInvoiceDto extends EditInvoiceDto {
+export class CreateFineDto extends EditFineDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
@@ -40,14 +40,14 @@ export class CreateInvoiceDto extends EditInvoiceDto {
   receiverUserId: number;
 }
 
-export class CreateInvoiceWithUserDto extends CreateInvoiceDto {
+export class CreateFineWithUserDto extends CreateFineDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
   senderUserId: number;
 }
 
-export class PayInvoiceDto {
+export class PayFineDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
