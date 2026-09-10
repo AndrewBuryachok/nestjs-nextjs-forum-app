@@ -10,6 +10,7 @@ export const editProductAmountAndPriceFactory = (
   action: 'edit',
   dialog: 'product',
   color: Color.YELLOW,
+  userId: isAll ? 0 : product.user.id,
   icon: <LuPencil />,
   body: <EditProductAmountAndPriceForm product={product} isAll={isAll} />,
 });

@@ -7,6 +7,7 @@ export const deleteShopFactory = (shop: Shop, isAll: boolean) => ({
   action: 'delete',
   dialog: 'shop',
   color: Color.RED,
+  userId: isAll ? 0 : shop.user.id,
   icon: <LuTrash2 />,
   body: <DeleteShopForm shop={shop} isAll={isAll} />,
 });

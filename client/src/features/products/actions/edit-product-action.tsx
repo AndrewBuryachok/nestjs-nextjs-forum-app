@@ -7,6 +7,7 @@ export const editProductFactory = (product: Product, isAll: boolean) => ({
   action: 'edit',
   dialog: 'product',
   color: Color.YELLOW,
+  userId: isAll ? 0 : product.user.id,
   icon: <LuPencil />,
   body: <EditProductForm product={product} isAll={isAll} />,
 });
