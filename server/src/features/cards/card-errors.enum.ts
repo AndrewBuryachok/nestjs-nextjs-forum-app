@@ -1,4 +1,7 @@
 export enum CardError {
+  HAS_FINE = 'cards.has_fine',
+  HAS_SHOP = 'cards.has_shop',
+  HAS_ORDER = 'cards.has_order',
   USER_ALREADY_IN = 'cards.user_already_in',
   USER_NOT_IN = 'cards.user_not_in',
   USER_IS_OWNER = 'cards.user_is_owner',
