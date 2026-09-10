@@ -1,4 +1,5 @@
 export enum ShopError {
+  HAS_PRODUCT = 'shops.has_product',
   NOT_OWNER = 'shops.not_owner',
   NOT_FOUND = 'shops.not_found',
   CREATE_FAILED = 'shops.create_failed',
