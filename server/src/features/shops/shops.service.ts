@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
@@ -78,11 +79,13 @@ export class ShopsService {
 
   async deleteMyShop(myId: number, shopId: number): Promise<void> {
     await this.throwIfNotShopOwner(shopId, myId);
+    await this.throwIfShopHasProduct(shopId);
     await this.delete(shopId);
   }
 
   async deleteUserShop(shopId: number): Promise<void> {
     await this.throwIfShopNotFound(shopId);
+    await this.throwIfShopHasProduct(shopId);
     await this.delete(shopId);
   }
 
@@ -101,6 +104,15 @@ export class ShopsService {
       throw new ForbiddenException(ShopError.NOT_OWNER);
     }
     return shop;
+  }
+
+  async throwIfShopHasProduct(shopId: number): Promise<void> {
+    const product = await this.shopsRepository.manager.existsBy('products', {
+      shopId,
+    });
+    if (product) {
+      throw new BadRequestException(ShopError.HAS_PRODUCT);
+    }
   }
 
   private findShopById(id: number): Promise<Shop | null> {
