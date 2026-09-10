@@ -7,6 +7,7 @@ export const deleteCardFactory = (card: Card, isAll: boolean) => ({
   action: 'delete',
   dialog: 'card',
   color: Color.RED,
+  disabled: card.users > 1,
   userId: isAll ? 0 : card.user.id,
   icon: <LuTrash2 />,
   body: <DeleteCardForm card={card} isAll={isAll} />,
