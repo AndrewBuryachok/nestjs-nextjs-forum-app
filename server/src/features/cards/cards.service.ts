@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, IsNull, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { Card } from './card.entity';
 import { CardUser } from './card-user.entity';
@@ -89,13 +89,37 @@ export class CardsService {
   }
 
   async deleteMyCard(myId: number, cardId: number): Promise<void> {
-    await this.throwIfNotCardOwner(cardId, myId);
-    await this.delete(cardId);
+    const card = await this.throwIfNotCardOwner(cardId, myId);
+    await this.deleteCard(card);
   }
 
   async deleteUserCard(cardId: number): Promise<void> {
-    await this.throwIfCardNotFound(cardId);
-    await this.delete(cardId);
+    const card = await this.throwIfCardNotFound(cardId);
+    await this.deleteCard(card);
+  }
+
+  private async deleteCard(card: Card): Promise<void> {
+    const fine = await this.cardsRepository.manager.existsBy('fines', {
+      senderCardId: card.id,
+      paidAt: IsNull(),
+    });
+    if (fine) {
+      throw new BadRequestException(CardError.HAS_FINE);
+    }
+    const shop = await this.cardsRepository.manager.existsBy('shops', {
+      cardId: card.id,
+    });
+    if (shop) {
+      throw new BadRequestException(CardError.HAS_SHOP);
+    }
+    const order = await this.cardsRepository.manager.existsBy('orders', [
+      { customerCardId: card.id, completedAt: IsNull() },
+      { executorCardId: card.id, completedAt: IsNull() },
+    ]);
+    if (order) {
+      throw new BadRequestException(CardError.HAS_ORDER);
+    }
+    await this.delete(card.id);
   }
 
   async addMyCardUser(
