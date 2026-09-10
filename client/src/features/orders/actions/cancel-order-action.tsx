@@ -9,6 +9,7 @@ export const cancelOrderFactory = (order: Order, isAll: boolean) => ({
   dialog: 'order',
   color: Color.RED,
   disabled: order.status !== Status.TAKEN,
+  userId: isAll ? 0 : order.executorUser?.id,
   icon: <LuMinus />,
   body: <CancelOrderForm order={order} isAll={isAll} />,
 });

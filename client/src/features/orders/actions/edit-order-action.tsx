@@ -9,6 +9,7 @@ export const editOrderFactory = (order: Order, isAll: boolean) => ({
   dialog: 'order',
   color: Color.YELLOW,
   disabled: order.status !== Status.CREATED,
+  userId: isAll ? 0 : order.customerUser.id,
   icon: <LuPencil />,
   body: <EditOrderForm order={order} isAll={isAll} />,
 });

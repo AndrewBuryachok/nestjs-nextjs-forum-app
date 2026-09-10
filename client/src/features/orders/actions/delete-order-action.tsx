@@ -9,6 +9,7 @@ export const deleteOrderFactory = (order: Order, isAll: boolean) => ({
   dialog: 'order',
   color: Color.RED,
   disabled: order.status !== Status.CREATED,
+  userId: isAll ? 0 : order.customerUser.id,
   icon: <LuTrash2 />,
   body: <DeleteOrderForm order={order} isAll={isAll} />,
 });
