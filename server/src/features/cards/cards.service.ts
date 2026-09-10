@@ -99,6 +99,12 @@ export class CardsService {
   }
 
   private async deleteCard(card: Card): Promise<void> {
+    const users = await this.cardsUsersRepository.countBy({
+      cardId: card.id,
+    });
+    if (users > 1) {
+      throw new BadRequestException(CardError.HAS_USER);
+    }
     const fine = await this.cardsRepository.manager.existsBy('fines', {
       senderCardId: card.id,
       paidAt: IsNull(),
@@ -137,8 +143,8 @@ export class CardsService {
   }
 
   private async addCardUser(card: Card, userId: number): Promise<void> {
-    const isCardUser = await this.isCardUser(card.id, userId);
-    if (isCardUser) {
+    const cardUser = await this.isCardUser(card.id, userId);
+    if (cardUser) {
       throw new BadRequestException(CardError.USER_ALREADY_IN);
     }
     await this.addUser(card.id, userId);
@@ -171,11 +177,11 @@ export class CardsService {
     if (card.userId === userId) {
       throw new BadRequestException(CardError.USER_IS_OWNER);
     }
-    const isCardUser = await this.isCardUser(card.id, userId);
-    if (!isCardUser) {
+    const cardUser = await this.isCardUser(card.id, userId);
+    if (!cardUser) {
       throw new BadRequestException(CardError.USER_NOT_IN);
     }
-    await this.removeUser(card.id, userId);
+    await this.removeUser(cardUser.id);
     this.mqttService.publishNotification(
       card.userId,
       userId,
@@ -225,17 +231,16 @@ export class CardsService {
 
   async throwIfNotCardUser(cardId: number, userId: number): Promise<Card> {
     const card = await this.throwIfCardNotFound(cardId);
-    const isCardUser = await this.isCardUser(cardId, userId);
-    if (!isCardUser) {
+    const cardUser = await this.isCardUser(cardId, userId);
+    if (!cardUser) {
       throw new ForbiddenException(CardError.NOT_USER);
     }
     return card;
   }
 
-  async isCardUser(cardId: number, userId: number): Promise<boolean> {
+  async isCardUser(cardId: number, userId: number): Promise<CardUser | null> {
     await this.usersService.throwIfUserNotFound(userId);
-    const cardUser = await this.findUserByCardAndUser(cardId, userId);
-    return !!cardUser;
+    return this.findUserByCardAndUser(cardId, userId);
   }
 
   private findCardById(id: number): Promise<Card | null> {
@@ -280,8 +285,13 @@ export class CardsService {
     }
   }
 
+  @Transactional()
   private async delete(id: number): Promise<void> {
     try {
+      await this.cardsUsersRepository.softDelete({
+        cardId: id,
+        deletedAt: IsNull(),
+      });
       await this.cardsRepository.softDelete({ id });
     } catch (error) {
       throw new InternalServerErrorException(CardError.DELETE_FAILED);
@@ -297,9 +307,9 @@ export class CardsService {
     }
   }
 
-  private async removeUser(cardId: number, userId: number): Promise<void> {
+  private async removeUser(id: number): Promise<void> {
     try {
-      await this.cardsUsersRepository.softDelete({ cardId, userId });
+      await this.cardsUsersRepository.softDelete({ id });
     } catch (error) {
       throw new InternalServerErrorException(CardError.REMOVE_USER_FAILED);
     }
