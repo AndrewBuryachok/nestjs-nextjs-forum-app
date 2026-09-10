@@ -7,6 +7,7 @@ export const buyProductFactory = (product: Product, isAll: boolean) => ({
   action: 'buy',
   dialog: 'product',
   color: Color.GREEN,
+  disabled: !product.amount,
   icon: <LuPlus />,
   body: <BuyProductForm product={product} isAll={isAll} />,
 });

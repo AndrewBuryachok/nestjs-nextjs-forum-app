@@ -9,6 +9,7 @@ export const executeOrderFactory = (order: Order, isAll: boolean) => ({
   dialog: 'order',
   color: Color.GREEN,
   disabled: order.status !== Status.TAKEN,
+  userId: isAll ? 0 : order.executorUser?.id,
   icon: <LuPlus />,
   body: <ExecuteOrderForm order={order} isAll={isAll} />,
 });
