@@ -273,11 +273,7 @@ export class OrdersService {
     userId: number,
   ): Promise<Order> {
     const order = await this.throwIfOrderNotFound(orderId);
-    const isCardUser = await this.cardsService.isCardUser(
-      order.customerCardId,
-      userId,
-    );
-    if (!isCardUser) {
+    if (order.customerUserId !== userId) {
       throw new ForbiddenException(OrderError.NOT_CUSTOMER);
     }
     return order;
@@ -288,10 +284,7 @@ export class OrdersService {
     userId: number,
   ): Promise<Order> {
     const order = await this.throwIfOrderNotFound(orderId);
-    const isCardUser =
-      !!order.executorCardId &&
-      (await this.cardsService.isCardUser(order.executorCardId, userId));
-    if (!isCardUser) {
+    if (order.executorUserId !== userId) {
       throw new ForbiddenException(OrderError.NOT_EXECUTOR);
     }
     return order;
