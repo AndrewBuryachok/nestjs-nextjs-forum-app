@@ -1,4 +1,5 @@
 export enum CardError {
+  NON_ZERO_BALANCE = 'cards.non_zero_balance',
   HAS_USER = 'cards.has_user',
   HAS_FINE = 'cards.has_fine',
   HAS_SHOP = 'cards.has_shop',
