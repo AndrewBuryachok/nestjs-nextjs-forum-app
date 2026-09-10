@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { CardsService } from '../cards/cards.service';
 import { TransactionsService } from '../transactions/transactions.service';
-import { InvoicesService } from '../invoices/invoices.service';
+import { FinesService } from '../fines/fines.service';
 import { ShopsService } from '../shops/shops.service';
 import { ProductsService } from '../products/products.service';
 import { PurchasesService } from '../purchases/purchases.service';
@@ -11,7 +11,7 @@ import { OrdersService } from '../orders/orders.service';
 import { User } from '../users/user.entity';
 import { Card } from '../cards/card.entity';
 import { Transaction } from '../transactions/transaction.entity';
-import { Invoice } from '../invoices/invoice.entity';
+import { Fine } from '../fines/fine.entity';
 import { Shop } from '../shops/shop.entity';
 import { Product } from '../products/product.entity';
 import { Purchase } from '../purchases/purchase.entity';
@@ -25,7 +25,7 @@ export class ForumService {
     private usersService: UsersService,
     private cardsService: CardsService,
     private transactionsService: TransactionsService,
-    private invoicesService: InvoicesService,
+    private finesService: FinesService,
     private shopsService: ShopsService,
     private productsService: ProductsService,
     private purchasesService: PurchasesService,
@@ -48,8 +48,8 @@ export class ForumService {
     return this.transactionsService.getMyTransactions(myId, req);
   }
 
-  getMyInvoices(myId: number, req: Request): Promise<Response<Invoice>> {
-    return this.invoicesService.getMyInvoices(myId, req);
+  getMyFines(myId: number, req: Request): Promise<Response<Fine>> {
+    return this.finesService.getMyFines(myId, req);
   }
 
   getMainShops(req: Request): Promise<Response<Shop>> {

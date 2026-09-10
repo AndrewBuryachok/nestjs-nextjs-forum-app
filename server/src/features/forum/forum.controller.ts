@@ -3,7 +3,7 @@ import { ForumService } from './forum.service';
 import { User } from '../users/user.entity';
 import { Card } from '../cards/card.entity';
 import { Transaction } from '../transactions/transaction.entity';
-import { Invoice } from '../invoices/invoice.entity';
+import { Fine } from '../fines/fine.entity';
 import { Shop } from '../shops/shop.entity';
 import { Product } from '../products/product.entity';
 import { Purchase } from '../purchases/purchase.entity';
@@ -42,12 +42,12 @@ export class ForumController {
   }
 
   @Public()
-  @Get(':userId/invoices/my')
-  getMyInvoices(
+  @Get(':userId/fines/my')
+  getMyFines(
     @Param() { userId }: { userId: number },
     @Query() req: Request,
-  ): Promise<Response<Invoice>> {
-    return this.forumService.getMyInvoices(userId, req);
+  ): Promise<Response<Fine>> {
+    return this.forumService.getMyFines(userId, req);
   }
 
   @Public()

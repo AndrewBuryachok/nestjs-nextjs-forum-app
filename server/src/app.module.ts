@@ -10,7 +10,7 @@ import { AuthModule } from './features/auth/auth.module';
 import { UsersModule } from './features/users/users.module';
 import { CardsModule } from './features/cards/cards.module';
 import { TransactionsModule } from './features/transactions/transactions.module';
-import { InvoicesModule } from './features/invoices/invoices.module';
+import { FinesModule } from './features/fines/fines.module';
 import { ShopsModule } from './features/shops/shops.module';
 import { ProductsModule } from './features/products/products.module';
 import { PurchasesModule } from './features/purchases/purchases.module';
@@ -50,7 +50,7 @@ import { AtGuard, RolesGuard } from './common/guards';
     UsersModule,
     CardsModule,
     TransactionsModule,
-    InvoicesModule,
+    FinesModule,
     ShopsModule,
     ProductsModule,
     PurchasesModule,
