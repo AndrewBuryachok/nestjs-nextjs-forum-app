@@ -1,11 +1,12 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, IsNull, Repository, SelectQueryBuilder } from 'typeorm';
 import { Locker } from './locker.entity';
 import { MqttService } from '../mqtt/mqtt.service';
 import { UsersService } from '../users/users.service';
@@ -73,11 +74,13 @@ export class LockersService {
 
   async deleteMyLocker(myId: number, lockerId: number): Promise<void> {
     await this.throwIfNotLockerOwner(lockerId, myId);
+    await this.throwIfLockerHasOrder(lockerId);
     await this.delete(lockerId);
   }
 
   async deleteUserLocker(lockerId: number): Promise<void> {
     await this.throwIfLockerNotFound(lockerId);
+    await this.throwIfLockerHasOrder(lockerId);
     await this.delete(lockerId);
   }
 
@@ -98,6 +101,16 @@ export class LockersService {
       throw new ForbiddenException(LockerError.NOT_OWNER);
     }
     return locker;
+  }
+
+  async throwIfLockerHasOrder(lockerId: number): Promise<void> {
+    const order = await this.lockersRepository.manager.existsBy('orders', {
+      lockerId,
+      completedAt: IsNull(),
+    });
+    if (order) {
+      throw new BadRequestException(LockerError.HAS_ORDER);
+    }
   }
 
   private findLockerById(id: number): Promise<Locker | null> {
