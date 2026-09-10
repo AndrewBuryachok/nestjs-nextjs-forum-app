@@ -5,7 +5,7 @@ export const PAGE_TABS_MAP = {
     my: {},
     all: { roles: [Role.ADMIN] },
   },
-  invoices: {
+  fines: {
     my: {},
     all: { roles: [Role.ADMIN] },
   },

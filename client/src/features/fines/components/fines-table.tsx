@@ -1,70 +1,68 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
-import { Invoice } from '../types';
+import { Fine } from '../types';
 import CustomTable from '@/components/custom-table';
 import CustomAvatarWithCard from '@/components/custom-avatar-with-card';
 import CustomAvatarWithUser from '@/components/custom-avatar-with-user';
 import CurrencyText from '@/components/currency-text';
 import CustomText from '@/components/custom-text';
 import DateText from '@/components/date-text';
-import InvoicesActions from './invoices-actions';
+import FinesActions from './fines-actions';
 
 type Props = {
-  tab: keyof typeof PAGE_TABS_MAP.invoices;
+  tab: keyof typeof PAGE_TABS_MAP.fines;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export default function InvoicesTable(props: Props) {
+export default function FinesTable(props: Props) {
   return (
-    <CustomTable<Invoice>
-      page='invoices'
+    <CustomTable<Fine>
+      page='fines'
       tab={props.tab}
       searchParams={props.searchParams}
       columns={[
         {
           value: 'sender',
-          render: (invoice) => (
+          render: (fine) => (
             <CustomAvatarWithCard
-              user={invoice.senderUser}
-              card={invoice.senderCard}
+              user={fine.senderUser}
+              card={fine.senderCard}
             />
           ),
         },
         {
           value: 'receiver',
-          render: (invoice) =>
-            invoice.receiverCard ? (
+          render: (fine) =>
+            fine.receiverCard ? (
               <CustomAvatarWithCard
-                user={invoice.receiverUser}
-                card={invoice.receiverCard}
+                user={fine.receiverUser}
+                card={fine.receiverCard}
               />
             ) : (
-              <CustomAvatarWithUser user={invoice.receiverUser} />
+              <CustomAvatarWithUser user={fine.receiverUser} />
             ),
         },
         {
           value: 'sum',
-          render: (invoice) => <CurrencyText value={invoice.sum} />,
+          render: (fine) => <CurrencyText value={fine.sum} />,
         },
         {
           value: 'description',
-          render: (invoice) => (
-            <CustomText muted value={invoice.description || '-'} />
+          render: (fine) => (
+            <CustomText muted value={fine.description || '-'} />
           ),
         },
         {
           value: 'paid',
-          render: (invoice) =>
-            invoice.paidAt ? (
-              <DateText value={invoice.paidAt} />
+          render: (fine) =>
+            fine.paidAt ? (
+              <DateText value={fine.paidAt} />
             ) : (
               <CustomText muted value='-' />
             ),
         },
         {
           value: 'actions',
-          render: (invoice) => (
-            <InvoicesActions tab={props.tab} invoice={invoice} />
-          ),
+          render: (fine) => <FinesActions tab={props.tab} fine={fine} />,
         },
       ]}
     />

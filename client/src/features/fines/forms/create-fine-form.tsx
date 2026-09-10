@@ -6,8 +6,8 @@ import { useTranslations } from 'next-intl';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Field, Input, NumberInput } from '@chakra-ui/react';
-import { createMyInvoiceAction, createUserInvoiceAction } from '../actions';
-import { createInvoiceSchema, CreateInvoiceType } from '../schema';
+import { createMyFineAction, createUserFineAction } from '../actions';
+import { createFineSchema, CreateFineType } from '../schema';
 import { useSelectAllUsers } from '@/features/users/hooks';
 import {
   useSelectMyCards,
@@ -23,15 +23,15 @@ type Props = {
   isAll: boolean;
 };
 
-export default function CreateInvoiceForm(props: Props) {
+export default function CreateFineForm(props: Props) {
   const t = useTranslations();
 
   const router = useRouter();
 
   const { closeDialog } = useDialogContext();
 
-  const form = useForm<CreateInvoiceType>({
-    resolver: zodResolver(createInvoiceSchema),
+  const form = useForm<CreateFineType>({
+    resolver: zodResolver(createFineSchema),
     defaultValues: {
       sum: 1,
     },
@@ -45,16 +45,16 @@ export default function CreateInvoiceForm(props: Props) {
 
   const onSubmit = form.handleSubmit(async (data) => {
     const res = props.isAll
-      ? await createUserInvoiceAction({ ...data, senderUserId })
-      : await createMyInvoiceAction(data);
+      ? await createUserFineAction({ ...data, senderUserId })
+      : await createMyFineAction(data);
     if (res.data) {
       if (res.data.ok) {
-        const title = t('toasts.invoices.create.success');
+        const title = t('toasts.fines.create.success');
         toaster.success({ title });
         router.refresh();
         closeDialog();
       } else {
-        const title = res.data.message ?? t('toasts.invoices.create.failure');
+        const title = res.data.message ?? t('toasts.fines.create.failure');
         toaster.error({ title });
       }
     }
