@@ -9,6 +9,7 @@ export const completeOrderFactory = (order: Order, isAll: boolean) => ({
   dialog: 'order',
   color: Color.GREEN,
   disabled: order.status !== Status.EXECUTED,
+  userId: isAll ? 0 : order.customerUser.id,
   icon: <LuPlus />,
   body: <CompleteOrderForm order={order} isAll={isAll} />,
 });
