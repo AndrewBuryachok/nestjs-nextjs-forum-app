@@ -1,6 +1,6 @@
 import { useTranslations } from 'next-intl';
 import { Field, Input } from '@chakra-ui/react';
-import { Invoice } from '../types';
+import { Fine } from '../types';
 import ViewForm from '@/components/view-form';
 import CardInput from '@/components/card-input';
 import UserInput from '@/components/user-input';
@@ -8,52 +8,49 @@ import CurrencyInput from '@/components/currency-input';
 import DateInput from '@/components/date-input';
 
 type Props = {
-  invoice: Invoice;
+  fine: Fine;
 };
 
-export default function ViewInvoiceForm(props: Props) {
+export default function ViewFineForm(props: Props) {
   const t = useTranslations();
 
   return (
     <ViewForm>
       <Field.Root>
         <Field.Label>{t('columns.id')}</Field.Label>
-        <Input readOnly value={props.invoice.id} />
+        <Input readOnly value={props.fine.id} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.sender')}</Field.Label>
-        <CardInput
-          user={props.invoice.senderUser}
-          card={props.invoice.senderCard}
-        />
+        <CardInput user={props.fine.senderUser} card={props.fine.senderCard} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.receiver')}</Field.Label>
-        {props.invoice.receiverCard ? (
+        {props.fine.receiverCard ? (
           <CardInput
-            user={props.invoice.receiverUser}
-            card={props.invoice.receiverCard}
+            user={props.fine.receiverUser}
+            card={props.fine.receiverCard}
           />
         ) : (
-          <UserInput user={props.invoice.receiverUser} />
+          <UserInput user={props.fine.receiverUser} />
         )}
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.sum')}</Field.Label>
-        <CurrencyInput value={props.invoice.sum} />
+        <CurrencyInput value={props.fine.sum} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.description')}</Field.Label>
-        <Input readOnly value={props.invoice.description || '-'} />
+        <Input readOnly value={props.fine.description || '-'} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.created')}</Field.Label>
-        <DateInput value={props.invoice.createdAt} />
+        <DateInput value={props.fine.createdAt} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.paid')}</Field.Label>
-        {props.invoice.paidAt ? (
-          <DateInput value={props.invoice.paidAt} />
+        {props.fine.paidAt ? (
+          <DateInput value={props.fine.paidAt} />
         ) : (
           <Input readOnly value='-' />
         )}

@@ -23,7 +23,7 @@ export default function CustomEmptyState(props: Props) {
 
   const icon = {
     cards: <LuCreditCard />,
-    invoices: <LuReceipt />,
+    fines: <LuReceipt />,
     lockers: <LuMailbox />,
     notifications: <LuBellOff />,
     orders: <LuShoppingBag />,
