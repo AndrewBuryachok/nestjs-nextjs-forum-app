@@ -1,7 +1,7 @@
 import { BaseUser } from '../users/types';
 import { BaseCard } from '../cards/types';
 
-export interface Invoice {
+export interface Fine {
   id: number;
   senderUser: BaseUser;
   senderCard: BaseCard;

@@ -5,9 +5,9 @@ import { useTranslations } from 'next-intl';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Field } from '@chakra-ui/react';
-import { Invoice } from '../types';
-import { payMyInvoiceAction, payUserInvoiceAction } from '../actions';
-import { payInvoiceSchema, PayInvoiceType } from '../schema';
+import { Fine } from '../types';
+import { payMyFineAction, payUserFineAction } from '../actions';
+import { payFineSchema, PayFineType } from '../schema';
 import {
   useSelectMyCards,
   useSelectUserCardsWithBalance,
@@ -18,43 +18,43 @@ import CustomForm from '@/components/custom-form';
 import CardsWithBalanceCombobox from '@/features/cards/components/cards-with-balance-combobox';
 
 type Props = {
-  invoice: Invoice;
+  fine: Fine;
   isAll: boolean;
 };
 
-export default function PayInvoiceForm(props: Props) {
+export default function PayFineForm(props: Props) {
   const t = useTranslations();
 
   const router = useRouter();
 
   const { closeDialog } = useDialogContext();
 
-  const form = useForm<PayInvoiceType>({
-    resolver: zodResolver(payInvoiceSchema),
+  const form = useForm<PayFineType>({
+    resolver: zodResolver(payFineSchema),
     defaultValues: {
-      invoiceId: props.invoice.id,
+      fineId: props.fine.id,
     },
   });
 
   const onSubmit = form.handleSubmit(async (data) => {
     const res = props.isAll
-      ? await payUserInvoiceAction(data)
-      : await payMyInvoiceAction(data);
+      ? await payUserFineAction(data)
+      : await payMyFineAction(data);
     if (res.data) {
       if (res.data.ok) {
-        const title = t('toasts.invoices.pay.success');
+        const title = t('toasts.fines.pay.success');
         toaster.success({ title });
         router.refresh();
         closeDialog();
       } else {
-        const title = res.data.message ?? t('toasts.invoices.pay.failure');
+        const title = res.data.message ?? t('toasts.fines.pay.failure');
         toaster.error({ title });
       }
     }
   });
 
   const cards = props.isAll
-    ? useSelectUserCardsWithBalance(props.invoice.receiverUser.id)
+    ? useSelectUserCardsWithBalance(props.fine.receiverUser.id)
     : useSelectMyCards();
 
   return (

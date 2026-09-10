@@ -5,46 +5,46 @@ import { useTranslations } from 'next-intl';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Field, Input, NumberInput } from '@chakra-ui/react';
-import { Invoice } from '../types';
-import { editMyInvoiceAction, editUserInvoiceAction } from '../actions';
-import { editInvoiceSchema, EditInvoiceType } from '../schema';
+import { Fine } from '../types';
+import { editMyFineAction, editUserFineAction } from '../actions';
+import { editFineSchema, EditFineType } from '../schema';
 import { useDialogContext } from '@/providers/dialog-provider';
 import { toaster } from '@/components/ui/toaster';
 import CustomForm from '@/components/custom-form';
 
 type Props = {
-  invoice: Invoice;
+  fine: Fine;
   isAll: boolean;
 };
 
-export default function EditInvoiceForm(props: Props) {
+export default function EditFineForm(props: Props) {
   const t = useTranslations();
 
   const router = useRouter();
 
   const { closeDialog } = useDialogContext();
 
-  const form = useForm<EditInvoiceType>({
-    resolver: zodResolver(editInvoiceSchema),
+  const form = useForm<EditFineType>({
+    resolver: zodResolver(editFineSchema),
     defaultValues: {
-      invoiceId: props.invoice.id,
-      sum: props.invoice.sum,
-      description: props.invoice.description,
+      fineId: props.fine.id,
+      sum: props.fine.sum,
+      description: props.fine.description,
     },
   });
 
   const onSubmit = form.handleSubmit(async (data) => {
     const res = props.isAll
-      ? await editUserInvoiceAction(data)
-      : await editMyInvoiceAction(data);
+      ? await editUserFineAction(data)
+      : await editMyFineAction(data);
     if (res.data) {
       if (res.data.ok) {
-        const title = t('toasts.invoices.edit.success');
+        const title = t('toasts.fines.edit.success');
         toaster.success({ title });
         router.refresh();
         closeDialog();
       } else {
-        const title = res.data.message ?? t('toasts.invoices.edit.failure');
+        const title = res.data.message ?? t('toasts.fines.edit.failure');
         toaster.error({ title });
       }
     }
