@@ -99,6 +99,12 @@ export class CardsService {
   }
 
   private async deleteCard(card: Card): Promise<void> {
+    const users = await this.cardsUsersRepository.countBy({
+      cardId: card.id,
+    });
+    if (users > 1) {
+      throw new BadRequestException(CardError.HAS_USER);
+    }
     const fine = await this.cardsRepository.manager.existsBy('fines', {
       senderCardId: card.id,
       paidAt: IsNull(),
