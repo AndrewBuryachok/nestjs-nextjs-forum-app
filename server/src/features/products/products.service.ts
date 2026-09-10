@@ -29,7 +29,6 @@ export class ProductsService {
     @InjectRepository(Product)
     private productsRepository: Repository<Product>,
     private mqttService: MqttService,
-    private cardsService: CardsService,
     private shopsService: ShopsService,
     @Inject(forwardRef(() => PurchasesService))
     private purchasesService: PurchasesService,
@@ -133,11 +132,7 @@ export class ProductsService {
     userId: number,
   ): Promise<Product> {
     const product = await this.throwIfProductNotFound(productId);
-    const isCardUser = await this.cardsService.isCardUser(
-      product.shop.cardId,
-      userId,
-    );
-    if (!isCardUser) {
+    if (product.userId !== userId) {
       throw new ForbiddenException(ProductError.NOT_OWNER);
     }
     return product;

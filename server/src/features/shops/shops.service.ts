@@ -99,8 +99,7 @@ export class ShopsService {
 
   async throwIfNotShopOwner(shopId: number, userId: number): Promise<Shop> {
     const shop = await this.throwIfShopNotFound(shopId);
-    const isCardUser = await this.cardsService.isCardUser(shop.cardId, userId);
-    if (!isCardUser) {
+    if (shop.userId !== userId) {
       throw new ForbiddenException(ShopError.NOT_OWNER);
     }
     return shop;

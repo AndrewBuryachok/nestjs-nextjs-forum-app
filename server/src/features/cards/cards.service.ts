@@ -241,7 +241,7 @@ export class CardsService {
     return card;
   }
 
-  async isCardUser(cardId: number, userId: number): Promise<boolean> {
+  private async isCardUser(cardId: number, userId: number): Promise<boolean> {
     await this.usersService.throwIfUserNotFound(userId);
     const cardUser = await this.findUserByCardAndUser(cardId, userId);
     return !!cardUser;
