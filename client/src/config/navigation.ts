@@ -15,6 +15,11 @@ export const PAGE_TABS_MAP = {
     my: {},
     all: { roles: [Role.ADMIN] },
   },
+  markets: {
+    main: { public: true },
+    my: {},
+    all: { roles: [Role.ADMIN] },
+  },
   orders: {
     main: { public: true },
     my: {},

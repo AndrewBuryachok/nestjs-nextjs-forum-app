@@ -10,6 +10,7 @@ import {
   LuShoppingCart,
   LuStore,
   LuUsers,
+  LuWarehouse,
 } from 'react-icons/lu';
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import { EmptyState } from './ui/empty-state';
@@ -25,6 +26,7 @@ export default function CustomEmptyState(props: Props) {
     cards: <LuCreditCard />,
     fines: <LuReceipt />,
     lockers: <LuMailbox />,
+    markets: <LuWarehouse />,
     notifications: <LuBellOff />,
     orders: <LuShoppingBag />,
     products: <LuShoppingBasket />,

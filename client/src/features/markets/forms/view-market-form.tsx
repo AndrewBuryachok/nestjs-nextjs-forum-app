@@ -1,50 +1,42 @@
 import { useTranslations } from 'next-intl';
 import { Field, Input } from '@chakra-ui/react';
-import { Market } from '@/features/markets/types';
-import { Shop } from '@/features/shops/types';
-import { Locker } from '@/features/lockers/types';
+import { Market } from '../types';
 import ViewForm from '@/components/view-form';
 import CardInput from '@/components/card-input';
-import UserInput from '@/components/user-input';
 import DateInput from '@/components/date-input';
 
 type Props = {
-  place: Market | Shop | Locker;
-  type: 'market' | 'shop' | 'locker';
+  market: Market;
 };
 
-export default function ViewPlaceForm(props: Props) {
+export default function ViewMarketForm(props: Props) {
   const t = useTranslations();
 
   return (
     <ViewForm>
       <Field.Root>
         <Field.Label>{t('columns.id')}</Field.Label>
-        <Input readOnly value={props.place.id} />
+        <Input readOnly value={props.market.id} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.owner')}</Field.Label>
-        {'card' in props.place ? (
-          <CardInput user={props.place.user} card={props.place.card} />
-        ) : (
-          <UserInput user={props.place.user} />
-        )}
+        <CardInput user={props.market.user} card={props.market.card} />
       </Field.Root>
       <Field.Root>
-        <Field.Label>{t(`columns.${props.type}`)}</Field.Label>
-        <Input readOnly value={props.place.name} />
+        <Field.Label>{t('columns.market')}</Field.Label>
+        <Input readOnly value={props.market.name} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.x')}</Field.Label>
-        <Input readOnly value={props.place.x} />
+        <Input readOnly value={props.market.x} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.y')}</Field.Label>
-        <Input readOnly value={props.place.y} />
+        <Input readOnly value={props.market.y} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.created')}</Field.Label>
-        <DateInput value={props.place.createdAt} />
+        <DateInput value={props.market.createdAt} />
       </Field.Root>
     </ViewForm>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { Market } from '@/features/markets/types';
 import { Shop } from '@/features/shops/types';
 import { Locker } from '@/features/lockers/types';
 import { useDialogContext } from '@/providers/dialog-provider';
@@ -9,8 +10,8 @@ import { placeColor } from '@/lib/place';
 import { colorToVar } from '@/lib/color';
 
 type Props = {
-  place: Shop | Locker;
-  type: 'shop' | 'locker';
+  place: Market | Shop | Locker;
+  type: 'market' | 'shop' | 'locker';
 };
 
 export default function PlaceLineWithCircle(props: Props) {
