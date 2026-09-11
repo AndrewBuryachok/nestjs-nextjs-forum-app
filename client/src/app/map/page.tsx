@@ -7,13 +7,13 @@ import { colorToVar } from '@/lib/color';
 
 export async function generateMetadata() {
   const t = await getTranslations();
-  return { title: t('pages.map') };
+  return { title: `SpringPlus - ${t('pages.map')}` };
 }
 
 export default function Page() {
   const lines = [
-    { x: '50%', y: '100%', color: Color.RED },
-    { x: '50%', y: '0%', color: Color.YELLOW },
+    { x: '50%', y: '100%', color: Color.YELLOW },
+    { x: '50%', y: '0%', color: Color.RED },
     { x: '100%', y: '50%', color: Color.GREEN },
     { x: '0%', y: '50%', color: Color.BLUE },
   ];
