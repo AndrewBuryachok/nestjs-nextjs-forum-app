@@ -1,6 +1,5 @@
 import 'server-only';
 import xior, { isXiorError, merge } from 'xior';
-import { getTranslations } from 'next-intl/server';
 import { getAccessToken } from './tokens';
 import { Request } from '@/types/request';
 import { Response } from '@/types/response';
@@ -58,9 +57,7 @@ export async function send<T, U>(
     return { ok: true, data: res.data };
   } catch (error) {
     if (isXiorError<{ message: string }>(error)) {
-      const t = await getTranslations();
-      const message = t(`errors.${error.response?.data.message}`);
-      return { ok: false, message };
+      return { ok: false, message: error.response?.data.message };
     }
     return { ok: false };
   }
