@@ -16,6 +16,7 @@ import {
   EditMarketDto,
   MarketIdDto,
 } from './market.dto';
+import { UserIdDto } from '../users/user.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -42,6 +43,17 @@ export class MarketsController {
   @Get('all')
   getAllMarkets(@Query() req: Request): Promise<Response<Market>> {
     return this.marketsService.getAllMarkets(req);
+  }
+
+  @Get('my/select')
+  selectMyMarkets(@MyId() myId: number): Promise<Market[]> {
+    return this.marketsService.selectUserMarkets(myId);
+  }
+
+  @Public()
+  @Get(':userId/select')
+  selectUserMarkets(@Param() { userId }: UserIdDto): Promise<Market[]> {
+    return this.marketsService.selectUserMarkets(userId);
   }
 
   @Post()

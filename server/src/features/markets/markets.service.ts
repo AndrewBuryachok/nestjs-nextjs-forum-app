@@ -40,6 +40,14 @@ export class MarketsService {
     return { data, total };
   }
 
+  selectUserMarkets(userId: number): Promise<Market[]> {
+    return this.selectMarketsQueryBuilder()
+      .innerJoin('market.card', 'ownerCard')
+      .innerJoin('ownerCard.cardUsers', 'ownerCardUsers')
+      .where('ownerCardUsers.userId = :userId', { userId })
+      .getMany();
+  }
+
   async createMarket(dto: CreateMarketWithUserDto): Promise<void> {
     await this.cardsService.throwIfNotCardUser(dto.cardId, dto.userId);
     await this.create(dto);
@@ -129,6 +137,13 @@ export class MarketsService {
     } catch (error) {
       throw new InternalServerErrorException(MarketError.DELETE_FAILED);
     }
+  }
+
+  private selectMarketsQueryBuilder(): SelectQueryBuilder<Market> {
+    return this.marketsRepository
+      .createQueryBuilder('market')
+      .select(['market.id', 'market.name', 'market.x', 'market.y'])
+      .orderBy('market.name', 'ASC');
   }
 
   private getMarketsQueryBuilder(req: Request): SelectQueryBuilder<Market> {

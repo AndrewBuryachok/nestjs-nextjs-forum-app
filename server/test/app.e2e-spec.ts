@@ -516,6 +516,19 @@ describe('App', () => {
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
 
+    it('GET /markets/my/select', () => {
+      return request(app.getHttpServer())
+        .get('/markets/my/select')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+    });
+
+    it('GET /markets/:userId/select', () => {
+      return request(app.getHttpServer())
+        .get(`/markets/${user.user.id}/select`)
+        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+    });
+
     it('PATCH /markets/:marketId', () => {
       return request(app.getHttpServer())
         .patch(`/markets/${markets[0]}`)
