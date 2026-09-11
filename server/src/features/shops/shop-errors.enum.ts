@@ -1,8 +1,8 @@
 export enum ShopError {
-  HAS_PRODUCT = 'shops.has_product',
-  NOT_OWNER = 'shops.not_owner',
-  NOT_FOUND = 'shops.not_found',
-  CREATE_FAILED = 'shops.create_failed',
-  EDIT_FAILED = 'shops.edit_failed',
-  DELETE_FAILED = 'shops.delete_failed',
+  HAS_PRODUCT = 'Магазин має активний товар',
+  NOT_OWNER = 'Ви не власник магазину',
+  NOT_FOUND = 'Не вдалося знайти магазин',
+  CREATE_FAILED = 'Не вдалося створити магазин',
+  EDIT_FAILED = 'Не вдалося редагувати магазин',
+  DELETE_FAILED = 'Не вдалося видалити магазин',
 }

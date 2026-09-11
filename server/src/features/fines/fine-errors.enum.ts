@@ -1,10 +1,10 @@
 export enum FineError {
-  ALREADY_PAID = 'fines.already_paid',
-  NOT_SENDER = 'fines.not_sender',
-  NOT_RECEIVER = 'fines.not_receiver',
-  NOT_FOUND = 'fines.not_found',
-  CREATE_FAILED = 'fines.create_failed',
-  EDIT_FAILED = 'fines.edit_failed',
-  DELETE_FAILED = 'fines.delete_failed',
-  PAY_FAILED = 'fines.pay_failed',
+  ALREADY_PAID = 'Штраф вже сплачено',
+  NOT_SENDER = 'Ви не відправник штрафу',
+  NOT_RECEIVER = 'Ви не отримувач штрафу',
+  NOT_FOUND = 'Не вдалося знайти штраф',
+  CREATE_FAILED = 'Не вдалося створити штраф',
+  EDIT_FAILED = 'Не вдалося редагувати штраф',
+  DELETE_FAILED = 'Не вдалося видалити штраф',
+  PAY_FAILED = 'Не вдалося сплатити штраф',
 }
