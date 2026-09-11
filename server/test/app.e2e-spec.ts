@@ -466,6 +466,28 @@ describe('App', () => {
     });
   });
 
+  describe('Markets', () => {
+    it('GET /markets', () => {
+      return request(app.getHttpServer())
+        .get('/markets')
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /markets/my', () => {
+      return request(app.getHttpServer())
+        .get('/markets/my')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /markets/all', () => {
+      return request(app.getHttpServer())
+        .get('/markets/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+  });
+
   describe('Shops', () => {
     it('POST /shops', () => {
       return request(app.getHttpServer())

@@ -115,6 +115,12 @@ export class CardsService {
     if (fine) {
       throw new BadRequestException(CardError.HAS_FINE);
     }
+    const market = await this.cardsRepository.manager.existsBy('markets', {
+      cardId: card.id,
+    });
+    if (market) {
+      throw new BadRequestException(CardError.HAS_MARKET);
+    }
     const shop = await this.cardsRepository.manager.existsBy('shops', {
       cardId: card.id,
     });
