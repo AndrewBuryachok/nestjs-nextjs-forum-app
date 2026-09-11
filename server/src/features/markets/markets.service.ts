@@ -1,9 +1,14 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Market } from './market.entity';
 import { CardsService } from '../cards/cards.service';
-import { CreateMarketWithUserDto } from './market.dto';
+import { CreateMarketWithUserDto, EditMarketDto } from './market.dto';
 import { MarketError } from './market-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 
@@ -40,6 +45,57 @@ export class MarketsService {
     await this.create(dto);
   }
 
+  async editMyMarket(
+    myId: number,
+    marketId: number,
+    dto: EditMarketDto,
+  ): Promise<void> {
+    await this.throwIfNotMarketOwner(marketId, myId);
+    await this.edit(marketId, dto);
+  }
+
+  async editUserMarket(marketId: number, dto: EditMarketDto): Promise<void> {
+    await this.throwIfMarketNotFound(marketId);
+    await this.edit(marketId, dto);
+  }
+
+  async deleteMyMarket(myId: number, marketId: number): Promise<void> {
+    await this.throwIfNotMarketOwner(marketId, myId);
+    await this.delete(marketId);
+  }
+
+  async deleteUserMarket(marketId: number): Promise<void> {
+    await this.throwIfMarketNotFound(marketId);
+    await this.delete(marketId);
+  }
+
+  async throwIfMarketNotFound(marketId: number): Promise<Market> {
+    const market = await this.findMarketById(marketId);
+    if (!market) {
+      throw new NotFoundException(MarketError.NOT_FOUND);
+    }
+    return market;
+  }
+
+  async throwIfNotMarketOwner(
+    marketId: number,
+    userId: number,
+  ): Promise<Market> {
+    const market = await this.throwIfMarketNotFound(marketId);
+    const isCardUser = await this.cardsService.isCardUser(
+      market.cardId,
+      userId,
+    );
+    if (!isCardUser) {
+      throw new ForbiddenException(MarketError.NOT_OWNER);
+    }
+    return market;
+  }
+
+  private findMarketById(id: number): Promise<Market | null> {
+    return this.marketsRepository.findOneBy({ id });
+  }
+
   private async create(dto: CreateMarketWithUserDto): Promise<Market> {
     try {
       const market = this.marketsRepository.create({
@@ -53,6 +109,25 @@ export class MarketsService {
       return market;
     } catch (error) {
       throw new InternalServerErrorException(MarketError.CREATE_FAILED);
+    }
+  }
+
+  private async edit(id: number, dto: EditMarketDto): Promise<void> {
+    try {
+      await this.marketsRepository.update(
+        { id },
+        { name: dto.name, x: dto.x, y: dto.y },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(MarketError.EDIT_FAILED);
+    }
+  }
+
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.marketsRepository.softDelete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(MarketError.DELETE_FAILED);
     }
   }
 

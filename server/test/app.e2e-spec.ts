@@ -49,6 +49,7 @@ describe('App', () => {
   let cards: number[];
   let transactions: number[];
   let fines: number[];
+  let markets: number[];
   let shops: number[];
   let products: number[];
   let purchases: number[];
@@ -504,7 +505,8 @@ describe('App', () => {
       return request(app.getHttpServer())
         .get('/markets/my')
         .set('Authorization', `Bearer ${user.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
+        .then((res) => (markets = res.body.data.map((market) => market.id)));
     });
 
     it('GET /markets/all', () => {
@@ -512,6 +514,44 @@ describe('App', () => {
         .get('/markets/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('PATCH /markets/:marketId', () => {
+      return request(app.getHttpServer())
+        .patch(`/markets/${markets[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          name: 'Market',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+        })
+        .expect(200);
+    });
+
+    it('PATCH /markets/all/:marketId', () => {
+      return request(app.getHttpServer())
+        .patch(`/markets/all/${markets[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          name: 'Market',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+        })
+        .expect(200);
+    });
+
+    it('DELETE /markets/:marketId', () => {
+      return request(app.getHttpServer())
+        .delete(`/markets/${markets[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(200);
+    });
+
+    it('DELETE /markets/all/:marketId', () => {
+      return request(app.getHttpServer())
+        .delete(`/markets/all/${markets[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(200);
     });
   });
 
