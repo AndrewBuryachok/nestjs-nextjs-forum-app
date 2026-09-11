@@ -3,11 +3,13 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { Transaction } from './transaction.entity';
 import { MqttService } from '../mqtt/mqtt.service';
+import { UsersService } from '../users/users.service';
 import { CardsService } from '../cards/cards.service';
 import {
   CreateTransactionDto,
@@ -17,13 +19,16 @@ import {
 import { TransactionError } from './transaction-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 import { Notification, TransactionType } from '../../common/enums';
+import { postData } from '../../common/utils';
 
 @Injectable()
 export class TransactionsService {
   constructor(
     @InjectRepository(Transaction)
     private transactionsRepository: Repository<Transaction>,
+    private configService: ConfigService,
     private mqttService: MqttService,
+    private usersService: UsersService,
     private cardsService: CardsService,
   ) {}
 
@@ -56,6 +61,18 @@ export class TransactionsService {
     myId: number,
     dto: CreateTransactionDto,
   ): Promise<void> {
+    const user = await this.usersService.findUserById(myId);
+    try {
+      await postData(
+        this.configService.getOrThrow('TAKE_URL'),
+        this.configService.getOrThrow('AUTH_TOKEN'),
+        { nick: user!.nick, amount: dto.sum },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(
+        TransactionError.TAKE_DIAMODS_FAILED,
+      );
+    }
     await this.createIncreaseTransaction(
       { ...dto, type: TransactionType.DEPOSIT, description: '' },
       myId,
@@ -70,6 +87,18 @@ export class TransactionsService {
       { ...dto, type: TransactionType.WITHDRAW, description: '' },
       myId,
     );
+    const user = await this.usersService.findUserById(myId);
+    try {
+      await postData(
+        this.configService.getOrThrow('GIVE_URL'),
+        this.configService.getOrThrow('AUTH_TOKEN'),
+        { nick: user!.nick, amount: dto.sum },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(
+        TransactionError.GIVE_DIAMODS_FAILED,
+      );
+    }
   }
 
   @Transactional()
