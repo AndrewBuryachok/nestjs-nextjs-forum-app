@@ -467,6 +467,33 @@ describe('App', () => {
   });
 
   describe('Markets', () => {
+    it('POST /markets', () => {
+      return request(app.getHttpServer())
+        .post('/markets')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          cardId: cards[1],
+          name: 'Market',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+        })
+        .expect(201);
+    });
+
+    it('POST /markets/all', () => {
+      return request(app.getHttpServer())
+        .post('/markets/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          userId: user.user.id,
+          cardId: cards[0],
+          name: 'Market',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+        })
+        .expect(201);
+    });
+
     it('GET /markets', () => {
       return request(app.getHttpServer())
         .get('/markets')
