@@ -16,3 +16,18 @@ export const createMarketWithUserSchema = createMarketSchema.extend({
 export type CreateMarketWithUserType = z.infer<
   typeof createMarketWithUserSchema
 >;
+
+export const editMarketSchema = z.object({
+  marketId: z.number().int().min(1),
+  name: z.string().min(1).max(16),
+  x: z.number().int().min(-1000).max(1000),
+  y: z.number().int().min(-1000).max(1000),
+});
+
+export type EditMarketType = z.infer<typeof editMarketSchema>;
+
+export const deleteMarketSchema = z.object({
+  marketId: z.number().int().min(1),
+});
+
+export type DeleteMarketType = z.infer<typeof deleteMarketSchema>;
