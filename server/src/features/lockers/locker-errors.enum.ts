@@ -1,8 +1,8 @@
 export enum LockerError {
-  HAS_ORDER = 'lockers.has_order',
-  NOT_OWNER = 'lockers.not_owner',
-  NOT_FOUND = 'lockers.not_found',
-  CREATE_FAILED = 'lockers.create_failed',
-  EDIT_FAILED = 'lockers.edit_failed',
-  DELETE_FAILED = 'lockers.delete_failed',
+  HAS_ORDER = 'Поштомат має активне замовлення',
+  NOT_OWNER = 'Ви не власник поштомату',
+  NOT_FOUND = 'Не вдалося знайти поштомат',
+  CREATE_FAILED = 'Не вдалося створити поштомат',
+  EDIT_FAILED = 'Не вдалося редагувати поштомат',
+  DELETE_FAILED = 'Не вдалося видалити поштомат',
 }
