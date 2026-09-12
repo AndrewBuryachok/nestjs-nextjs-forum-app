@@ -32,7 +32,7 @@ export default function CustomNavbar() {
     {
       value: 'property',
       icon: <LuWarehouse />,
-      links: [{ value: 'markets' }, { value: 'plots' }],
+      links: [{ value: 'plots' }, { value: 'rents' }, { value: 'markets' }],
     },
     {
       value: 'mail',

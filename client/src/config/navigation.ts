@@ -40,6 +40,12 @@ export const PAGE_TABS_MAP = {
     my: {},
     all: { roles: [Role.ADMIN] },
   },
+  rents: {
+    main: { public: true },
+    my: {},
+    completed: {},
+    all: { roles: [Role.ADMIN] },
+  },
   shops: {
     main: { public: true },
     my: {},
