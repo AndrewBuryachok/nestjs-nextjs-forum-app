@@ -44,15 +44,15 @@ export class OrdersService {
   async getMyOrders(myId: number, req: Request): Promise<Response<Order>> {
     const [data, total] = await this.getOrdersQueryBuilder(req)
       .innerJoin('customerCard.cardUsers', 'customerCardUsers')
-      .andWhere('customerCardUsers.userId = :myId', { myId })
-      .getManyAndCount();
-    return { data, total };
-  }
-
-  async getTakenOrders(myId: number, req: Request): Promise<Response<Order>> {
-    const [data, total] = await this.getOrdersQueryBuilder(req)
       .leftJoin('executorCard.cardUsers', 'executorCardUsers')
-      .andWhere('executorCardUsers.userId = :myId', { myId })
+      .andWhere(
+        new Brackets((qb) =>
+          qb
+            .where('customerCardUsers.userId = :myId')
+            .orWhere('executorCardUsers.userId = :myId'),
+        ),
+        { myId },
+      )
       .getManyAndCount();
     return { data, total };
   }
