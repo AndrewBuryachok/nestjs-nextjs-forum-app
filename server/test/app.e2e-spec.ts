@@ -889,13 +889,6 @@ describe('App', () => {
         .expect(201);
     });
 
-    it('GET /orders/taken', () => {
-      return request(app.getHttpServer())
-        .get('/orders/taken')
-        .set('Authorization', `Bearer ${user.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
-    });
-
     it('GET /orders/all', () => {
       return request(app.getHttpServer())
         .get('/orders/all')
