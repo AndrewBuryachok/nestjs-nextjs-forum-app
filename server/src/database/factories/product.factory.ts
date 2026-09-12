@@ -12,5 +12,6 @@ export default setSeederFactory(Product, (faker) => {
   product.batch = unit === Unit.PIECE ? batch : 1;
   product.unit = unit;
   product.price = faker.number.int({ min: 1, max: 1000 });
+  product.updatedAt = new Date();
   return product;
 });
