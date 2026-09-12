@@ -961,6 +961,13 @@ describe('App', () => {
         .expect(201);
     });
 
+    it('GET /orders/completed', () => {
+      return request(app.getHttpServer())
+        .get('/orders/completed')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
     it('PATCH /orders/:orderId', () => {
       return request(app.getHttpServer())
         .patch(`/orders/${orders[0]}`)
