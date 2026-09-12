@@ -50,6 +50,7 @@ describe('App', () => {
   let transactions: number[];
   let fines: number[];
   let markets: number[];
+  let plots: number[];
   let shops: number[];
   let products: number[];
   let purchases: number[];
@@ -570,7 +571,8 @@ describe('App', () => {
       return request(app.getHttpServer())
         .get('/plots/my')
         .set('Authorization', `Bearer ${user.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
+        .then((res) => (plots = res.body.data.map((plot) => plot.id)));
     });
 
     it('GET /plots/all', () => {
@@ -578,6 +580,46 @@ describe('App', () => {
         .get('/plots/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('PATCH /plots/:plotId', () => {
+      return request(app.getHttpServer())
+        .patch(`/plots/${plots[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          name: 'Plot',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+          price: 10,
+        })
+        .expect(200);
+    });
+
+    it('PATCH /plots/all/:plotId', () => {
+      return request(app.getHttpServer())
+        .patch(`/plots/all/${plots[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          name: 'Plot',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+          price: 10,
+        })
+        .expect(200);
+    });
+
+    it('DELETE /plots/:plotId', () => {
+      return request(app.getHttpServer())
+        .delete(`/plots/${plots[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(200);
+    });
+
+    it('DELETE /plots/all/:plotId', () => {
+      return request(app.getHttpServer())
+        .delete(`/plots/all/${plots[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(200);
     });
   });
 
