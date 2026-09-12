@@ -42,17 +42,18 @@ export class OrdersService {
   }
 
   async getMyOrders(myId: number, req: Request): Promise<Response<Order>> {
-    const [data, total] = await this.getOrdersQueryBuilder(req)
-      .innerJoin('customerCard.cardUsers', 'customerCardUsers')
-      .leftJoin('executorCard.cardUsers', 'executorCardUsers')
-      .andWhere(
-        new Brackets((qb) =>
-          qb
-            .where('customerCardUsers.userId = :myId')
-            .orWhere('executorCardUsers.userId = :myId'),
-        ),
-        { myId },
-      )
+    const [data, total] = await this.getMyOrdersQueryBuilder(myId, req)
+      .andWhere('order.completedAt IS NULL')
+      .getManyAndCount();
+    return { data, total };
+  }
+
+  async getCompletedOrders(
+    myId: number,
+    req: Request,
+  ): Promise<Response<Order>> {
+    const [data, total] = await this.getMyOrdersQueryBuilder(myId, req)
+      .andWhere('order.completedAt IS NOT NULL')
       .getManyAndCount();
     return { data, total };
   }
@@ -423,6 +424,23 @@ export class OrdersService {
     } catch (error) {
       throw new InternalServerErrorException(OrderError.COMPLETE_FAILED);
     }
+  }
+
+  private getMyOrdersQueryBuilder(
+    myId: number,
+    req: Request,
+  ): SelectQueryBuilder<Order> {
+    return this.getOrdersQueryBuilder(req)
+      .innerJoin('customerCard.cardUsers', 'customerCardUsers')
+      .leftJoin('executorCard.cardUsers', 'executorCardUsers')
+      .andWhere(
+        new Brackets((qb) =>
+          qb
+            .where('customerCardUsers.userId = :myId')
+            .orWhere('executorCardUsers.userId = :myId'),
+        ),
+        { myId },
+      );
   }
 
   private getOrdersQueryBuilder(req: Request): SelectQueryBuilder<Order> {
