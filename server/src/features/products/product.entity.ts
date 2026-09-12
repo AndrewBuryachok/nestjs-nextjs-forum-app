@@ -64,6 +64,9 @@ export class Product {
   @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
   createdAt: Date;
 
+  @CreateDateColumn({ type: 'timestamptz', name: 'updated_at' })
+  updatedAt: Date;
+
   @DeleteDateColumn({ type: 'timestamptz', name: 'deleted_at', nullable: true })
   deletedAt?: Date;
 }
