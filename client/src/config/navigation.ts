@@ -26,6 +26,11 @@ export const PAGE_TABS_MAP = {
     completed: {},
     all: { roles: [Role.ADMIN] },
   },
+  plots: {
+    main: { public: true },
+    my: {},
+    all: { roles: [Role.ADMIN] },
+  },
   products: {
     main: { public: true },
     my: {},
