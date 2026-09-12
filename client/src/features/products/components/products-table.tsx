@@ -53,8 +53,8 @@ export default function ProductsTable(props: Props) {
           ),
         },
         {
-          value: 'created',
-          render: (product) => <DateText value={product.createdAt} />,
+          value: 'updated',
+          render: (product) => <DateText value={product.updatedAt} />,
         },
         {
           value: 'actions',
