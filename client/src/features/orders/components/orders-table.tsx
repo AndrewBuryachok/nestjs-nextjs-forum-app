@@ -8,6 +8,7 @@ import CurrencyText from '@/components/currency-text';
 import StatusBadge from '@/components/status-badge';
 import PlaceText from '@/components/place-text';
 import DateText from '@/components/date-text';
+import CustomText from '@/components/custom-text';
 import OrdersActions from './orders-actions';
 
 type Props = {
@@ -58,10 +59,20 @@ export default function OrdersTable(props: Props) {
           value: 'locker',
           render: (order) => <PlaceText place={order.locker} />,
         },
-        {
-          value: 'created',
-          render: (order) => <DateText value={order.createdAt} />,
-        },
+        props.tab === 'main' || props.tab === 'my'
+          ? {
+              value: 'created',
+              render: (order) => <DateText value={order.createdAt} />,
+            }
+          : {
+              value: 'completed',
+              render: (order) =>
+                order.completedAt ? (
+                  <DateText value={order.completedAt} />
+                ) : (
+                  <CustomText muted value='-' />
+                ),
+            },
         {
           value: 'actions',
           render: (order) => <OrdersActions tab={props.tab} order={order} />,
