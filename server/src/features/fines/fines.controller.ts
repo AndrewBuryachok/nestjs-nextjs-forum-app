@@ -33,6 +33,14 @@ export class FinesController {
     return this.finesService.getMyFines(myId, req);
   }
 
+  @Get('paid')
+  getPaidFines(
+    @MyId() myId: number,
+    @Query() req: Request,
+  ): Promise<Response<Fine>> {
+    return this.finesService.getPaidFines(myId, req);
+  }
+
   @Roles([Role.ADMIN])
   @Get('all')
   getAllFines(@Query() req: Request): Promise<Response<Fine>> {
