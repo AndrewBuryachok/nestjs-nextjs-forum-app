@@ -40,6 +40,14 @@ export class OrdersController {
     return this.ordersService.getMyOrders(myId, req);
   }
 
+  @Get('completed')
+  getCompletedOrders(
+    @MyId() myId: number,
+    @Query() req: Request,
+  ): Promise<Response<Order>> {
+    return this.ordersService.getCompletedOrders(myId, req);
+  }
+
   @Roles([Role.ADMIN])
   @Get('all')
   getAllOrders(@Query() req: Request): Promise<Response<Order>> {
