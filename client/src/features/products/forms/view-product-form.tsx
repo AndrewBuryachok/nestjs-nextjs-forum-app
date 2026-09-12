@@ -56,6 +56,10 @@ export default function ViewProductForm(props: Props) {
         <Field.Label>{t('columns.created')}</Field.Label>
         <DateInput value={props.product.createdAt} />
       </Field.Root>
+      <Field.Root>
+        <Field.Label>{t('columns.updated')}</Field.Label>
+        <DateInput value={props.product.updatedAt} />
+      </Field.Root>
     </ViewForm>
   );
 }

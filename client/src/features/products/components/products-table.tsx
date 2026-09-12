@@ -54,8 +54,8 @@ export default function ProductsTable(props: Props) {
           render: (product) => <PlaceText place={product.shop} />,
         },
         {
-          value: 'created',
-          render: (product) => <DateText value={product.createdAt} />,
+          value: 'updated',
+          render: (product) => <DateText value={product.updatedAt} />,
         },
         {
           value: 'actions',
