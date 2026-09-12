@@ -12,7 +12,7 @@ export const NOTIFICATION_TABS_MAP = {
   },
   orders: {
     cancel: 'my',
-    complete: 'my',
+    complete: 'completed',
     create: 'main',
     execute: 'my',
     take: 'my',

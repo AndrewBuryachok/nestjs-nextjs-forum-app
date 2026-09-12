@@ -67,6 +67,7 @@ export default function OrdersActions(props: Props) {
   const actions = {
     main: [takeMyOrderAction],
     my: myActions(props.order.status),
+    completed: [],
     all: allActions(props.order.status),
   }[props.tab];
 
