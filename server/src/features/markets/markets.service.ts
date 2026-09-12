@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
@@ -98,6 +99,15 @@ export class MarketsService {
       throw new ForbiddenException(MarketError.NOT_OWNER);
     }
     return market;
+  }
+
+  async throwIfMarketHasPlot(marketId: number): Promise<void> {
+    const plot = await this.marketsRepository.manager.existsBy('plots', {
+      marketId,
+    });
+    if (plot) {
+      throw new BadRequestException(MarketError.HAS_PLOT);
+    }
   }
 
   private findMarketById(id: number): Promise<Market | null> {

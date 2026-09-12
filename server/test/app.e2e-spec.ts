@@ -528,7 +528,31 @@ describe('App', () => {
         .get(`/markets/${user.user.id}/select`)
         .expect((res) => expect(res.body.length).toBeGreaterThan(0));
     });
+  });
 
+  describe('Plots', () => {
+    it('GET /plots', () => {
+      return request(app.getHttpServer())
+        .get('/plots')
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /plots/my', () => {
+      return request(app.getHttpServer())
+        .get('/plots/my')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /plots/all', () => {
+      return request(app.getHttpServer())
+        .get('/plots/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+  });
+
+  describe('Markets', () => {
     it('PATCH /markets/:marketId', () => {
       return request(app.getHttpServer())
         .patch(`/markets/${markets[0]}`)

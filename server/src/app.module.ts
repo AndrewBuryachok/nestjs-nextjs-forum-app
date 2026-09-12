@@ -12,6 +12,7 @@ import { CardsModule } from './features/cards/cards.module';
 import { TransactionsModule } from './features/transactions/transactions.module';
 import { FinesModule } from './features/fines/fines.module';
 import { MarketsModule } from './features/markets/markets.module';
+import { PlotsModule } from './features/plots/plots.module';
 import { ShopsModule } from './features/shops/shops.module';
 import { ProductsModule } from './features/products/products.module';
 import { PurchasesModule } from './features/purchases/purchases.module';
@@ -53,6 +54,7 @@ import { AtGuard, RolesGuard } from './common/guards';
     TransactionsModule,
     FinesModule,
     MarketsModule,
+    PlotsModule,
     ShopsModule,
     ProductsModule,
     PurchasesModule,

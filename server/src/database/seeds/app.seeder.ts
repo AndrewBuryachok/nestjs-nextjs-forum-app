@@ -7,6 +7,7 @@ import { CardUser } from '../../features/cards/card-user.entity';
 import { Transaction } from '../../features/transactions/transaction.entity';
 import { Fine } from '../../features/fines/fine.entity';
 import { Market } from '../../features/markets/market.entity';
+import { Plot } from '../../features/plots/plot.entity';
 import { Shop } from '../../features/shops/shop.entity';
 import { Product } from '../../features/products/product.entity';
 import { Purchase } from '../../features/purchases/purchase.entity';
@@ -151,6 +152,14 @@ export default class AppSeeder implements Seeder {
       const market = await marketFactory.make({ id, user, card });
       markets.push(market);
     }
+    const plotFactory = factoryManager.get(Plot);
+    const plots: Plot[] = [];
+    for (let i = 0; i < 40; i++) {
+      const id = i + 1;
+      const market = faker.helpers.arrayElement(markets);
+      const plot = await plotFactory.make({ id, market });
+      plots.push(plot);
+    }
     const shopFactory = factoryManager.get(Shop);
     const shops: Shop[] = [];
     for (let i = 0; i < 20; i++) {
@@ -278,6 +287,7 @@ export default class AppSeeder implements Seeder {
     await dataSource.getRepository(Transaction).save(transactions);
     await dataSource.getRepository(Fine).save(fines);
     await dataSource.getRepository(Market).save(markets);
+    await dataSource.getRepository(Plot).save(plots);
     await dataSource.getRepository(Shop).save(shops);
     await dataSource.getRepository(Product).save(products);
     await dataSource.getRepository(Purchase).save(purchases);
