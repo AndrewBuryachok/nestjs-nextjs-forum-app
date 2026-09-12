@@ -8,6 +8,7 @@ import { Transaction } from '../../features/transactions/transaction.entity';
 import { Fine } from '../../features/fines/fine.entity';
 import { Market } from '../../features/markets/market.entity';
 import { Plot } from '../../features/plots/plot.entity';
+import { Rent } from '../../features/rents/rent.entity';
 import { Shop } from '../../features/shops/shop.entity';
 import { Product } from '../../features/products/product.entity';
 import { Purchase } from '../../features/purchases/purchase.entity';
@@ -160,6 +161,35 @@ export default class AppSeeder implements Seeder {
       const plot = await plotFactory.make({ id, market });
       plots.push(plot);
     }
+    const rentFactory = factoryManager.get(Rent);
+    const rents: Rent[] = [];
+    for (let i = 0; i < 20; i++) {
+      const plot = faker.helpers.arrayElement(
+        plots.filter(
+          (plot) => !plot.reservedUntil || plot.reservedUntil < new Date(),
+        ),
+      );
+      const card = faker.helpers.arrayElement(
+        cards.filter((card) => card.balance >= plot.price),
+      );
+      const user = randomUserOf(card);
+      card.balance -= plot.price;
+      plot.market.card.balance += plot.price;
+      const transfer = await transactionFactory.make({
+        senderUser: user,
+        senderCard: card,
+        receiverUser: plot.market.user,
+        receiverCard: plot.market.card,
+        type: TransactionType.RENT_PLOT,
+        sum: plot.price,
+        description: plot.name,
+      });
+      transactions.push(transfer);
+      plot.reservedUntil = new Date();
+      plot.reservedUntil.setDate(plot.reservedUntil.getDate() + 7);
+      const rent = await rentFactory.make({ plot, user, card });
+      rents.push(rent);
+    }
     const shopFactory = factoryManager.get(Shop);
     const shops: Shop[] = [];
     for (let i = 0; i < 20; i++) {
@@ -288,6 +318,7 @@ export default class AppSeeder implements Seeder {
     await dataSource.getRepository(Fine).save(fines);
     await dataSource.getRepository(Market).save(markets);
     await dataSource.getRepository(Plot).save(plots);
+    await dataSource.getRepository(Rent).save(rents);
     await dataSource.getRepository(Shop).save(shops);
     await dataSource.getRepository(Product).save(products);
     await dataSource.getRepository(Purchase).save(purchases);
