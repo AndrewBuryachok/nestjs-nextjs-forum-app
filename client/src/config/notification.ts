@@ -5,6 +5,7 @@ export const NOTIFICATION_TABS_MAP = {
   },
   fines: {
     create: 'my',
+    pay: 'paid',
   },
   lockers: {
     create: 'main',
