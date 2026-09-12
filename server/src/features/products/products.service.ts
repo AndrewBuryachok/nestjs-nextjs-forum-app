@@ -38,6 +38,7 @@ export class ProductsService {
   async getMainProducts(req: Request): Promise<Response<Product>> {
     const [data, total] = await this.getProductsQueryBuilder(req)
       .andWhere('product.amount > 0')
+      .orderBy('product.updatedAt', 'DESC')
       .getManyAndCount();
     return { data, total };
   }
@@ -46,13 +47,15 @@ export class ProductsService {
     const [data, total] = await this.getProductsQueryBuilder(req)
       .innerJoin('sellerCard.cardUsers', 'sellerCardUsers')
       .andWhere('sellerCardUsers.userId = :myId', { myId })
+      .orderBy('product.updatedAt', 'ASC')
       .getManyAndCount();
     return { data, total };
   }
 
   async getAllProducts(req: Request): Promise<Response<Product>> {
-    const [data, total] =
-      await this.getProductsQueryBuilder(req).getManyAndCount();
+    const [data, total] = await this.getProductsQueryBuilder(req)
+      .orderBy('product.id', 'DESC')
+      .getManyAndCount();
     return { data, total };
   }
 
@@ -188,6 +191,7 @@ export class ProductsService {
         batch: dto.batch,
         unit: dto.unit,
         price: dto.price,
+        updatedAt: new Date(),
       });
       await this.productsRepository.save(product);
       return product;
@@ -203,7 +207,7 @@ export class ProductsService {
     try {
       await this.productsRepository.update(
         { id },
-        { amount: dto.amount, price: dto.price },
+        { amount: dto.amount, price: dto.price, updatedAt: new Date() },
       );
     } catch (error) {
       throw new InternalServerErrorException(
@@ -223,6 +227,7 @@ export class ProductsService {
           batch: dto.batch,
           unit: dto.unit,
           price: dto.price,
+          updatedAt: new Date(),
         },
       );
     } catch (error) {
@@ -270,6 +275,7 @@ export class ProductsService {
         'product.unit',
         'product.price',
         'product.createdAt',
+        'product.updatedAt',
       ])
       .innerJoin('product.shop', 'shop')
       .addSelect(['shop.id', 'shop.name', 'shop.x', 'shop.y'])
@@ -290,7 +296,6 @@ export class ProductsService {
             qb.where('product.userId = :userId', { userId: req.user }),
         ),
       )
-      .orderBy('product.id', 'DESC')
       .skip(req.skip)
       .take(req.take);
   }
