@@ -457,6 +457,13 @@ describe('App', () => {
         .send({ cardId: cards[0] })
         .expect(201);
     });
+
+    it('GET /fines/paid', () => {
+      return request(app.getHttpServer())
+        .get('/fines/paid')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
   });
 
   describe('Shops', () => {

@@ -28,18 +28,15 @@ export class FinesService {
   ) {}
 
   async getMyFines(myId: number, req: Request): Promise<Response<Fine>> {
-    const [data, total] = await this.getFinesQueryBuilder(req)
-      .innerJoin('senderCard.cardUsers', 'senderCardUsers')
-      .leftJoin('receiverCard.cardUsers', 'receiverCardUsers')
-      .andWhere(
-        new Brackets((qb) =>
-          qb
-            .where('receiverUser.id = :myId')
-            .orWhere('senderCardUsers.userId = :myId')
-            .orWhere('receiverCardUsers.userId = :myId'),
-        ),
-        { myId },
-      )
+    const [data, total] = await this.getMyFinesQueryBuilder(myId, req)
+      .andWhere('fine.paidAt IS NULL')
+      .getManyAndCount();
+    return { data, total };
+  }
+
+  async getPaidFines(myId: number, req: Request): Promise<Response<Fine>> {
+    const [data, total] = await this.getMyFinesQueryBuilder(myId, req)
+      .andWhere('fine.paidAt IS NOT NULL')
       .getManyAndCount();
     return { data, total };
   }
@@ -211,6 +208,24 @@ export class FinesService {
     } catch (error) {
       throw new InternalServerErrorException(FineError.PAY_FAILED);
     }
+  }
+
+  private getMyFinesQueryBuilder(
+    myId: number,
+    req: Request,
+  ): SelectQueryBuilder<Fine> {
+    return this.getFinesQueryBuilder(req)
+      .innerJoin('senderCard.cardUsers', 'senderCardUsers')
+      .leftJoin('receiverCard.cardUsers', 'receiverCardUsers')
+      .andWhere(
+        new Brackets((qb) =>
+          qb
+            .where('receiverUser.id = :myId')
+            .orWhere('senderCardUsers.userId = :myId')
+            .orWhere('receiverCardUsers.userId = :myId'),
+        ),
+        { myId },
+      );
   }
 
   private getFinesQueryBuilder(req: Request): SelectQueryBuilder<Fine> {
