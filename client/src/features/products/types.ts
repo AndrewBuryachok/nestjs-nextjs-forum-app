@@ -17,4 +17,5 @@ export interface Product {
   unit: Unit;
   price: number;
   createdAt: Date;
+  updatedAt: Date;
 }
