@@ -11,7 +11,7 @@ export const NOTIFICATION_TABS_MAP = {
   },
   orders: {
     cancel: 'my',
-    complete: 'taken',
+    complete: 'my',
     create: 'main',
     execute: 'my',
     take: 'my',

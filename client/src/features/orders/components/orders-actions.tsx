@@ -34,6 +34,19 @@ type Props = {
 };
 
 export default function OrdersActions(props: Props) {
+  const myActions = (status: Status) => {
+    switch (status) {
+      case Status.CREATED:
+        return [editMyOrderAction, deleteMyOrderAction];
+      case Status.TAKEN:
+        return [executeMyOrderAction, cancelMyOrderAction];
+      case Status.EXECUTED:
+        return [completeMyOrderAction];
+      default:
+        return [];
+    }
+  };
+
   const allActions = (status: Status) => {
     switch (status) {
       case Status.CREATED:
@@ -53,8 +66,7 @@ export default function OrdersActions(props: Props) {
 
   const actions = {
     main: [takeMyOrderAction],
-    my: [completeMyOrderAction, editMyOrderAction, deleteMyOrderAction],
-    taken: [executeMyOrderAction, cancelMyOrderAction],
+    my: myActions(props.order.status),
     all: allActions(props.order.status),
   }[props.tab];
 
