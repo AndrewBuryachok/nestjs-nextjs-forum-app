@@ -40,14 +40,6 @@ export class OrdersController {
     return this.ordersService.getMyOrders(myId, req);
   }
 
-  @Get('taken')
-  getTakenOrders(
-    @MyId() myId: number,
-    @Query() req: Request,
-  ): Promise<Response<Order>> {
-    return this.ordersService.getTakenOrders(myId, req);
-  }
-
   @Roles([Role.ADMIN])
   @Get('all')
   getAllOrders(@Query() req: Request): Promise<Response<Order>> {
