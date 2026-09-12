@@ -7,6 +7,7 @@ export const PAGE_TABS_MAP = {
   },
   fines: {
     my: {},
+    paid: {},
     all: { roles: [Role.ADMIN] },
   },
   lockers: {

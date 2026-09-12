@@ -51,15 +51,20 @@ export default function FinesTable(props: Props) {
             <CustomText muted value={fine.description || '-'} />
           ),
         },
-        {
-          value: 'paid',
-          render: (fine) =>
-            fine.paidAt ? (
-              <DateText value={fine.paidAt} />
-            ) : (
-              <CustomText muted value='-' />
-            ),
-        },
+        props.tab === 'my'
+          ? {
+              value: 'created',
+              render: (fine) => <DateText value={fine.createdAt} />,
+            }
+          : {
+              value: 'paid',
+              render: (fine) =>
+                fine.paidAt ? (
+                  <DateText value={fine.paidAt} />
+                ) : (
+                  <CustomText muted value='-' />
+                ),
+            },
         {
           value: 'actions',
           render: (fine) => <FinesActions tab={props.tab} fine={fine} />,

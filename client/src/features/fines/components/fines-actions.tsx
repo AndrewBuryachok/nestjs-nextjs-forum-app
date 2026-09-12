@@ -20,6 +20,7 @@ type Props = {
 export default function FinesActions(props: Props) {
   const actions = {
     my: [payMyFineAction, editMyFineAction, deleteMyFineAction],
+    paid: [],
     all: [payUserFineAction, editUserFineAction, deleteUserFineAction],
   }[props.tab];
 
