@@ -18,6 +18,7 @@ export const PAGE_TABS_MAP = {
   orders: {
     main: { public: true },
     my: {},
+    completed: {},
     all: { roles: [Role.ADMIN] },
   },
   products: {
