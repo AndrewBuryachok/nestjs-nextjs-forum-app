@@ -12,4 +12,5 @@ export interface BaseUserWithRoles extends BaseUser {
 
 export interface User extends BaseUserWithRoles {
   createdAt: Date;
+  onlineAt: Date;
 }

@@ -28,6 +28,10 @@ export default function ViewUserForm(props: Props) {
         <RolesBadge roles={props.user.roles} />
       </Field.Root>
       <Field.Root>
+        <Field.Label>{t('columns.online')}</Field.Label>
+        <DateInput value={props.user.onlineAt} />
+      </Field.Root>
+      <Field.Root>
         <Field.Label>{t('columns.registered')}</Field.Label>
         <DateInput value={props.user.createdAt} />
       </Field.Root>

@@ -27,6 +27,10 @@ export default function UsersTable(props: Props) {
           render: (user) => <RolesBadge roles={user.roles} />,
         },
         {
+          value: 'online',
+          render: (user) => <DateText value={user.onlineAt} />,
+        },
+        {
           value: 'registered',
           render: (user) => <DateText value={user.createdAt} />,
         },
