@@ -64,8 +64,15 @@ export default function BuyProductForm(props: Props) {
     ? useSelectUserCardsWithBalance(userId)
     : useSelectMyCards();
 
+  const card = cards.data?.find((card) => card.id === form.watch('cardId'));
+  const notEnoughBalance =
+    card && card.balance < form.watch('amount') * props.product.price;
+
   return (
-    <CustomForm disabled={form.formState.isSubmitting} onSubmit={onSubmit}>
+    <CustomForm
+      disabled={form.formState.isSubmitting || !!notEnoughBalance}
+      onSubmit={onSubmit}
+    >
       {props.isAll && (
         <Field.Root required>
           <Field.Label>
@@ -81,7 +88,11 @@ export default function BuyProductForm(props: Props) {
           />
         </Field.Root>
       )}
-      <Field.Root disabled={props.isAll && !userId} required>
+      <Field.Root
+        disabled={props.isAll && !userId}
+        invalid={notEnoughBalance}
+        required
+      >
         <Field.Label>
           {t('columns.card')}
           <Field.RequiredIndicator />
@@ -99,6 +110,9 @@ export default function BuyProductForm(props: Props) {
             />
           )}
         />
+        <Field.ErrorText>
+          {notEnoughBalance && t('errors.not_enough_balance')}
+        </Field.ErrorText>
       </Field.Root>
       <Field.Root invalid={!!form.formState.errors.amount} required>
         <Field.Label>
