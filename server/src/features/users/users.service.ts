@@ -131,6 +131,14 @@ export class UsersService {
     await this.removeRole(user, dto);
   }
 
+  async setUserOnline(userId: number, isOnline: boolean): Promise<void> {
+    await this.setOnline(userId, isOnline);
+  }
+
+  async resetUserOnline(): Promise<void> {
+    await this.resetOnline();
+  }
+
   async throwIfNickAlreadyUsed(nick: string): Promise<void> {
     const user = await this.findUserByNick(nick);
     if (user) {
@@ -223,11 +231,34 @@ export class UsersService {
     }
   }
 
+  private async setOnline(id: number, isOnline: boolean): Promise<void> {
+    try {
+      await this.usersRepository.update(
+        { id },
+        { isOnline, onlineAt: new Date() },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(UserError.SET_ONLINE_FAILED);
+    }
+  }
+
+  private async resetOnline(): Promise<void> {
+    try {
+      await this.usersRepository.update(
+        { isOnline: true },
+        { isOnline: false },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(UserError.RESET_ONLINE_FAILED);
+    }
+  }
+
   private selectUsersQueryBuilder(): SelectQueryBuilder<User> {
     return this.usersRepository
       .createQueryBuilder('user')
       .select(['user.id', 'user.nick', 'user.avatar'])
-      .orderBy('user.nick', 'ASC');
+      .orderBy('user.isOnline', 'DESC')
+      .addOrderBy('user.nick', 'ASC');
   }
 
   private getUsersQueryBuilder(req: Request): SelectQueryBuilder<User> {
@@ -246,7 +277,9 @@ export class UsersService {
         'user.nick',
         'user.avatar',
         'user.roles',
+        'user.isOnline',
         'user.createdAt',
+        'user.onlineAt',
         'town.id',
         'town.name',
         'town.world',
@@ -267,7 +300,8 @@ export class UsersService {
             req.user && qb.where('user.id = :userId', { userId: req.user }),
         ),
       )
-      .orderBy('user.id', 'DESC')
+      .orderBy('user.isOnline', 'DESC')
+      .addOrderBy('user.onlineAt', 'DESC')
       .skip(req.skip)
       .take(req.take);
   }

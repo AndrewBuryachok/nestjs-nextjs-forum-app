@@ -59,6 +59,12 @@ export class FinesService {
       fine.id,
       Notification.CREATE_FINE,
     );
+    await this.mqttService.sendMessage(
+      dto.senderUserId,
+      dto.receiverUserId,
+      'выписал вам штраф',
+      true,
+    );
   }
 
   async editMyFine(
@@ -127,6 +133,12 @@ export class FinesService {
       fine.senderUserId,
       fine.id,
       Notification.PAY_FINE,
+    );
+    await this.mqttService.sendMessage(
+      fine.receiverUserId,
+      fine.senderUserId,
+      'оплатил ваш штраф',
+      true,
     );
   }
 

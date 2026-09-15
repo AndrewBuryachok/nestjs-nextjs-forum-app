@@ -7,7 +7,9 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
+import { UsersService } from '../users/users.service';
 import { Notification } from '../../common/enums';
+import { postData } from '../../common/utils';
 
 @Injectable()
 export class MqttService implements OnModuleInit, OnModuleDestroy {
@@ -18,14 +20,19 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
   constructor(
     private configService: ConfigService,
     private schedulerRegistry: SchedulerRegistry,
+    private usersService: UsersService,
   ) {}
 
-  onModuleInit() {
+  async onModuleInit() {
+    await this.usersService.resetUserOnline();
     this.client = mqtt.connect(this.configService.getOrThrow('MQTT_URL'), {
       protocolVersion: 5,
     });
     this.client.on('connect', () => {
       this.logger.log('MQTT connect');
+      this.client.subscribe(
+        `${this.configService.getOrThrow('MQTT_TOPIC')}/users/+`,
+      );
     });
     this.client.on('offline', () => {
       this.logger.error('MQTT offline');
@@ -33,10 +40,40 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     this.client.on('error', (error) => {
       this.logger.error(error.message);
     });
+    this.client.on('message', async (topic, payload) => {
+      try {
+        const userId = Number(topic.split('/')[2]);
+        const isOnline = !!payload.length;
+        await this.usersService.setUserOnline(userId, isOnline);
+      } catch (error) {
+        this.logger.error(error);
+      }
+    });
   }
 
   onModuleDestroy() {
     this.client.end();
+  }
+
+  async sendMessage(
+    fromUserId: number,
+    toUserId: number,
+    message: string,
+    keep: boolean,
+  ) {
+    try {
+      const fromUser =
+        fromUserId && (await this.usersService.throwIfUserNotFound(fromUserId));
+      const toUser = await this.usersService.throwIfUserNotFound(toUserId);
+      const text = fromUser ? `${fromUser.nick} ${message}` : message;
+      await postData(
+        this.configService.getOrThrow('NOTIFICATIONS_URL'),
+        this.configService.getOrThrow('AUTH_TOKEN'),
+        { type: 'text', nick: toUser.nick, text, keep },
+      );
+    } catch (error) {
+      this.logger.error(error);
+    }
   }
 
   scheduleNotification(
@@ -46,12 +83,13 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     toUserId: number,
     id: number,
     notification: Notification,
+    message: string,
   ) {
     try {
-      const timeout = setTimeout(
-        () => this.publishNotification(fromUserId, toUserId, id, notification),
-        date.getTime() - new Date().getTime(),
-      );
+      const timeout = setTimeout(async () => {
+        this.publishNotification(fromUserId, toUserId, id, notification);
+        await this.sendMessage(fromUserId, toUserId, message, true);
+      }, date.getTime() - new Date().getTime());
       this.schedulerRegistry.addTimeout(key, timeout);
       this.logger.log(
         `Successfully scheduled notification ${key} at ${date.toISOString()}`,

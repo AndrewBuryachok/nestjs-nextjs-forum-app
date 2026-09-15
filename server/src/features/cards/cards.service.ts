@@ -172,6 +172,12 @@ export class CardsService {
       card.id,
       Notification.ADD_CARD_USER,
     );
+    await this.mqttService.sendMessage(
+      card.userId,
+      userId,
+      'добавил вас в карту',
+      true,
+    );
   }
 
   async removeMyCardUser(
@@ -205,6 +211,12 @@ export class CardsService {
       userId,
       card.id,
       Notification.REMOVE_CARD_USER,
+    );
+    await this.mqttService.sendMessage(
+      card.userId,
+      userId,
+      'убрал вас из карты',
+      true,
     );
   }
 
