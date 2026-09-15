@@ -124,6 +124,12 @@ export class TransactionsService {
       transaction.id,
       Notification.TRANSFER_TRANSACTION,
     );
+    await this.mqttService.sendMessage(
+      dto.senderUserId,
+      dto.receiverUserId,
+      'создал вам перевод',
+      true,
+    );
   }
 
   @Transactional()

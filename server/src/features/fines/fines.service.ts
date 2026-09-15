@@ -33,7 +33,12 @@ export class FinesService implements OnModuleInit {
       completedAt: MoreThan(new Date()),
     });
     for (const fine of fines) {
-      this.addTimeout(fine.id, fine.receiverUserId, fine.completedAt);
+      this.addTimeout(
+        fine.id,
+        fine.senderUserId,
+        fine.receiverUserId,
+        fine.completedAt,
+      );
     }
   }
 
@@ -69,7 +74,18 @@ export class FinesService implements OnModuleInit {
       fine.id,
       Notification.CREATE_FINE,
     );
-    this.addTimeout(fine.id, dto.receiverUserId, fine.completedAt);
+    this.addTimeout(
+      fine.id,
+      dto.senderUserId,
+      dto.receiverUserId,
+      fine.completedAt,
+    );
+    await this.mqttService.sendMessage(
+      dto.senderUserId,
+      dto.receiverUserId,
+      'выписал вам штраф',
+      true,
+    );
   }
 
   async editMyFine(
@@ -141,6 +157,12 @@ export class FinesService implements OnModuleInit {
       Notification.PAY_FINE,
     );
     this.removeTimeout(fine.id);
+    await this.mqttService.sendMessage(
+      fine.receiverUserId,
+      fine.senderUserId,
+      'оплатил ваш штраф',
+      true,
+    );
   }
 
   async throwIfFineNotFound(fineId: number): Promise<Fine> {
@@ -177,32 +199,47 @@ export class FinesService implements OnModuleInit {
     return this.finesRepository.findOneBy({ id });
   }
 
-  private addTimeout(id: number, userId: number, date: Date) {
+  private addTimeout(
+    id: number,
+    senderUserId: number,
+    receiverUserId: number,
+    date: Date,
+  ) {
     const before = new Date(date);
     before.setDate(before.getDate() - 3);
     if (before.getTime() > new Date().getTime()) {
+      const remind = (userId: number, type: 'sender' | 'receiver') =>
+        this.mqttService.scheduleNotification(
+          `fines/${id}/remind/${type}`,
+          before,
+          0,
+          userId,
+          id,
+          Notification.REMIND_FINE,
+          'Ваш штраф скоро просрочится',
+        );
+      remind(senderUserId, 'sender');
+      remind(receiverUserId, 'receiver');
+    }
+    const expire = (userId: number, type: 'sender' | 'receiver') =>
       this.mqttService.scheduleNotification(
-        `fines/${id}/remind`,
-        before,
+        `fines/${id}/expire/${type}`,
+        date,
         0,
         userId,
         id,
-        Notification.REMIND_FINE,
+        Notification.EXPIRE_FINE,
+        'Ваш штраф просрочился',
       );
-    }
-    this.mqttService.scheduleNotification(
-      `fines/${id}/expire`,
-      date,
-      0,
-      userId,
-      id,
-      Notification.EXPIRE_FINE,
-    );
+    expire(senderUserId, 'sender');
+    expire(receiverUserId, 'receiver');
   }
 
   private removeTimeout(id: number) {
-    this.mqttService.unscheduleNotification(`fines/${id}/remind`);
-    this.mqttService.unscheduleNotification(`fines/${id}/expire`);
+    for (const type of ['sender', 'receiver']) {
+      this.mqttService.unscheduleNotification(`fines/${id}/remind/${type}`);
+      this.mqttService.unscheduleNotification(`fines/${id}/expire/${type}`);
+    }
   }
 
   private async create(dto: CreateFineWithUserDto): Promise<Fine> {

@@ -31,11 +31,12 @@ export class RentsService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    const rents = await this.rentsRepository.findBy({
-      completedAt: MoreThan(new Date()),
+    const rents = await this.rentsRepository.find({
+      relations: { plot: true },
+      where: { completedAt: MoreThan(new Date()) },
     });
     for (const rent of rents) {
-      this.addTimeout(rent.id, rent.userId, rent.completedAt);
+      this.addTimeout(rent.id, rent.userId, rent.plot.userId, rent.completedAt);
     }
   }
 
@@ -94,7 +95,13 @@ export class RentsService implements OnModuleInit {
       rent.id,
       Notification.CREATE_RENT,
     );
-    this.addTimeout(rent.id, dto.userId, rent.completedAt);
+    this.addTimeout(rent.id, dto.userId, plot.userId, rent.completedAt);
+    await this.mqttService.sendMessage(
+      dto.userId,
+      plot.userId,
+      'арендовал ваш участок',
+      true,
+    );
   }
 
   async continueMyRent(myId: number, rentId: number): Promise<void> {
@@ -127,7 +134,13 @@ export class RentsService implements OnModuleInit {
       Notification.CONTINUE_RENT,
     );
     this.removeTimeout(rent.id);
-    this.addTimeout(rent.id, rent.userId, date);
+    this.addTimeout(rent.id, rent.userId, rent.plot.userId, date);
+    await this.mqttService.sendMessage(
+      rent.userId,
+      rent.plot.userId,
+      'продлил вашу аренду',
+      true,
+    );
   }
 
   async completeMyRent(myId: number, rentId: number): Promise<void> {
@@ -150,6 +163,12 @@ export class RentsService implements OnModuleInit {
       Notification.COMPLETE_RENT,
     );
     this.removeTimeout(rent.id);
+    await this.mqttService.sendMessage(
+      rent.userId,
+      rent.plot.userId,
+      'завершил вашу аренду',
+      true,
+    );
   }
 
   async throwIfRentNotFound(rentId: number): Promise<Rent> {
@@ -190,32 +209,47 @@ export class RentsService implements OnModuleInit {
     });
   }
 
-  private addTimeout(id: number, userId: number, date: Date) {
+  private addTimeout(
+    id: number,
+    rentUserId: number,
+    plotUserId: number,
+    date: Date,
+  ) {
     const before = new Date(date);
     before.setDate(before.getDate() - 3);
     if (before.getTime() > new Date().getTime()) {
+      const remind = (userId: number, type: 'rent' | 'plot') =>
+        this.mqttService.scheduleNotification(
+          `rents/${id}/remind/${type}`,
+          before,
+          0,
+          userId,
+          id,
+          Notification.REMIND_RENT,
+          'Ваша аренда скоро закончится',
+        );
+      remind(rentUserId, 'rent');
+      remind(plotUserId, 'plot');
+    }
+    const expire = (userId: number, type: 'rent' | 'plot') =>
       this.mqttService.scheduleNotification(
-        `rents/${id}/remind`,
-        before,
+        `rents/${id}/expire/${type}`,
+        date,
         0,
         userId,
         id,
-        Notification.REMIND_RENT,
+        Notification.EXPIRE_RENT,
+        'Ваша аренда закончилась',
       );
-    }
-    this.mqttService.scheduleNotification(
-      `rents/${id}/expire`,
-      date,
-      0,
-      userId,
-      id,
-      Notification.EXPIRE_RENT,
-    );
+    expire(rentUserId, 'rent');
+    expire(plotUserId, 'plot');
   }
 
   private removeTimeout(id: number) {
-    this.mqttService.unscheduleNotification(`rents/${id}/remind`);
-    this.mqttService.unscheduleNotification(`rents/${id}/expire`);
+    for (const type of ['rent', 'plot']) {
+      this.mqttService.unscheduleNotification(`rents/${id}/remind/${type}`);
+      this.mqttService.unscheduleNotification(`rents/${id}/expire/${type}`);
+    }
   }
 
   private async create(dto: CreateRentWithUserDto): Promise<Rent> {
