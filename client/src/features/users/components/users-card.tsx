@@ -3,7 +3,7 @@ import { Card, Flex, HStack, SimpleGrid } from '@chakra-ui/react';
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import { User } from '../types';
 import CardWrapper from '@/components/card-wrapper';
-import CustomAvatarWithUser from '@/components/custom-avatar-with-user';
+import CustomAvatarWithOnline from '@/components/custom-avatar-with-online';
 import RolesBadge from '@/components/roles-badge';
 import PlaceIconWithText from '@/components/place-icon-with-text';
 import PlaceIcon from '@/components/place-icon';
@@ -23,7 +23,7 @@ export default function UsersCard(props: Props) {
     <CardWrapper>
       <Card.Header>
         <Flex justify='space-between'>
-          <CustomAvatarWithUser user={props.user} />
+          <CustomAvatarWithOnline user={props.user} />
           <RolesBadge roles={props.user.roles} />
         </Flex>
       </Card.Header>
