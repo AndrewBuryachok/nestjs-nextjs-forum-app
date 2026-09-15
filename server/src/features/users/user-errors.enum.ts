@@ -11,4 +11,6 @@ export enum UserError {
   CHANGE_PASSWORD_FAILED = 'Не удалось изменить пароль игрока',
   ADD_ROLE_FAILED = 'Не удалось добавить роль игрока',
   REMOVE_ROLE_FAILED = 'Не удалось убрать роль игрока',
+  SET_ONLINE_FAILED = 'Не удалось установить онлайн игрока',
+  RESET_ONLINE_FAILED = 'Не удалось сбросить онлайн игрока',
 }

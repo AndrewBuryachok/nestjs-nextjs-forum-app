@@ -28,8 +28,14 @@ export class User {
   @Column({ type: 'enum', enum: Role, array: true, default: [] })
   roles: Role[];
 
+  @Column({ name: 'is_online', default: false })
+  isOnline: boolean;
+
   @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
   createdAt: Date;
+
+  @CreateDateColumn({ type: 'timestamptz', name: 'online_at' })
+  onlineAt: Date;
 
   @OneToMany(() => TownUser, (townUser) => townUser.user)
   townUsers: TownUser[];
