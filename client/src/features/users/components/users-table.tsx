@@ -47,6 +47,10 @@ export default function UsersTable(props: Props) {
             ),
         },
         {
+          value: 'online',
+          render: (user) => <DateText value={user.onlineAt} />,
+        },
+        {
           value: 'registered',
           render: (user) => <DateText value={user.createdAt} />,
         },
