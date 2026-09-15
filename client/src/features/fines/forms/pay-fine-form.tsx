@@ -57,9 +57,15 @@ export default function PayFineForm(props: Props) {
     ? useSelectUserCardsWithBalance(props.fine.receiverUser.id)
     : useSelectMyCards();
 
+  const card = cards.data?.find((card) => card.id === form.watch('cardId'));
+  const notEnoughBalance = card && card.balance < props.fine.sum;
+
   return (
-    <CustomForm disabled={form.formState.isSubmitting} onSubmit={onSubmit}>
-      <Field.Root required>
+    <CustomForm
+      disabled={form.formState.isSubmitting || !!notEnoughBalance}
+      onSubmit={onSubmit}
+    >
+      <Field.Root invalid={notEnoughBalance} required>
         <Field.Label>
           {t('columns.card')}
           <Field.RequiredIndicator />
@@ -77,6 +83,9 @@ export default function PayFineForm(props: Props) {
             />
           )}
         />
+        <Field.ErrorText>
+          {notEnoughBalance && t('errors.not_enough_balance')}
+        </Field.ErrorText>
       </Field.Root>
     </CustomForm>
   );
