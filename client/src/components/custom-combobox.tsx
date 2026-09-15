@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   Combobox,
@@ -30,13 +31,17 @@ export default function CustomCombobox<T>(props: Props<T>) {
 
   const rest = props.data.filter((v) => props.itemToValue(v) !== props.value);
 
-  const { collection, filter } = useListCollection<T>({
+  const { collection, filter, set } = useListCollection<T>({
     initialItems: value ? [value, ...rest] : props.data,
     itemToString: props.itemToLabel,
     itemToValue: props.itemToValue,
     filter: contains,
     limit: 20,
   });
+
+  useEffect(() => {
+    set(value ? [value, ...rest] : props.data);
+  }, [props.data]);
 
   return (
     <Combobox.Root
