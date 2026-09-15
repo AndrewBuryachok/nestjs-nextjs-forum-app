@@ -80,8 +80,16 @@ export default function CreateTransferForm(props: Props) {
     : useSelectMyCards();
   const receiverCards = useSelectUserCards(receiverUserId);
 
+  const card = senderCards.data?.find(
+    (card) => card.id === form.watch('senderCardId'),
+  );
+  const notEnoughBalance = card && card.balance < form.watch('sum');
+
   return (
-    <CustomForm disabled={form.formState.isSubmitting} onSubmit={onSubmit}>
+    <CustomForm
+      disabled={form.formState.isSubmitting || !!notEnoughBalance}
+      onSubmit={onSubmit}
+    >
       {props.isAll && (
         <Field.Root required>
           <Field.Label>
@@ -97,7 +105,11 @@ export default function CreateTransferForm(props: Props) {
           />
         </Field.Root>
       )}
-      <Field.Root disabled={props.isAll && !senderUserId} required>
+      <Field.Root
+        disabled={props.isAll && !senderUserId}
+        invalid={notEnoughBalance}
+        required
+      >
         <Field.Label>
           {t('columns.card')}
           <Field.RequiredIndicator />
@@ -115,6 +127,9 @@ export default function CreateTransferForm(props: Props) {
             />
           )}
         />
+        <Field.ErrorText>
+          {notEnoughBalance && t('errors.not_enough_balance')}
+        </Field.ErrorText>
       </Field.Root>
       <Field.Root required>
         <Field.Label>
