@@ -8,9 +8,14 @@ import { Field, Input, NumberInput } from '@chakra-ui/react';
 import { Order } from '../types';
 import { editMyOrderAction, editUserOrderAction } from '../actions';
 import { editOrderSchema, EditOrderType } from '../schema';
+import {
+  useSelectMyCards,
+  useSelectUserCardsWithBalance,
+} from '@/features/cards/hooks';
 import { useDialogContext } from '@/providers/dialog-provider';
 import { toaster } from '@/components/ui/toaster';
 import CustomForm from '@/components/custom-form';
+import CardsWithBalanceCombobox from '@/features/cards/components/cards-with-balance-combobox';
 import ItemsCombobox from '@/components/items-combobox';
 import UnitsSegmentGroup from '@/components/units-segment-group';
 
@@ -56,11 +61,39 @@ export default function EditOrderForm(props: Props) {
     }
   });
 
+  const cards = props.isAll
+    ? useSelectUserCardsWithBalance(props.order.customerUser.id)
+    : useSelectMyCards();
+
+  const card = cards.data?.find(
+    (card) => card.id === props.order.customerCard.id,
+  );
+  const notEnoughBalance =
+    card &&
+    props.order.sum < form.watch('sum') &&
+    card.balance < form.watch('sum') - props.order.sum;
+
   return (
     <CustomForm
       disabled={form.formState.isSubmitting || !form.formState.isDirty}
       onSubmit={onSubmit}
     >
+      <Field.Root invalid={notEnoughBalance} readOnly required>
+        <Field.Label>
+          {t('columns.card')}
+          <Field.RequiredIndicator />
+        </Field.Label>
+        <CardsWithBalanceCombobox
+          data={cards.data}
+          loading={cards.isLoading}
+          placeholder={t('columns.card')}
+          value={props.order.customerCard.id}
+          setValue={() => {}}
+        />
+        <Field.ErrorText>
+          {notEnoughBalance && t('errors.not_enough_balance')}
+        </Field.ErrorText>
+      </Field.Root>
       <Field.Root required>
         <Field.Label>
           {t('columns.item')}

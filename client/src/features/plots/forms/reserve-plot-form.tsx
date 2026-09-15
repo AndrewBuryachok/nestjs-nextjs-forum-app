@@ -63,8 +63,14 @@ export default function ReservePlotForm(props: Props) {
     ? useSelectUserCardsWithBalance(userId)
     : useSelectMyCards();
 
+  const card = cards.data?.find((card) => card.id === form.watch('cardId'));
+  const notEnoughBalance = card && card.balance < props.plot.price;
+
   return (
-    <CustomForm disabled={form.formState.isSubmitting} onSubmit={onSubmit}>
+    <CustomForm
+      disabled={form.formState.isSubmitting || !!notEnoughBalance}
+      onSubmit={onSubmit}
+    >
       {props.isAll && (
         <Field.Root required>
           <Field.Label>
@@ -80,7 +86,11 @@ export default function ReservePlotForm(props: Props) {
           />
         </Field.Root>
       )}
-      <Field.Root disabled={props.isAll && !userId} required>
+      <Field.Root
+        disabled={props.isAll && !userId}
+        invalid={notEnoughBalance}
+        required
+      >
         <Field.Label>
           {t('columns.card')}
           <Field.RequiredIndicator />
@@ -98,6 +108,9 @@ export default function ReservePlotForm(props: Props) {
             />
           )}
         />
+        <Field.ErrorText>
+          {notEnoughBalance && t('errors.not_enough_balance')}
+        </Field.ErrorText>
       </Field.Root>
     </CustomForm>
   );
