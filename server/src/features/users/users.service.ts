@@ -26,14 +26,16 @@ export class UsersService {
   ) {}
 
   async getMainUsers(req: Request): Promise<Response<User>> {
-    const [data, total] =
-      await this.getUsersQueryBuilder(req).getManyAndCount();
+    const [data, total] = await this.getUsersQueryBuilder(req)
+      .addOrderBy('user.onlineAt', 'DESC')
+      .getManyAndCount();
     return { data, total };
   }
 
   async getAllUsers(req: Request): Promise<Response<User>> {
-    const [data, total] =
-      await this.getUsersQueryBuilder(req).getManyAndCount();
+    const [data, total] = await this.getUsersQueryBuilder(req)
+      .addOrderBy('user.id', 'DESC')
+      .getManyAndCount();
     return { data, total };
   }
 
@@ -116,6 +118,14 @@ export class UsersService {
       throw new BadRequestException(UserError.NOT_HAVE_ROLE);
     }
     await this.removeRole(user, dto);
+  }
+
+  async setUserOnline(userId: number, isOnline: boolean): Promise<void> {
+    await this.setOnline(userId, isOnline);
+  }
+
+  async resetUserOnline(): Promise<void> {
+    await this.resetOnline();
   }
 
   async throwIfNickAlreadyUsed(nick: string): Promise<void> {
@@ -210,11 +220,34 @@ export class UsersService {
     }
   }
 
+  private async setOnline(id: number, isOnline: boolean): Promise<void> {
+    try {
+      await this.usersRepository.update(
+        { id },
+        { isOnline, onlineAt: new Date() },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(UserError.SET_ONLINE_FAILED);
+    }
+  }
+
+  private async resetOnline(): Promise<void> {
+    try {
+      await this.usersRepository.update(
+        { isOnline: true },
+        { isOnline: false },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(UserError.RESET_ONLINE_FAILED);
+    }
+  }
+
   private selectUsersQueryBuilder(): SelectQueryBuilder<User> {
     return this.usersRepository
       .createQueryBuilder('user')
       .select(['user.id', 'user.nick', 'user.avatar'])
-      .orderBy('user.nick', 'ASC');
+      .orderBy('user.isOnline', 'DESC')
+      .addOrderBy('user.nick', 'ASC');
   }
 
   private getUsersQueryBuilder(req: Request): SelectQueryBuilder<User> {
@@ -226,6 +259,7 @@ export class UsersService {
         'user.avatar',
         'user.roles',
         'user.createdAt',
+        'user.onlineAt',
       ])
       .where(
         new Brackets(
@@ -238,7 +272,7 @@ export class UsersService {
             req.user && qb.where('user.id = :userId', { userId: req.user }),
         ),
       )
-      .orderBy('user.id', 'DESC')
+      .orderBy('user.isOnline', 'DESC')
       .skip(req.skip)
       .take(req.take);
   }
