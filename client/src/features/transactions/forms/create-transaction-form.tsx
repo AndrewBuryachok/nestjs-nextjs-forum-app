@@ -64,8 +64,15 @@ export default function CreateTransactionForm(props: Props) {
   const users = useSelectAllUsers();
   const cards = useSelectUserCardsWithBalance(userId);
 
+  const card = cards.data?.find((card) => card.id === form.watch('cardId'));
+  const notEnoughBalance =
+    !props.type && card && card.balance < form.watch('sum');
+
   return (
-    <CustomForm disabled={form.formState.isSubmitting} onSubmit={onSubmit}>
+    <CustomForm
+      disabled={form.formState.isSubmitting || !!notEnoughBalance}
+      onSubmit={onSubmit}
+    >
       <Field.Root required>
         <Field.Label>
           {t('columns.user')}
@@ -79,7 +86,7 @@ export default function CreateTransactionForm(props: Props) {
           setValue={setUserId}
         />
       </Field.Root>
-      <Field.Root disabled={!userId} required>
+      <Field.Root disabled={!userId} invalid={notEnoughBalance} required>
         <Field.Label>
           {t('columns.card')}
           <Field.RequiredIndicator />
@@ -97,6 +104,9 @@ export default function CreateTransactionForm(props: Props) {
             />
           )}
         />
+        <Field.ErrorText>
+          {notEnoughBalance && t('errors.not_enough_balance')}
+        </Field.ErrorText>
       </Field.Root>
       <Field.Root invalid={!!form.formState.errors.sum} required>
         <Field.Label>
