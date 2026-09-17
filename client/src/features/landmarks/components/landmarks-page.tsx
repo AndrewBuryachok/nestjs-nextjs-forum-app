@@ -1,5 +1,6 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
+import LandmarksAction from './landmarks-action';
 import LandmarksTable from './landmarks-table';
 
 type Props = {
@@ -12,6 +13,7 @@ export default function LandmarksPage(props: Props) {
     <CustomPage
       page='landmarks'
       tab={props.tab}
+      action={<LandmarksAction tab={props.tab} />}
       table={
         <LandmarksTable tab={props.tab} searchParams={props.searchParams} />
       }
