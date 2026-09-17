@@ -11,6 +11,8 @@ import { useSelectAllUsers } from '@/features/users/hooks';
 import { useDialogContext } from '@/providers/dialog-provider';
 import CustomForm from '@/components/custom-form';
 import UsersCombobox from '@/features/users/components/users-combobox';
+import ItemsCombobox from './items-combobox';
+import { Item } from '@/constants/items';
 
 export default function SearchForm() {
   const t = useTranslations();
@@ -85,6 +87,24 @@ export default function SearchForm() {
         />
         <Field.ErrorText>{form.formState.errors.user?.message}</Field.ErrorText>
       </Field.Root>
+      {['products', 'purchases', 'orders'].includes(pathname.split('/')[1]) && (
+        <Field.Root invalid={!!form.formState.errors.item}>
+          <Field.Label>{t('columns.item')}</Field.Label>
+          <Controller
+            control={form.control}
+            name='item'
+            render={({ field }) => (
+              <ItemsCombobox
+                value={(field.value ?? '') as Item}
+                setValue={field.onChange}
+              />
+            )}
+          />
+          <Field.ErrorText>
+            {form.formState.errors.item?.message}
+          </Field.ErrorText>
+        </Field.Root>
+      )}
     </CustomForm>
   );
 }
