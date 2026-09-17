@@ -10,6 +10,11 @@ export const PAGE_TABS_MAP = {
     paid: {},
     all: { roles: [Role.ADMIN] },
   },
+  landmarks: {
+    main: { public: true },
+    my: {},
+    all: { roles: [Role.ADMIN] },
+  },
   lockers: {
     main: { public: true },
     my: {},
