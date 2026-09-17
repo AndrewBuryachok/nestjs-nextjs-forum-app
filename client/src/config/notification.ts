@@ -7,6 +7,9 @@ export const NOTIFICATION_TABS_MAP = {
     create: 'my',
     pay: 'paid',
   },
+  landmarks: {
+    create: 'main',
+  },
   lockers: {
     create: 'main',
   },
