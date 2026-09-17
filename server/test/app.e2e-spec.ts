@@ -306,6 +306,33 @@ describe('App', () => {
   });
 
   describe('Landmarks', () => {
+    it('POST /landmarks', () => {
+      return request(app.getHttpServer())
+        .post('/landmarks')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          name: 'Landmark',
+          world: World.OVERWORLD,
+          x: 0,
+          y: 0,
+        })
+        .expect(201);
+    });
+
+    it('POST /landmarks/all', () => {
+      return request(app.getHttpServer())
+        .post('/landmarks/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          userId: user.user.id,
+          name: 'Landmark',
+          world: World.OVERWORLD,
+          x: 0,
+          y: 0,
+        })
+        .expect(201);
+    });
+
     it('GET /landmarks', () => {
       return request(app.getHttpServer())
         .get('/landmarks')
