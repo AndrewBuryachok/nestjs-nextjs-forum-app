@@ -168,6 +168,28 @@ describe('App', () => {
     });
   });
 
+  describe('Landmarks', () => {
+    it('GET /landmarks', () => {
+      return request(app.getHttpServer())
+        .get('/landmarks')
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /landmarks/my', () => {
+      return request(app.getHttpServer())
+        .get('/landmarks/my')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /landmarks/all', () => {
+      return request(app.getHttpServer())
+        .get('/landmarks/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+  });
+
   describe('Cards', () => {
     it('POST /cards', () => {
       return request(app.getHttpServer())
