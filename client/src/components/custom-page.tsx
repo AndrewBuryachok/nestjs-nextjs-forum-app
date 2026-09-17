@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
-import { Flex, HStack } from '@chakra-ui/react';
+import { ButtonGroup, Flex, HStack } from '@chakra-ui/react';
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomHeading from './custom-heading';
 import SearchButton from './search-button';
+import SortButton from './sort-button';
 import CustomTabs from './custom-tabs';
 import TableSkeleton from './table-skeleton';
 
@@ -18,10 +19,11 @@ export default function CustomPage(props: Props) {
     <>
       <Flex justify='space-between'>
         <CustomHeading page={props.page} />
-        <HStack>
+        <ButtonGroup attached size='xs' variant='ghost'>
           {props.action}
           <SearchButton />
-        </HStack>
+          <SortButton />
+        </ButtonGroup>
       </Flex>
       <CustomTabs page={props.page} tab={props.tab} />
       <Suspense fallback={<TableSkeleton />}>{props.table}</Suspense>
