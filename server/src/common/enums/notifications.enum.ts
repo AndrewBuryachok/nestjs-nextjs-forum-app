@@ -2,6 +2,7 @@ export enum Notification {
   CREATE_TOWN = 'create towns',
   CREATE_INVITATION = 'create invitations',
   CREATE_APPLICATION = 'create applications',
+  CREATE_LANDMARK = 'create landmarks',
   ADD_CARD_USER = 'add cards',
   REMOVE_CARD_USER = 'remove cards',
   CREATE_TRANSACTION = 'create transactions',
