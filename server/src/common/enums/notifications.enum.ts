@@ -10,6 +10,7 @@ export enum Notification {
   DELETE_APPLICATION = 'delete applications',
   ACCEPT_APPLICATION = 'accept applications',
   REJECT_APPLICATION = 'reject applications',
+  CREATE_LANDMARK = 'create landmarks',
   ADD_CARD_USER = 'add cards',
   REMOVE_CARD_USER = 'remove cards',
   CREATE_TRANSACTION = 'create transactions',
