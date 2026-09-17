@@ -18,6 +18,11 @@ export const PAGE_TABS_MAP = {
     sent: {},
     received: {},
   },
+  landmarks: {
+    main: { public: true },
+    my: {},
+    all: { roles: [Role.ADMIN] },
+  },
   lockers: {
     main: { public: true },
     my: {},
