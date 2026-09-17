@@ -372,6 +372,12 @@ export class ProductsService {
             qb.where('product.userId = :userId', { userId: req.user }),
         ),
       )
+      .andWhere(
+        new Brackets(
+          (qb) =>
+            req.item && qb.where('product.item = :item', { item: req.item }),
+        ),
+      )
       .skip(req.skip)
       .take(req.take);
   }

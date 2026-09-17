@@ -496,6 +496,12 @@ export class OrdersService {
         ),
         { userId: req.user },
       )
+      .andWhere(
+        new Brackets(
+          (qb) =>
+            req.item && qb.where('order.item = :item', { item: req.item }),
+        ),
+      )
       .orderBy({
         ...(req.sort === Sort.ASC && { 'order.sum': 'ASC' }),
         ...(req.sort === Sort.DESC && { 'order.sum': 'DESC' }),
