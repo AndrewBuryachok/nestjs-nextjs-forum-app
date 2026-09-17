@@ -13,6 +13,9 @@ export const NOTIFICATION_TABS_MAP = {
   invitations: {
     create: 'received',
   },
+  landmarks: {
+    create: 'main',
+  },
   lockers: {
     create: 'main',
   },
