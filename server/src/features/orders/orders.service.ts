@@ -21,7 +21,12 @@ import {
 } from './order.dto';
 import { OrderError } from './order-errors.enum';
 import { Request, Response } from '../../common/interfaces';
-import { Notification, Status, TransactionType } from '../../common/enums';
+import {
+  Notification,
+  Sort,
+  Status,
+  TransactionType,
+} from '../../common/enums';
 
 @Injectable()
 export class OrdersService {
@@ -491,7 +496,11 @@ export class OrdersService {
         ),
         { userId: req.user },
       )
-      .orderBy('order.id', 'DESC')
+      .orderBy({
+        ...(req.sort === Sort.ASC && { 'order.sum': 'ASC' }),
+        ...(req.sort === Sort.DESC && { 'order.sum': 'DESC' }),
+        'order.id': 'DESC',
+      })
       .skip(req.skip)
       .take(req.take);
   }

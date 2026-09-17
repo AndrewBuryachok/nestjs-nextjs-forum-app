@@ -13,7 +13,7 @@ import { CardsService } from '../cards/cards.service';
 import { CreatePlotWithUserDto, EditPlotDto } from './plot.dto';
 import { PlotError } from './plot-errors.enum';
 import { Request, Response } from '../../common/interfaces';
-import { Notification } from '../../common/enums';
+import { Notification, Sort } from '../../common/enums';
 
 @Injectable()
 export class PlotsService {
@@ -186,7 +186,11 @@ export class PlotsService {
             req.user && qb.where('plot.userId = :userId', { userId: req.user }),
         ),
       )
-      .orderBy('plot.id', 'DESC')
+      .orderBy({
+        ...(req.sort === Sort.ASC && { 'plot.price': 'ASC' }),
+        ...(req.sort === Sort.DESC && { 'plot.price': 'DESC' }),
+        'plot.id': 'DESC',
+      })
       .skip(req.skip)
       .take(req.take);
   }
