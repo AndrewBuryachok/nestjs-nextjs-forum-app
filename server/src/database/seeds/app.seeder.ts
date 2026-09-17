@@ -4,6 +4,7 @@ import { faker } from '@faker-js/faker';
 import { User } from '../../features/users/user.entity';
 import { Town } from '../../features/towns/town.entity';
 import { TownUser } from '../../features/towns/town-user.entity';
+import { Landmark } from '../../features/landmarks/landmark.entity';
 import { Card } from '../../features/cards/card.entity';
 import { CardUser } from '../../features/cards/card-user.entity';
 import { Transaction } from '../../features/transactions/transaction.entity';
@@ -55,6 +56,14 @@ export default class AppSeeder implements Seeder {
       );
       const townUser = await townUserFactory.make({ town, user });
       townsUsers.push(townUser);
+    }
+    const landmarkFactory = factoryManager.get(Landmark);
+    const landmarks: Landmark[] = [];
+    for (let i = 0; i < 20; i++) {
+      const id = i + 1;
+      const user = faker.helpers.arrayElement(users);
+      const landmark = await landmarkFactory.make({ id, user });
+      landmarks.push(landmark);
     }
     const cardFactory = factoryManager.get(Card);
     const cards: Card[] = [];
@@ -344,6 +353,7 @@ export default class AppSeeder implements Seeder {
     await dataSource.getRepository(User).save(users);
     await dataSource.getRepository(Town).save(towns);
     await dataSource.getRepository(TownUser).save(townsUsers);
+    await dataSource.getRepository(Landmark).save(landmarks);
     await dataSource.getRepository(Card).save(cards);
     await dataSource.getRepository(CardUser).save(cardsUsers);
     await dataSource.getRepository(Transaction).save(transactions);
