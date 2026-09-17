@@ -24,7 +24,7 @@ import {
 } from './product.dto';
 import { ProductError } from './product-errors.enum';
 import { Request, Response } from '../../common/interfaces';
-import { Notification } from '../../common/enums';
+import { Notification, Sort } from '../../common/enums';
 
 @Injectable()
 export class ProductsService {
@@ -39,7 +39,11 @@ export class ProductsService {
 
   async getMainProducts(req: Request): Promise<Response<Product>> {
     const [data, total] = await this.getProductsQueryBuilder(req)
-      .orderBy('product.updatedAt', 'DESC')
+      .orderBy({
+        ...(req.sort === Sort.ASC && { 'product.price': 'ASC' }),
+        ...(req.sort === Sort.DESC && { 'product.price': 'DESC' }),
+        'product.updatedAt': 'DESC',
+      })
       .getManyAndCount();
     return { data, total };
   }
@@ -48,14 +52,22 @@ export class ProductsService {
     const [data, total] = await this.getProductsQueryBuilder(req)
       .innerJoin('sellerCard.cardUsers', 'sellerCardUsers')
       .andWhere('sellerCardUsers.userId = :myId', { myId })
-      .orderBy('product.updatedAt', 'ASC')
+      .orderBy({
+        ...(req.sort === Sort.ASC && { 'product.price': 'ASC' }),
+        ...(req.sort === Sort.DESC && { 'product.price': 'DESC' }),
+        'product.updatedAt': 'ASC',
+      })
       .getManyAndCount();
     return { data, total };
   }
 
   async getAllProducts(req: Request): Promise<Response<Product>> {
     const [data, total] = await this.getProductsQueryBuilder(req)
-      .orderBy('product.id', 'DESC')
+      .orderBy({
+        ...(req.sort === Sort.ASC && { 'product.price': 'ASC' }),
+        ...(req.sort === Sort.DESC && { 'product.price': 'DESC' }),
+        'product.id': 'DESC',
+      })
       .getManyAndCount();
     return { data, total };
   }

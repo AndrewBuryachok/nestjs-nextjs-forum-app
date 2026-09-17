@@ -1,5 +1,6 @@
-import { IsInt, IsOptional, Min } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import { Sort } from '../enums';
 
 export class Request {
   @IsOptional()
@@ -25,4 +26,8 @@ export class Request {
   @Min(1)
   @Type(() => Number)
   user?: number;
+
+  @IsOptional()
+  @IsEnum(Sort)
+  sort?: Sort;
 }
