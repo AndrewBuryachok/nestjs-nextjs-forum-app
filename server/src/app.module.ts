@@ -11,6 +11,7 @@ import { RedisModule } from './features/redis/redis.module';
 import { AuthModule } from './features/auth/auth.module';
 import { UsersModule } from './features/users/users.module';
 import { TownsModule } from './features/towns/towns.module';
+import { LandmarksModule } from './features/landmarks/landmarks.module';
 import { CardsModule } from './features/cards/cards.module';
 import { TransactionsModule } from './features/transactions/transactions.module';
 import { FinesModule } from './features/fines/fines.module';
@@ -57,6 +58,7 @@ import { AtGuard, RolesGuard } from './common/guards';
     AuthModule,
     UsersModule,
     TownsModule,
+    LandmarksModule,
     CardsModule,
     TransactionsModule,
     FinesModule,
