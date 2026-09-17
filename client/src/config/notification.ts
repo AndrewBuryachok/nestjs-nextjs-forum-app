@@ -21,6 +21,9 @@ export const NOTIFICATION_TABS_MAP = {
     delete: 'received',
     reject: 'sent',
   },
+  landmarks: {
+    create: 'main',
+  },
   lockers: {
     create: 'main',
   },
