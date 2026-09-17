@@ -31,11 +31,7 @@ export default function CustomAction(props: Props) {
     openDialog({ title: t('dialogs.login'), body: <AuthFormWithTabs /> });
 
   return (
-    <IconButton
-      size='xs'
-      variant='ghost'
-      onClick={user ? openActionDialog : openAuthDialog}
-    >
+    <IconButton onClick={user ? openActionDialog : openAuthDialog}>
       {props.icon ?? <LuPlus />}
     </IconButton>
   );
