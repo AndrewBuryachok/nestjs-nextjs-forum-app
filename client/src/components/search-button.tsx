@@ -15,7 +15,7 @@ export default function SearchButton() {
     openDialog({ title: t('dialogs.search'), body: <SearchForm /> });
 
   return (
-    <IconButton size='xs' variant='ghost' onClick={onClick}>
+    <IconButton onClick={onClick}>
       <LuSearch />
     </IconButton>
   );
