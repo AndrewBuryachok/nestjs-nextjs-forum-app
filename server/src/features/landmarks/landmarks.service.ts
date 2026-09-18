@@ -1,10 +1,15 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Landmark } from './landmark.entity';
 import { MqttService } from '../mqtt/mqtt.service';
 import { UsersService } from '../users/users.service';
-import { CreateLandmarkWithUserDto } from './landmark.dto';
+import { CreateLandmarkWithUserDto, EditLandmarkDto } from './landmark.dto';
 import { LandmarkError } from './landmark-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 import { Notification } from '../../common/enums';
@@ -47,8 +52,58 @@ export class LandmarksService {
       dto.userId,
       0,
       landmark.id,
-      Notification.CREATE_LOCKER,
+      Notification.CREATE_LANDMARK,
     );
+  }
+
+  async editMyLandmark(
+    myId: number,
+    landmarkId: number,
+    dto: EditLandmarkDto,
+  ): Promise<void> {
+    await this.throwIfNotLandmarkOwner(landmarkId, myId);
+    await this.edit(landmarkId, dto);
+  }
+
+  async editUserLandmark(
+    landmarkId: number,
+    dto: EditLandmarkDto,
+  ): Promise<void> {
+    await this.throwIfLandmarkNotFound(landmarkId);
+    await this.edit(landmarkId, dto);
+  }
+
+  async deleteMyLandmark(myId: number, landmarkId: number): Promise<void> {
+    await this.throwIfNotLandmarkOwner(landmarkId, myId);
+    await this.delete(landmarkId);
+  }
+
+  async deleteUserLandmark(landmarkId: number): Promise<void> {
+    await this.throwIfLandmarkNotFound(landmarkId);
+    await this.delete(landmarkId);
+  }
+
+  async throwIfLandmarkNotFound(landmarkId: number): Promise<Landmark> {
+    const landmark = await this.findLandmarkById(landmarkId);
+    if (!landmark) {
+      throw new NotFoundException(LandmarkError.NOT_FOUND);
+    }
+    return landmark;
+  }
+
+  async throwIfNotLandmarkOwner(
+    landmarkId: number,
+    userId: number,
+  ): Promise<Landmark> {
+    const landmark = await this.throwIfLandmarkNotFound(landmarkId);
+    if (landmark.userId !== userId) {
+      throw new ForbiddenException(LandmarkError.NOT_OWNER);
+    }
+    return landmark;
+  }
+
+  private findLandmarkById(id: number): Promise<Landmark | null> {
+    return this.landmarksRepository.findOneBy({ id });
   }
 
   private async create(dto: CreateLandmarkWithUserDto): Promise<Landmark> {
@@ -63,6 +118,25 @@ export class LandmarksService {
       return landmark;
     } catch (error) {
       throw new InternalServerErrorException(LandmarkError.CREATE_FAILED);
+    }
+  }
+
+  private async edit(id: number, dto: EditLandmarkDto): Promise<void> {
+    try {
+      await this.landmarksRepository.update(
+        { id },
+        { name: dto.name, x: dto.x, y: dto.y },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(LandmarkError.EDIT_FAILED);
+    }
+  }
+
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.landmarksRepository.softDelete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(LandmarkError.DELETE_FAILED);
     }
   }
 

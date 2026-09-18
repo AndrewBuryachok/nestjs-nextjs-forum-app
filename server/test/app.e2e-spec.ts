@@ -46,6 +46,7 @@ describe('App', () => {
   let admin: Tokens;
   let user: Tokens;
   let users: number[];
+  let landmarks: number[];
   let cards: number[];
   let transactions: number[];
   let fines: number[];
@@ -204,7 +205,10 @@ describe('App', () => {
       return request(app.getHttpServer())
         .get('/landmarks/my')
         .set('Authorization', `Bearer ${user.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
+        .then(
+          (res) => (landmarks = res.body.data.map((landmark) => landmark.id)),
+        );
     });
 
     it('GET /landmarks/all', () => {
@@ -212,6 +216,44 @@ describe('App', () => {
         .get('/landmarks/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('PATCH /landmarks/:landmarkId', () => {
+      return request(app.getHttpServer())
+        .patch(`/landmarks/${landmarks[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          name: 'Landmark',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+        })
+        .expect(200);
+    });
+
+    it('PATCH /landmarks/all/:landmarkId', () => {
+      return request(app.getHttpServer())
+        .patch(`/landmarks/all/${landmarks[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          name: 'Landmark',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+        })
+        .expect(200);
+    });
+
+    it('DELETE /landmarks/:landmarkId', () => {
+      return request(app.getHttpServer())
+        .delete(`/landmarks/${landmarks[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(200);
+    });
+
+    it('DELETE /landmarks/all/:landmarkId', () => {
+      return request(app.getHttpServer())
+        .delete(`/landmarks/all/${landmarks[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(200);
     });
   });
 
