@@ -23,3 +23,19 @@ export const createLandmarkWithUserSchema = createLandmarkSchema.extend({
 export type CreateLandmarkWithUserType = z.infer<
   typeof createLandmarkWithUserSchema
 >;
+
+export const editLandmarkSchema = z.object({
+  landmarkId: z.number().int().min(1),
+  name: z.string().min(1).max(16),
+  world: z.enum(World),
+  x: z.number().int().min(PLACE_X_MIN).max(PLACE_X_MAX),
+  y: z.number().int().min(PLACE_Y_MIN).max(PLACE_Y_MAX),
+});
+
+export type EditLandmarkType = z.infer<typeof editLandmarkSchema>;
+
+export const deleteLandmarkSchema = z.object({
+  landmarkId: z.number().int().min(1),
+});
+
+export type DeleteLandmarkType = z.infer<typeof deleteLandmarkSchema>;
