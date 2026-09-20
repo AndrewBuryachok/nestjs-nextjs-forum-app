@@ -71,6 +71,7 @@ export class CardsService {
 
   async createCard(dto: CreateCardWithUserDto): Promise<void> {
     await this.usersService.throwIfUserNotFound(dto.userId);
+    await this.throwIfNameAlreadyUsed(dto.userId, dto.name);
     await this.create(dto);
   }
 
@@ -79,13 +80,18 @@ export class CardsService {
     cardId: number,
     dto: EditCardDto,
   ): Promise<void> {
-    await this.throwIfNotCardOwner(cardId, myId);
-    await this.edit(cardId, dto);
+    const card = await this.throwIfNotCardOwner(cardId, myId);
+    await this.editCard(card, dto);
   }
 
   async editUserCard(cardId: number, dto: EditCardDto): Promise<void> {
-    await this.throwIfCardNotFound(cardId);
-    await this.edit(cardId, dto);
+    const card = await this.throwIfCardNotFound(cardId);
+    await this.editCard(card, dto);
+  }
+
+  private async editCard(card: Card, dto: EditCardDto): Promise<void> {
+    await this.throwIfNameAlreadyUsed(card.userId, dto.name, card.id);
+    await this.edit(card.id, dto);
   }
 
   async deleteMyCard(myId: number, cardId: number): Promise<void> {
@@ -220,6 +226,17 @@ export class CardsService {
     }
     await this.decreaseBalance(cardId, sum);
     return card.userId;
+  }
+
+  async throwIfNameAlreadyUsed(
+    userId: number,
+    name: string,
+    id?: number,
+  ): Promise<void> {
+    const card = await this.cardsRepository.findOneBy({ userId, name });
+    if (card && card.id !== id) {
+      throw new BadRequestException(CardError.NAME_ALREADY_USED);
+    }
   }
 
   async throwIfCardNotFound(cardId: number): Promise<Card> {

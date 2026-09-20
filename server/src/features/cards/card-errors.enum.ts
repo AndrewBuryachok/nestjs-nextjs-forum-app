@@ -1,4 +1,5 @@
 export enum CardError {
+  NAME_ALREADY_USED = 'Карта с таким названием уже существует',
   NON_ZERO_BALANCE = 'Ненулевой баланс на карте',
   HAS_USER = 'Карта имеет общего игрока',
   HAS_FINE = 'Карта имеет активный штраф',
