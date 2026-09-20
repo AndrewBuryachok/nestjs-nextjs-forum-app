@@ -269,7 +269,7 @@ describe('App', () => {
       return request(app.getHttpServer())
         .post('/cards')
         .set('Authorization', `Bearer ${user.access}`)
-        .send({ name: 'Card' })
+        .send({ name: 'Card 1' })
         .expect(201);
     });
 
@@ -277,7 +277,7 @@ describe('App', () => {
       return request(app.getHttpServer())
         .post('/cards/all')
         .set('Authorization', `Bearer ${admin.access}`)
-        .send({ userId: user.user.id, name: 'Card' })
+        .send({ userId: user.user.id, name: 'Card 2' })
         .expect(201);
     });
 
@@ -1318,7 +1318,7 @@ describe('App', () => {
       return request(app.getHttpServer())
         .patch(`/cards/${cards[0]}`)
         .set('Authorization', `Bearer ${user.access}`)
-        .send({ name: 'Card' })
+        .send({ name: 'Card 2' })
         .expect(200);
     });
 
@@ -1326,7 +1326,7 @@ describe('App', () => {
       return request(app.getHttpServer())
         .patch(`/cards/all/${cards[1]}`)
         .set('Authorization', `Bearer ${admin.access}`)
-        .send({ name: 'Card' })
+        .send({ name: 'Card 1' })
         .expect(200);
     });
 
