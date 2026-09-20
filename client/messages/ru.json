@@ -25,6 +25,7 @@
   "buttons": {
     "close": "Закрыть",
     "markAllAsRead": "Отметить все как прочитанные",
+    "notificationsSound": "Звук уведомлений",
     "submit": "Подтвердить"
   },
   "columns": {
