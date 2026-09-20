@@ -6,6 +6,8 @@ import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Button, HStack, useDrawerContext } from '@chakra-ui/react';
 import { LuChevronDown, LuChevronRight, LuDot } from 'react-icons/lu';
+import { useMqttContext } from '@/providers/mqtt-provider';
+import NotificationsBadge from './notifications-badge';
 
 type Props = {
   value: string;
@@ -19,6 +21,13 @@ export default function NavbarLink(props: Props) {
   const [open, setOpen] = useState(false);
 
   const page = usePathname().split('/')[1];
+
+  const { notifications } = useMqttContext();
+
+  const filterNotifications = (keys: string[]) =>
+    [...notifications].filter(([key]) =>
+      keys.find((k) => k === key.split('/')[1]),
+    ).length;
 
   const { setOpen: setDrawerOpen } = useDrawerContext();
 
@@ -37,6 +46,9 @@ export default function NavbarLink(props: Props) {
         <HStack>
           {props.icon}
           {t(`pages.${props.value}`)}
+          <NotificationsBadge
+            value={filterNotifications(props.links.map((link) => link.value))}
+          />
         </HStack>
         {open ? <LuChevronDown /> : <LuChevronRight />}
       </Button>
@@ -54,6 +66,7 @@ export default function NavbarLink(props: Props) {
               <HStack>
                 <LuDot />
                 {t(`pages.${link.value}`)}
+                <NotificationsBadge value={filterNotifications([link.value])} />
               </HStack>
             </Link>
           </Button>
@@ -71,6 +84,7 @@ export default function NavbarLink(props: Props) {
         <HStack>
           {props.icon}
           {t(`pages.${props.value}`)}
+          <NotificationsBadge value={filterNotifications([props.value])} />
         </HStack>
       </Link>
     </Button>
