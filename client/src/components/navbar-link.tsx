@@ -6,6 +6,8 @@ import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Button, HStack, useDrawerContext } from '@chakra-ui/react';
 import { LuChevronDown, LuChevronRight, LuDot } from 'react-icons/lu';
+import { useMqttContext } from '@/providers/mqtt-provider';
+import NotificationsBadge from './notifications-badge';
 
 type Props = {
   value: string;
@@ -20,9 +22,19 @@ export default function NavbarLink(props: Props) {
 
   const page = usePathname().split('/')[1];
 
+  const { notifications, clearNotification } = useMqttContext();
+
+  const filterNotifications = (pages: string[]) =>
+    [...notifications.keys()].filter((key) =>
+      pages.find((k) => k === key.split('/')[1]),
+    );
+
   const { setOpen: setDrawerOpen } = useDrawerContext();
 
-  const closeDrawer = () => setDrawerOpen(false);
+  const onClick = (page: string) => {
+    filterNotifications([page]).forEach(clearNotification);
+    setDrawerOpen(false);
+  };
 
   return props.links ? (
     <>
@@ -37,6 +49,11 @@ export default function NavbarLink(props: Props) {
         <HStack>
           {props.icon}
           {t(`pages.${props.value}`)}
+          <NotificationsBadge
+            value={
+              filterNotifications(props.links.map((link) => link.value)).length
+            }
+          />
         </HStack>
         {open ? <LuChevronDown /> : <LuChevronRight />}
       </Button>
@@ -48,12 +65,15 @@ export default function NavbarLink(props: Props) {
             justifyContent='flex-start'
             size='xs'
             variant={link.value === page ? 'subtle' : 'ghost'}
-            onClick={closeDrawer}
+            onClick={() => onClick(link.value)}
           >
             <Link href={`/${link.value}${link.my ? '/my' : ''}`}>
               <HStack>
                 <LuDot />
                 {t(`pages.${link.value}`)}
+                <NotificationsBadge
+                  value={filterNotifications([link.value]).length}
+                />
               </HStack>
             </Link>
           </Button>
@@ -65,12 +85,15 @@ export default function NavbarLink(props: Props) {
       justifyContent='flex-start'
       size='xs'
       variant={props.value === page ? 'subtle' : 'ghost'}
-      onClick={closeDrawer}
+      onClick={() => onClick(props.value)}
     >
       <Link href={`/${props.value}`}>
         <HStack>
           {props.icon}
           {t(`pages.${props.value}`)}
+          <NotificationsBadge
+            value={filterNotifications([props.value]).length}
+          />
         </HStack>
       </Link>
     </Button>
