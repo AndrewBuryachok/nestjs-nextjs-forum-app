@@ -1,4 +1,4 @@
-import { Badge } from '@chakra-ui/react';
+import { Circle } from '@chakra-ui/react';
 
 type Props = {
   value: number;
@@ -10,8 +10,8 @@ export default function NotificationsBadge(props: Props) {
   }
 
   return (
-    <Badge borderRadius='full' colorPalette='red' variant='solid'>
-      {props.value}
-    </Badge>
+    <Circle bg='red.500' color='white' fontSize='2xs' size='4'>
+      {props.value > 9 ? '9+' : props.value}
+    </Circle>
   );
 }
