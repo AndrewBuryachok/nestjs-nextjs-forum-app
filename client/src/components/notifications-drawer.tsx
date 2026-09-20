@@ -1,7 +1,8 @@
 import { useTranslations } from 'next-intl';
-import { IconButton } from '@chakra-ui/react';
+import { IconButton, Stack } from '@chakra-ui/react';
 import { LuBell } from 'react-icons/lu';
 import CustomDrawer from './custom-drawer';
+import NotificationsSwitch from './notifications-switch';
 import NotificationsTabs from './notifications-tabs';
 import NotificationsCircle from './notifications-circle';
 
@@ -12,7 +13,12 @@ export default function NotificationsDrawer() {
     <CustomDrawer
       placement='end'
       title={t('drawers.notifications.title')}
-      body={<NotificationsTabs />}
+      body={
+        <Stack>
+          <NotificationsSwitch />
+          <NotificationsTabs />
+        </Stack>
+      }
     >
       <IconButton size='xs' variant='ghost'>
         <LuBell />
