@@ -22,6 +22,8 @@ type MqttContextType = {
   users: Set<number>;
   notifications: Map<string, Date>;
   clearNotification: (key: string) => void;
+  muted: boolean;
+  setMuted: (muted: boolean) => void;
 };
 
 const MqttContext = createContext<MqttContextType | null>(null);
@@ -43,7 +45,16 @@ export function MqttProvider(props: Props) {
     new Set(),
   );
 
+  const mutedRef = useRef(false);
+  const [muted, setMuted] = useState(false);
+
   const { user } = useAuthContext();
+
+  useEffect(() => {
+    const muted = !!localStorage.getItem('muted');
+    mutedRef.current = muted;
+    setMuted(muted);
+  }, []);
 
   useEffect(() => {
     setIsLoading(true);
@@ -104,7 +115,9 @@ export function MqttProvider(props: Props) {
             description: t(`notifications.${page}.${action}`),
             meta: { userId },
           });
-          new Audio('/sound.mp3').play().catch(() => {});
+          if (!mutedRef.current) {
+            new Audio('/sound.mp3').play().catch(() => {});
+          }
         }
       }
       if (type === 'unnotifications') {
@@ -154,9 +167,26 @@ export function MqttProvider(props: Props) {
     }
   };
 
+  const customSetMuted = (muted: boolean) => {
+    mutedRef.current = muted;
+    setMuted(muted);
+    if (muted) {
+      localStorage.setItem('muted', String(true));
+    } else {
+      localStorage.removeItem('muted');
+    }
+  };
+
   return (
     <MqttContext.Provider
-      value={{ isLoading, users, notifications, clearNotification }}
+      value={{
+        isLoading,
+        users,
+        notifications,
+        clearNotification,
+        muted,
+        setMuted: customSetMuted,
+      }}
     >
       {props.children}
     </MqttContext.Provider>
