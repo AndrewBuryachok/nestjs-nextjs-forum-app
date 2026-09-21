@@ -125,7 +125,7 @@ export default function BuyProductForm(props: Props) {
           render={({ field }) => (
             <NumberInput.Root
               w='full'
-              value={String(field.value)}
+              value={Number.isNaN(field.value) ? '' : String(field.value)}
               onValueChange={(d) => field.onChange(d.valueAsNumber)}
             >
               <NumberInput.Control />

@@ -58,7 +58,11 @@ export default function SearchForm() {
           render={({ field }) => (
             <NumberInput.Root
               w='full'
-              value={field.value === undefined ? '' : String(field.value)}
+              value={
+                field.value === undefined || Number.isNaN(field.value)
+                  ? ''
+                  : String(field.value)
+              }
               onValueChange={(d) =>
                 field.onChange(d.value === '' ? undefined : d.valueAsNumber)
               }
