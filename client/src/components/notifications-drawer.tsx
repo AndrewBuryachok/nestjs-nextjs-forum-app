@@ -20,7 +20,7 @@ export default function NotificationsDrawer() {
         </Stack>
       }
     >
-      <IconButton size='xs' variant='ghost'>
+      <IconButton>
         <LuBell />
         <NotificationsCircle />
       </IconButton>
