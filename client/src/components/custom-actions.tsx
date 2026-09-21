@@ -13,6 +13,7 @@ import { useAuthContext } from '@/providers/auth-provider';
 import { useDialogContext } from '@/providers/dialog-provider';
 import AuthFormWithTabs from '@/features/auth/forms/auth-form-with-tabs';
 import { Color } from '@/constants/colors';
+import { Role } from '@/constants/roles';
 
 type Props = {
   actions: {
@@ -24,6 +25,7 @@ type Props = {
     color?: Color;
     disabled?: boolean;
     userId?: number;
+    role?: Role;
     icon: React.ReactNode;
     body: React.ReactNode;
   }[];
@@ -52,7 +54,9 @@ export default function CustomActions(props: Props) {
   const actions = props.actions.map((action) => ({
     ...action,
     disabled:
-      action.disabled || (!!action.userId && action.userId !== user?.id),
+      action.disabled ||
+      (!!action.userId && action.userId !== user?.id) ||
+      (!!action.role && !user?.roles.includes(action.role)),
     onClick:
       user || action.action === 'view'
         ? () => openActionDialog(action.action, action.dialog, action.body)

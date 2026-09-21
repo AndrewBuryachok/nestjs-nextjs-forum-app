@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Field, Input } from '@chakra-ui/react';
+import { Field, Input, SegmentGroup } from '@chakra-ui/react';
 import {
   createDepositTransactionAction,
   createWithdrawTransactionAction,
@@ -19,11 +19,7 @@ import CustomForm from '@/components/custom-form';
 import UsersCombobox from '@/features/users/components/users-combobox';
 import CardsWithBalanceCombobox from '@/features/cards/components/cards-with-balance-combobox';
 
-type Props = {
-  type: boolean;
-};
-
-export default function CreateTransactionForm(props: Props) {
+export default function CreateTransactionForm() {
   const t = useTranslations();
 
   const router = useRouter();
@@ -37,6 +33,8 @@ export default function CreateTransactionForm(props: Props) {
     },
   });
 
+  const types = ['deposit', 'withdraw'];
+  const [type, setType] = useState(true);
   const [userId, setUserId] = useState(0);
 
   useEffect(() => {
@@ -44,7 +42,7 @@ export default function CreateTransactionForm(props: Props) {
   }, [userId]);
 
   const onSubmit = form.handleSubmit(async (data) => {
-    const res = props.type
+    const res = type
       ? await createDepositTransactionAction({ ...data, userId })
       : await createWithdrawTransactionAction({ ...data, userId });
     if (res.data) {
@@ -69,7 +67,7 @@ export default function CreateTransactionForm(props: Props) {
     name: ['cardId', 'sum'],
   });
   const card = cards.data?.find((card) => card.id === cardId);
-  const notEnoughBalance = !props.type && !!card && card.balance < sum;
+  const notEnoughBalance = !type && !!card && card.balance < sum;
 
   return (
     <CustomForm
@@ -77,6 +75,20 @@ export default function CreateTransactionForm(props: Props) {
       loading={form.formState.isSubmitting}
       onSubmit={onSubmit}
     >
+      <SegmentGroup.Root
+        w='full'
+        value={types[Number(!type)]}
+        onValueChange={({ value }) => value && setType(!types.indexOf(value))}
+      >
+        <SegmentGroup.Indicator />
+        <SegmentGroup.Items
+          w='full'
+          items={types.map((type) => ({
+            value: type,
+            label: t(`actions.${type}`),
+          }))}
+        />
+      </SegmentGroup.Root>
       <Field.Root required>
         <Field.Label>
           {t('columns.user')}

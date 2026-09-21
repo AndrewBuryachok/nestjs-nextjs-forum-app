@@ -60,7 +60,7 @@ export const PAGE_TABS_MAP = {
   },
   transactions: {
     my: {},
-    all: { roles: [Role.ADMIN] },
+    all: { roles: [Role.ADMIN, Role.BANKER] },
   },
   users: {
     main: { public: true },
