@@ -6,10 +6,13 @@ import { LuPlus } from 'react-icons/lu';
 import { useAuthContext } from '@/providers/auth-provider';
 import { useDialogContext } from '@/providers/dialog-provider';
 import AuthFormWithTabs from '@/features/auth/forms/auth-form-with-tabs';
+import { Role } from '@/constants/roles';
 
 type Props = {
   action: string;
   dialog: string;
+  role?: Role;
+  icon?: React.ReactNode;
   body: React.ReactNode;
 };
 
@@ -30,8 +33,11 @@ export default function CustomAction(props: Props) {
     openDialog({ title: t('dialogs.login'), body: <AuthFormWithTabs /> });
 
   return (
-    <IconButton onClick={user ? openActionDialog : openAuthDialog}>
-      <LuPlus />
+    <IconButton
+      disabled={!!props.role && !user?.roles.includes(props.role)}
+      onClick={user ? openActionDialog : openAuthDialog}
+    >
+      {props.icon ?? <LuPlus />}
     </IconButton>
   );
 }
