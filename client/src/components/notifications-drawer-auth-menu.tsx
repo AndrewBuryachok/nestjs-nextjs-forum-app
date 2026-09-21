@@ -1,12 +1,14 @@
-import { HStack } from '@chakra-ui/react';
+import { ButtonGroup } from '@chakra-ui/react';
+import ThemeButton from './theme-button';
 import NotificationsDrawer from './notifications-drawer';
 import AuthMenu from './auth-menu';
 
 export default function NotificationsDrawerAuthMenu() {
   return (
-    <HStack>
+    <ButtonGroup size='xs' variant='ghost'>
+      <ThemeButton />
       <NotificationsDrawer />
       <AuthMenu />
-    </HStack>
+    </ButtonGroup>
   );
 }
