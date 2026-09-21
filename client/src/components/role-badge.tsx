@@ -12,6 +12,7 @@ export default function RoleBadge(props: Props) {
 
   const color = {
     admin: Color.RED,
+    banker: Color.YELLOW,
     user: undefined,
   }[props.role];
 
