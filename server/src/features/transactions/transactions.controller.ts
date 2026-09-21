@@ -31,13 +31,13 @@ export class TransactionsController {
     return this.transactionsService.getMyTransactions(myId, req);
   }
 
-  @Roles([Role.ADMIN])
+  @Roles([Role.ADMIN, Role.BANKER])
   @Get('all')
   getAllTransactions(@Query() req: Request): Promise<Response<Transaction>> {
     return this.transactionsService.getAllTransactions(req);
   }
 
-  @Roles([Role.ADMIN])
+  @Roles([Role.ADMIN, Role.BANKER])
   @Post('deposit')
   createDepositTransaction(
     @MyId() myId: number,
@@ -46,7 +46,7 @@ export class TransactionsController {
     return this.transactionsService.createDepositTransaction(myId, dto);
   }
 
-  @Roles([Role.ADMIN])
+  @Roles([Role.ADMIN, Role.BANKER])
   @Post('withdraw')
   createWithdrawTransaction(
     @MyId() myId: number,
