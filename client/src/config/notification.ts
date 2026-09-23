@@ -17,6 +17,9 @@ export const NOTIFICATION_TABS_MAP = {
     execute: 'my',
     take: 'my',
   },
+  plots: {
+    create: 'main',
+  },
   products: {
     create: 'main',
     end: 'my',

@@ -1,5 +1,6 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
+import PlotsAction from './plots-action';
 import PlotsTable from './plots-table';
 
 type Props = {
@@ -12,6 +13,7 @@ export default function PlotsPage(props: Props) {
     <CustomPage
       page='plots'
       tab={props.tab}
+      action={<PlotsAction tab={props.tab} />}
       table={<PlotsTable tab={props.tab} searchParams={props.searchParams} />}
     />
   );
