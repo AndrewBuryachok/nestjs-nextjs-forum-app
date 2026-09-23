@@ -530,6 +530,35 @@ describe('App', () => {
   });
 
   describe('Plots', () => {
+    it('POST /plots', () => {
+      return request(app.getHttpServer())
+        .post('/plots')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          cardId: cards[1],
+          name: 'Plot',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+          price: 10,
+        })
+        .expect(201);
+    });
+
+    it('POST /plots/all', () => {
+      return request(app.getHttpServer())
+        .post('/plots/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          userId: user.user.id,
+          cardId: cards[0],
+          name: 'Plot',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+          price: 10,
+        })
+        .expect(201);
+    });
+
     it('GET /plots', () => {
       return request(app.getHttpServer())
         .get('/plots')

@@ -1,6 +1,7 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { PlotsService } from './plots.service';
 import { Plot } from './plot.entity';
+import { CreatePlotDto, CreatePlotWithUserDto } from './plot.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -27,5 +28,19 @@ export class PlotsController {
   @Get('all')
   getAllPlots(@Query() req: Request): Promise<Response<Plot>> {
     return this.plotsService.getAllPlots(req);
+  }
+
+  @Post()
+  createMyPlot(
+    @MyId() myId: number,
+    @Body() dto: CreatePlotDto,
+  ): Promise<void> {
+    return this.plotsService.createPlot({ ...dto, userId: myId });
+  }
+
+  @Roles([Role.ADMIN])
+  @Post('all')
+  createUserPlot(@Body() dto: CreatePlotWithUserDto): Promise<void> {
+    return this.plotsService.createPlot(dto);
   }
 }
