@@ -121,6 +121,12 @@ export class CardsService {
     if (shop) {
       throw new BadRequestException(CardError.HAS_SHOP);
     }
+    const plot = await this.cardsRepository.manager.existsBy('plots', {
+      cardId: card.id,
+    });
+    if (plot) {
+      throw new BadRequestException(CardError.HAS_PLOT);
+    }
     const order = await this.cardsRepository.manager.existsBy('orders', [
       { customerCardId: card.id, completedAt: IsNull() },
       { executorCardId: card.id, completedAt: IsNull() },

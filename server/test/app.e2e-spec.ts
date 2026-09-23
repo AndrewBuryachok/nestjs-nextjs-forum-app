@@ -529,6 +529,28 @@ describe('App', () => {
     });
   });
 
+  describe('Plots', () => {
+    it('GET /plots', () => {
+      return request(app.getHttpServer())
+        .get('/plots')
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /plots/my', () => {
+      return request(app.getHttpServer())
+        .get('/plots/my')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /plots/all', () => {
+      return request(app.getHttpServer())
+        .get('/plots/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+  });
+
   describe('Products', () => {
     it('POST /products', () => {
       return request(app.getHttpServer())
