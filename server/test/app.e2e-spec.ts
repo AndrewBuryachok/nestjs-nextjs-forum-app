@@ -583,6 +583,22 @@ describe('App', () => {
   });
 
   describe('Rents', () => {
+    it('POST /rents', () => {
+      return request(app.getHttpServer())
+        .post('/rents')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ plotId: plots[1], cardId: cards[0] })
+        .expect(201);
+    });
+
+    it('POST /rents/all', () => {
+      return request(app.getHttpServer())
+        .post('/rents/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({ userId: user.user.id, plotId: plots[0], cardId: cards[0] })
+        .expect(201);
+    });
+
     it('GET /rents', () => {
       return request(app.getHttpServer())
         .get('/rents')
