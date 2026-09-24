@@ -15,3 +15,19 @@ export const createPlotWithUserSchema = createPlotSchema.extend({
 });
 
 export type CreatePlotWithUserType = z.infer<typeof createPlotWithUserSchema>;
+
+export const editPlotSchema = z.object({
+  plotId: z.number().int().min(1),
+  name: z.string().min(1).max(16),
+  x: z.number().int().min(-1000).max(1000),
+  y: z.number().int().min(-1000).max(1000),
+  price: z.number().int().min(1),
+});
+
+export type EditPlotType = z.infer<typeof editPlotSchema>;
+
+export const deletePlotSchema = z.object({
+  plotId: z.number().int().min(1),
+});
+
+export type DeletePlotType = z.infer<typeof deletePlotSchema>;
