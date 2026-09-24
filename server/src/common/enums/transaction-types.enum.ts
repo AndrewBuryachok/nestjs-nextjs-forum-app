@@ -4,6 +4,7 @@ export enum TransactionType {
   TRANSFER = 'transfer',
   PAY_FINE = 'pay_fine',
   RESERVE_PLOT = 'reserve_plot',
+  CONTINUE_RENT = 'continue_rent',
   BUY_PRODUCT = 'buy_product',
   CREATE_ORDER = 'create_order',
   EDIT_ORDER = 'edit_order',

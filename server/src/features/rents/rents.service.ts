@@ -1,4 +1,10 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
@@ -70,6 +76,87 @@ export class RentsService {
     );
   }
 
+  async continueMyRent(myId: number, rentId: number): Promise<void> {
+    const rent = await this.throwIfNotRentOwner(rentId, myId);
+    await this.continueRent(rent);
+  }
+
+  async continueUserRent(rentId: number): Promise<void> {
+    const rent = await this.throwIfRentNotFound(rentId);
+    await this.continueRent(rent);
+  }
+
+  @Transactional()
+  private async continueRent(rent: Rent): Promise<void> {
+    this.throwIfRentAlreadyCompleted(rent);
+    await this.transactionsService.createTransferTransaction({
+      senderUserId: rent.userId,
+      senderCardId: rent.cardId,
+      receiverUserId: rent.plot.userId,
+      receiverCardId: rent.plot.cardId,
+      type: TransactionType.CONTINUE_RENT,
+      sum: rent.plot.price,
+      description: rent.plot.name,
+    });
+    await this.continue(rent.id, rent.completedAt);
+    this.mqttService.publishNotification(
+      rent.userId,
+      rent.plot.userId,
+      rent.id,
+      Notification.CONTINUE_RENT,
+    );
+  }
+
+  async completeMyRent(myId: number, rentId: number): Promise<void> {
+    const rent = await this.throwIfNotRentOwner(rentId, myId);
+    await this.completeRent(rent);
+  }
+
+  async completeUserRent(rentId: number): Promise<void> {
+    const rent = await this.throwIfRentNotFound(rentId);
+    await this.completeRent(rent);
+  }
+
+  private async completeRent(rent: Rent): Promise<void> {
+    this.throwIfRentAlreadyCompleted(rent);
+    await this.complete(rent.id);
+    this.mqttService.publishNotification(
+      rent.userId,
+      rent.plot.userId,
+      rent.id,
+      Notification.COMPLETE_RENT,
+    );
+  }
+
+  async throwIfRentNotFound(rentId: number): Promise<Rent> {
+    const rent = await this.findRentById(rentId);
+    if (!rent) {
+      throw new NotFoundException(RentError.NOT_FOUND);
+    }
+    return rent;
+  }
+
+  async throwIfNotRentOwner(rentId: number, userId: number): Promise<Rent> {
+    const rent = await this.throwIfRentNotFound(rentId);
+    if (rent.userId !== userId) {
+      throw new ForbiddenException(RentError.NOT_OWNER);
+    }
+    return rent;
+  }
+
+  private throwIfRentAlreadyCompleted(rent: Rent): void {
+    if (rent.completedAt < new Date()) {
+      throw new BadRequestException(RentError.ALREADY_COMPLETED);
+    }
+  }
+
+  private findRentById(id: number): Promise<Rent | null> {
+    return this.rentsRepository.findOne({
+      relations: { plot: true },
+      where: { id },
+    });
+  }
+
   private async create(dto: CreateRentWithUserDto): Promise<Rent> {
     try {
       const completedAt = new Date();
@@ -84,6 +171,24 @@ export class RentsService {
       return rent;
     } catch (error) {
       throw new InternalServerErrorException(RentError.CREATE_FAILED);
+    }
+  }
+
+  private async continue(id: number, date: Date): Promise<void> {
+    try {
+      const completedAt = new Date(date);
+      completedAt.setDate(completedAt.getDate() + 7);
+      await this.rentsRepository.update({ id }, { completedAt });
+    } catch (error) {
+      throw new InternalServerErrorException(RentError.CONTINUE_FAILED);
+    }
+  }
+
+  private async complete(id: number): Promise<void> {
+    try {
+      await this.rentsRepository.update({ id }, { completedAt: new Date() });
+    } catch (error) {
+      throw new InternalServerErrorException(RentError.COMPLETE_FAILED);
     }
   }
 
