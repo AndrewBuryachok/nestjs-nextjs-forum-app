@@ -9,5 +9,6 @@ import { PlotsService } from './plots.service';
   imports: [TypeOrmModule.forFeature([Plot]), CardsModule],
   controllers: [PlotsController],
   providers: [PlotsService],
+  exports: [PlotsService],
 })
 export class PlotsModule {}

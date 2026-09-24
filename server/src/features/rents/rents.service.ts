@@ -1,14 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { Transactional } from 'typeorm-transactional';
 import { Rent } from './rent.entity';
+import { MqttService } from '../mqtt/mqtt.service';
+import { TransactionsService } from '../transactions/transactions.service';
+import { PlotsService } from '../plots/plots.service';
+import { CreateRentWithUserDto } from './rent.dto';
+import { RentError } from './rent-errors.enum';
 import { Request, Response } from '../../common/interfaces';
+import { Notification, TransactionType } from '../../common/enums';
 
 @Injectable()
 export class RentsService {
   constructor(
     @InjectRepository(Rent)
     private rentsRepository: Repository<Rent>,
+    private mqttService: MqttService,
+    private transactionsService: TransactionsService,
+    private plotsService: PlotsService,
   ) {}
 
   async getMainRents(req: Request): Promise<Response<Rent>> {
@@ -36,6 +46,45 @@ export class RentsService {
     const [data, total] =
       await this.getRentsQueryBuilder(req).getManyAndCount();
     return { data, total };
+  }
+
+  @Transactional()
+  async createRent(dto: CreateRentWithUserDto): Promise<void> {
+    const plot = await this.plotsService.throwIfPlotNotFound(dto.plotId);
+    await this.plotsService.throwIfPlotHasRent(dto.plotId);
+    await this.transactionsService.createTransferTransaction({
+      senderUserId: dto.userId,
+      senderCardId: dto.cardId,
+      receiverUserId: plot.userId,
+      receiverCardId: plot.cardId,
+      type: TransactionType.RESERVE_PLOT,
+      sum: plot.price,
+      description: plot.name,
+    });
+    const rent = await this.create(dto);
+    this.mqttService.publishNotification(
+      dto.userId,
+      plot.userId,
+      rent.id,
+      Notification.CREATE_RENT,
+    );
+  }
+
+  private async create(dto: CreateRentWithUserDto): Promise<Rent> {
+    try {
+      const completedAt = new Date();
+      completedAt.setDate(completedAt.getDate() + 7);
+      const rent = this.rentsRepository.create({
+        plotId: dto.plotId,
+        userId: dto.userId,
+        cardId: dto.cardId,
+        completedAt,
+      });
+      await this.rentsRepository.save(rent);
+      return rent;
+    } catch (error) {
+      throw new InternalServerErrorException(RentError.CREATE_FAILED);
+    }
   }
 
   private getMyRentsQueryBuilder(
