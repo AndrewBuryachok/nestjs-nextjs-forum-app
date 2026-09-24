@@ -31,3 +31,16 @@ export const deletePlotSchema = z.object({
 });
 
 export type DeletePlotType = z.infer<typeof deletePlotSchema>;
+
+export const reservePlotSchema = z.object({
+  plotId: z.number().int().min(1),
+  cardId: z.number().int().min(1),
+});
+
+export type ReservePlotType = z.infer<typeof reservePlotSchema>;
+
+export const reservePlotWithUserSchema = reservePlotSchema.extend({
+  userId: z.number().int().min(1),
+});
+
+export type ReservePlotWithUserType = z.infer<typeof reservePlotWithUserSchema>;
