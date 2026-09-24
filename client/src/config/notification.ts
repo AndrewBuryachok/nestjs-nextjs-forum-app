@@ -29,6 +29,8 @@ export const NOTIFICATION_TABS_MAP = {
   },
   rents: {
     create: 'my',
+    continue: 'my',
+    complete: 'completed',
   },
   shops: {
     create: 'main',
