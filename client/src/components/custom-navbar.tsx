@@ -29,7 +29,11 @@ export default function CustomNavbar() {
         { value: 'shops' },
       ],
     },
-    { value: 'property', icon: <LuWarehouse />, links: [{ value: 'plots' }] },
+    {
+      value: 'property',
+      icon: <LuWarehouse />,
+      links: [{ value: 'plots' }, { value: 'rents' }],
+    },
     {
       value: 'mail',
       icon: <LuMailbox />,

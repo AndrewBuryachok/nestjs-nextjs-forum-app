@@ -2,6 +2,7 @@ import { useTranslations } from 'next-intl';
 import {
   LuBanknote,
   LuBellOff,
+  LuCalendarDays,
   LuCreditCard,
   LuLandPlot,
   LuMailbox,
@@ -31,6 +32,7 @@ export default function CustomEmptyState(props: Props) {
     plots: <LuLandPlot />,
     products: <LuShoppingBasket />,
     purchases: <LuShoppingCart />,
+    rents: <LuCalendarDays />,
     shops: <LuStore />,
     transactions: <LuBanknote />,
     users: <LuUsers />,
