@@ -7,6 +7,7 @@ export enum Notification {
   PAY_FINE = 'pay fines',
   CREATE_SHOP = 'create shops',
   CREATE_PLOT = 'create plots',
+  CREATE_RENT = 'create rents',
   CREATE_PRODUCT = 'create products',
   END_PRODUCT = 'end products',
   CREATE_PURCHASE = 'create purchases',
