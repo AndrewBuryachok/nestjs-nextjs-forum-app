@@ -7,6 +7,7 @@ export const deletePlotFactory = (plot: Plot, isAll: boolean) => ({
   action: 'delete',
   dialog: 'plot',
   color: Color.RED,
+  disabled: !!plot.rent,
   icon: <LuTrash2 />,
   body: <DeletePlotForm plot={plot} isAll={isAll} />,
 });
