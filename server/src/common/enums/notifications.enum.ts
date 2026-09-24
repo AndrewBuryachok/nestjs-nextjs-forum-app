@@ -8,6 +8,8 @@ export enum Notification {
   CREATE_SHOP = 'create shops',
   CREATE_PLOT = 'create plots',
   CREATE_RENT = 'create rents',
+  CONTINUE_RENT = 'continue rents',
+  COMPLETE_RENT = 'complete rents',
   CREATE_PRODUCT = 'create products',
   END_PRODUCT = 'end products',
   CREATE_PURCHASE = 'create purchases',

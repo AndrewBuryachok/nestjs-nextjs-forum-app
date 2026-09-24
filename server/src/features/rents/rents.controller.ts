@@ -1,7 +1,15 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { RentsService } from './rents.service';
 import { Rent } from './rent.entity';
-import { CreateRentDto, CreateRentWithUserDto } from './rent.dto';
+import { CreateRentDto, CreateRentWithUserDto, RentIdDto } from './rent.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -50,5 +58,33 @@ export class RentsController {
   @Post('all')
   createUserRent(@Body() dto: CreateRentWithUserDto): Promise<void> {
     return this.rentsService.createRent(dto);
+  }
+
+  @Post(':rentId')
+  continueMyRent(
+    @MyId() myId: number,
+    @Param() { rentId }: RentIdDto,
+  ): Promise<void> {
+    return this.rentsService.continueMyRent(myId, rentId);
+  }
+
+  @Roles([Role.ADMIN])
+  @Post('all/:rentId')
+  continueUserRent(@Param() { rentId }: RentIdDto): Promise<void> {
+    return this.rentsService.continueUserRent(rentId);
+  }
+
+  @Delete(':rentId')
+  completeMyRent(
+    @MyId() myId: number,
+    @Param() { rentId }: RentIdDto,
+  ): Promise<void> {
+    return this.rentsService.completeMyRent(myId, rentId);
+  }
+
+  @Roles([Role.ADMIN])
+  @Delete('all/:rentId')
+  completeUserRent(@Param() { rentId }: RentIdDto): Promise<void> {
+    return this.rentsService.completeUserRent(rentId);
   }
 }

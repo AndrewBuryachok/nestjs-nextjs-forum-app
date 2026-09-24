@@ -51,6 +51,7 @@ describe('App', () => {
   let fines: number[];
   let shops: number[];
   let plots: number[];
+  let rents: number[];
   let products: number[];
   let purchases: number[];
   let lockers: number[];
@@ -609,7 +610,8 @@ describe('App', () => {
       return request(app.getHttpServer())
         .get('/rents/my')
         .set('Authorization', `Bearer ${user.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
+        .then((res) => (rents = res.body.data.map((rent) => rent.id)));
     });
 
     it('GET /rents/all', () => {
@@ -617,6 +619,34 @@ describe('App', () => {
         .get('/rents/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('POST /rents/:rentId', () => {
+      return request(app.getHttpServer())
+        .post(`/rents/${rents[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(201);
+    });
+
+    it('POST /rents/all/:rentId', () => {
+      return request(app.getHttpServer())
+        .post(`/rents/all/${rents[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(201);
+    });
+
+    it('DELETE /rents/:rentId', () => {
+      return request(app.getHttpServer())
+        .delete(`/rents/${rents[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(200);
+    });
+
+    it('DELETE /rents/all/:rentId', () => {
+      return request(app.getHttpServer())
+        .delete(`/rents/all/${rents[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(200);
     });
 
     it('GET /rents/completed', () => {
