@@ -1,10 +1,15 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Plot } from './plot.entity';
 import { MqttService } from '../mqtt/mqtt.service';
 import { CardsService } from '../cards/cards.service';
-import { CreatePlotWithUserDto } from './plot.dto';
+import { CreatePlotWithUserDto, EditPlotDto } from './plot.dto';
 import { PlotError } from './plot-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 import { Notification } from '../../common/enums';
@@ -49,6 +54,51 @@ export class PlotsService {
     );
   }
 
+  async editMyPlot(
+    myId: number,
+    plotId: number,
+    dto: EditPlotDto,
+  ): Promise<void> {
+    await this.throwIfNotPlotOwner(plotId, myId);
+    await this.edit(plotId, dto);
+  }
+
+  async editUserPlot(plotId: number, dto: EditPlotDto): Promise<void> {
+    await this.throwIfPlotNotFound(plotId);
+    await this.edit(plotId, dto);
+  }
+
+  async deleteMyPlot(myId: number, plotId: number): Promise<void> {
+    await this.throwIfNotPlotOwner(plotId, myId);
+    await this.delete(plotId);
+  }
+
+  async deleteUserPlot(plotId: number): Promise<void> {
+    await this.throwIfPlotNotFound(plotId);
+    await this.delete(plotId);
+  }
+
+  async throwIfPlotNotFound(plotId: number): Promise<Plot> {
+    const plot = await this.findPlotById(plotId);
+    if (!plot) {
+      throw new NotFoundException(PlotError.NOT_FOUND);
+    }
+    return plot;
+  }
+
+  async throwIfNotPlotOwner(plotId: number, userId: number): Promise<Plot> {
+    const plot = await this.throwIfPlotNotFound(plotId);
+    const isCardUser = await this.cardsService.isCardUser(plot.cardId, userId);
+    if (!isCardUser) {
+      throw new ForbiddenException(PlotError.NOT_OWNER);
+    }
+    return plot;
+  }
+
+  private findPlotById(id: number): Promise<Plot | null> {
+    return this.plotsRepository.findOneBy({ id });
+  }
+
   private async create(dto: CreatePlotWithUserDto): Promise<Plot> {
     try {
       const plot = this.plotsRepository.create({
@@ -63,6 +113,25 @@ export class PlotsService {
       return plot;
     } catch (error) {
       throw new InternalServerErrorException(PlotError.CREATE_FAILED);
+    }
+  }
+
+  private async edit(id: number, dto: EditPlotDto): Promise<void> {
+    try {
+      await this.plotsRepository.update(
+        { id },
+        { name: dto.name, x: dto.x, y: dto.y, price: dto.price },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(PlotError.EDIT_FAILED);
+    }
+  }
+
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.plotsRepository.softDelete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(PlotError.DELETE_FAILED);
     }
   }
 
