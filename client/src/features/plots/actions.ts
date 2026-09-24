@@ -5,6 +5,8 @@ import {
   createPlotWithUserSchema,
   deletePlotSchema,
   editPlotSchema,
+  reservePlotSchema,
+  reservePlotWithUserSchema,
 } from './schema';
 import { actionClient } from '@/lib/safe-action';
 import { send } from '@/lib/api';
@@ -43,4 +45,16 @@ export const deleteUserPlotAction = actionClient
   .inputSchema(deletePlotSchema)
   .action(({ parsedInput: { plotId } }) => {
     return send('DELETE', `/plots/all/${plotId}`);
+  });
+
+export const reserveMyPlotAction = actionClient
+  .inputSchema(reservePlotSchema)
+  .action(({ parsedInput: body }) => {
+    return send('POST', '/rents', body);
+  });
+
+export const reserveUserPlotAction = actionClient
+  .inputSchema(reservePlotWithUserSchema)
+  .action(({ parsedInput: body }) => {
+    return send('POST', '/rents/all', body);
   });
