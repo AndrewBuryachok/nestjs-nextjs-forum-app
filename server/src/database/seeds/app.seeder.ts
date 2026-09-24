@@ -8,6 +8,7 @@ import { Transaction } from '../../features/transactions/transaction.entity';
 import { Fine } from '../../features/fines/fine.entity';
 import { Shop } from '../../features/shops/shop.entity';
 import { Plot } from '../../features/plots/plot.entity';
+import { Rent } from '../../features/rents/rent.entity';
 import { Product } from '../../features/products/product.entity';
 import { Purchase } from '../../features/purchases/purchase.entity';
 import { Locker } from '../../features/lockers/locker.entity';
@@ -160,6 +161,31 @@ export default class AppSeeder implements Seeder {
       const plot = await plotFactory.make({ id, user, card });
       plots.push(plot);
     }
+    const rentFactory = factoryManager.get(Rent);
+    const rents: Rent[] = [];
+    for (let i = 0; i < 20; i++) {
+      const plot = faker.helpers.arrayElement(
+        plots.filter((plot) => !rents.find((rent) => rent.plot.id === plot.id)),
+      );
+      const card = faker.helpers.arrayElement(
+        cards.filter((card) => card.balance >= plot.price),
+      );
+      const user = randomUserOf(card);
+      card.balance -= plot.price;
+      plot.card.balance += plot.price;
+      const transfer = await transactionFactory.make({
+        senderUser: user,
+        senderCard: card,
+        receiverUser: plot.user,
+        receiverCard: plot.card,
+        type: TransactionType.RESERVE_PLOT,
+        sum: plot.price,
+        description: plot.name,
+      });
+      transactions.push(transfer);
+      const rent = await rentFactory.make({ plot, user, card });
+      rents.push(rent);
+    }
     const productFactory = factoryManager.get(Product);
     const products: Product[] = [];
     for (let i = 0; i < 40; i++) {
@@ -279,6 +305,7 @@ export default class AppSeeder implements Seeder {
     await dataSource.getRepository(Fine).save(fines);
     await dataSource.getRepository(Shop).save(shops);
     await dataSource.getRepository(Plot).save(plots);
+    await dataSource.getRepository(Rent).save(rents);
     await dataSource.getRepository(Product).save(products);
     await dataSource.getRepository(Purchase).save(purchases);
     await dataSource.getRepository(Locker).save(lockers);
