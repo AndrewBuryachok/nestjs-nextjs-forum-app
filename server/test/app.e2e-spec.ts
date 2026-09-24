@@ -580,7 +580,38 @@ describe('App', () => {
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
+  });
 
+  describe('Rents', () => {
+    it('GET /rents', () => {
+      return request(app.getHttpServer())
+        .get('/rents')
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /rents/my', () => {
+      return request(app.getHttpServer())
+        .get('/rents/my')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /rents/all', () => {
+      return request(app.getHttpServer())
+        .get('/rents/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /rents/completed', () => {
+      return request(app.getHttpServer())
+        .get('/rents/completed')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+  });
+
+  describe('Plots', () => {
     it('PATCH /plots/:plotId', () => {
       return request(app.getHttpServer())
         .patch(`/plots/${plots[0]}`)

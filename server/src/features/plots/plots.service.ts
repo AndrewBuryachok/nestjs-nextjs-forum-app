@@ -1,11 +1,12 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, MoreThan, Repository, SelectQueryBuilder } from 'typeorm';
 import { Plot } from './plot.entity';
 import { MqttService } from '../mqtt/mqtt.service';
 import { CardsService } from '../cards/cards.service';
@@ -24,8 +25,9 @@ export class PlotsService {
   ) {}
 
   async getMainPlots(req: Request): Promise<Response<Plot>> {
-    const [data, total] =
-      await this.getPlotsQueryBuilder(req).getManyAndCount();
+    const [data, total] = await this.getPlotsQueryBuilder(req)
+      .andWhere('rent.id IS NULL')
+      .getManyAndCount();
     return { data, total };
   }
 
@@ -70,11 +72,13 @@ export class PlotsService {
 
   async deleteMyPlot(myId: number, plotId: number): Promise<void> {
     await this.throwIfNotPlotOwner(plotId, myId);
+    await this.throwIfPlotHasRent(plotId);
     await this.delete(plotId);
   }
 
   async deleteUserPlot(plotId: number): Promise<void> {
     await this.throwIfPlotNotFound(plotId);
+    await this.throwIfPlotHasRent(plotId);
     await this.delete(plotId);
   }
 
@@ -93,6 +97,16 @@ export class PlotsService {
       throw new ForbiddenException(PlotError.NOT_OWNER);
     }
     return plot;
+  }
+
+  async throwIfPlotHasRent(plotId: number): Promise<void> {
+    const rent = await this.plotsRepository.manager.existsBy('rents', {
+      plotId,
+      completedAt: MoreThan(new Date()),
+    });
+    if (rent) {
+      throw new BadRequestException(PlotError.HAS_RENT);
+    }
   }
 
   private findPlotById(id: number): Promise<Plot | null> {
@@ -150,6 +164,17 @@ export class PlotsService {
       .addSelect(['ownerUser.id', 'ownerUser.nick', 'ownerUser.avatar'])
       .innerJoin('plot.card', 'ownerCard')
       .addSelect(['ownerCard.id', 'ownerCard.name'])
+      .leftJoinAndMapOne(
+        'plot.rent',
+        'plot.rents',
+        'rent',
+        'rent.completedAt > NOW()',
+      )
+      .addSelect(['rent.id', 'rent.createdAt', 'rent.completedAt'])
+      .leftJoin('rent.user', 'renterUser')
+      .addSelect(['renterUser.id', 'renterUser.nick', 'renterUser.avatar'])
+      .leftJoin('rent.card', 'renterCard')
+      .addSelect(['renterCard.id', 'renterCard.name'])
       .where(
         new Brackets(
           (qb) => req.id && qb.where('plot.id = :id', { id: req.id }),
