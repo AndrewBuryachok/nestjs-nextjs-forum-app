@@ -43,6 +43,22 @@ export default function ViewPlotForm(props: Props) {
         <Field.Label>{t('columns.created')}</Field.Label>
         <DateInput value={props.plot.createdAt} />
       </Field.Root>
+      <Field.Root>
+        <Field.Label>{t('columns.renter')}</Field.Label>
+        {props.plot.rent ? (
+          <CardInput user={props.plot.rent.user} card={props.plot.rent.card} />
+        ) : (
+          <Input readOnly value='-' />
+        )}
+      </Field.Root>
+      <Field.Root>
+        <Field.Label>{t('columns.reserved')}</Field.Label>
+        {props.plot.rent ? (
+          <DateInput value={props.plot.rent.completedAt} />
+        ) : (
+          <Input readOnly value='-' />
+        )}
+      </Field.Root>
     </ViewForm>
   );
 }

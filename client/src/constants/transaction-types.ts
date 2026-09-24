@@ -3,6 +3,7 @@ export enum TransactionType {
   WITHDRAW = 'withdraw',
   TRANSFER = 'transfer',
   PAY_FINE = 'pay_fine',
+  RESERVE_PLOT = 'reserve_plot',
   BUY_PRODUCT = 'buy_product',
   CREATE_ORDER = 'create_order',
   EDIT_ORDER = 'edit_order',

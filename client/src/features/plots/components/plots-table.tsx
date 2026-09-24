@@ -42,8 +42,25 @@ export default function PlotsTable(props: Props) {
           render: (plot) => <CurrencyText value={plot.price} />,
         },
         {
-          value: 'created',
-          render: (plot) => <DateText value={plot.createdAt} />,
+          value: 'renter',
+          render: (plot) =>
+            plot.rent ? (
+              <CustomAvatarWithCard
+                user={plot.rent.user}
+                card={plot.rent.card}
+              />
+            ) : (
+              <CustomText muted value='-' />
+            ),
+        },
+        {
+          value: 'reserved',
+          render: (plot) =>
+            plot.rent ? (
+              <DateText value={plot.rent.completedAt} />
+            ) : (
+              <CustomText muted value='-' />
+            ),
         },
         {
           value: 'actions',
