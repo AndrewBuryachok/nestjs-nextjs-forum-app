@@ -621,6 +621,19 @@ describe('App', () => {
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
 
+    it('GET /rents/my/select', () => {
+      return request(app.getHttpServer())
+        .get('/rents/my/select')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+    });
+
+    it('GET /rents/:userId/select', () => {
+      return request(app.getHttpServer())
+        .get(`/rents/${user.user.id}/select`)
+        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+    });
+
     it('POST /rents/:rentId', () => {
       return request(app.getHttpServer())
         .post(`/rents/${rents[0]}`)
