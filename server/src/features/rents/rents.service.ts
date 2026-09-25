@@ -64,6 +64,14 @@ export class RentsService implements OnModuleInit {
     return { data, total };
   }
 
+  selectUserRents(userId: number): Promise<Rent[]> {
+    return this.selectRentsQueryBuilder()
+      .innerJoin('rent.card', 'ownerCard')
+      .innerJoin('ownerCard.cardUsers', 'ownerCardUsers')
+      .andWhere('ownerCardUsers.userId = :userId', { userId })
+      .getMany();
+  }
+
   @Transactional()
   async createRent(dto: CreateRentWithUserDto): Promise<void> {
     const plot = await this.plotsService.throwIfPlotNotFound(dto.plotId);
@@ -233,6 +241,16 @@ export class RentsService implements OnModuleInit {
     } catch (error) {
       throw new InternalServerErrorException(RentError.COMPLETE_FAILED);
     }
+  }
+
+  private selectRentsQueryBuilder(): SelectQueryBuilder<Rent> {
+    return this.rentsRepository
+      .createQueryBuilder('rent')
+      .select(['rent.id'])
+      .innerJoin('rent.plot', 'plot')
+      .addSelect(['plot.id', 'plot.name', 'plot.x', 'plot.y'])
+      .where('rent.completedAt > NOW()')
+      .orderBy('plot.name', 'ASC');
   }
 
   private getMyRentsQueryBuilder(
