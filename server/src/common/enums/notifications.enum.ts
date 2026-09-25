@@ -10,6 +10,8 @@ export enum Notification {
   CREATE_RENT = 'create rents',
   CONTINUE_RENT = 'continue rents',
   COMPLETE_RENT = 'complete rents',
+  REMIND_RENT = 'remind rents',
+  EXPIRE_RENT = 'expire rents',
   CREATE_PRODUCT = 'create products',
   END_PRODUCT = 'end products',
   CREATE_PURCHASE = 'create purchases',
