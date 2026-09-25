@@ -6,6 +6,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { SchedulerRegistry } from '@nestjs/schedule';
 import { Notification } from '../../common/enums';
 
 @Injectable()
@@ -14,7 +15,10 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
 
   private client: mqtt.MqttClient;
 
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private configService: ConfigService,
+    private schedulerRegistry: SchedulerRegistry,
+  ) {}
 
   onModuleInit() {
     this.client = mqtt.connect(this.configService.getOrThrow('MQTT_URL'), {
@@ -33,6 +37,47 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
 
   onModuleDestroy() {
     this.client.end();
+  }
+
+  scheduleNotification(
+    key: string,
+    date: Date,
+    fromUserId: number,
+    toUserId: number,
+    id: number,
+    notification: Notification,
+  ) {
+    try {
+      const delay = date.getTime() - Date.now();
+      if (delay > 0 && delay < 24 * 24 * 60 * 60 * 1000) {
+        const timeout = setTimeout(
+          () =>
+            this.publishNotification(fromUserId, toUserId, id, notification),
+          delay,
+        );
+        this.schedulerRegistry.addTimeout(key, timeout);
+        this.logger.debug(
+          `Successfully scheduled notification ${key} at ${date.toISOString()}`,
+        );
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed to schedule notification ${key} at ${date.toISOString()}`,
+      );
+      this.logger.error(error);
+    }
+  }
+
+  unscheduleNotification(key: string) {
+    try {
+      if (this.schedulerRegistry.doesExist('timeout', key)) {
+        this.schedulerRegistry.deleteTimeout(key);
+        this.logger.debug(`Successfully unscheduled notification ${key}`);
+      }
+    } catch (error) {
+      this.logger.error(`Failed to unschedule notification ${key}`);
+      this.logger.error(error);
+    }
   }
 
   publishNotification(
