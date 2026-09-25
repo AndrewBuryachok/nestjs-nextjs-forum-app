@@ -6,6 +6,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { SchedulerRegistry } from '@nestjs/schedule';
 import { Notification } from '../../common/enums';
 
 @Injectable()
@@ -14,7 +15,10 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
 
   private client: mqtt.MqttClient;
 
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private configService: ConfigService,
+    private schedulerRegistry: SchedulerRegistry,
+  ) {}
 
   onModuleInit() {
     this.client = mqtt.connect(this.configService.getOrThrow('MQTT_URL'), {
@@ -33,6 +37,27 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
 
   onModuleDestroy() {
     this.client.end();
+  }
+
+  scheduleNotification(
+    key: string,
+    date: Date,
+    fromUserId: number,
+    toUserId: number,
+    id: number,
+    notification: Notification,
+  ) {
+    const timeout = setTimeout(
+      () => this.publishNotification(fromUserId, toUserId, id, notification),
+      date.getTime() - new Date().getTime(),
+    );
+    this.schedulerRegistry.addTimeout(key, timeout);
+    this.logger.log(`Scheduled notification ${key} at ${date.toISOString()}`);
+  }
+
+  unscheduleNotification(key: string) {
+    this.schedulerRegistry.deleteTimeout(key);
+    this.logger.log(`Unscheduled notification ${key}`);
   }
 
   publishNotification(
