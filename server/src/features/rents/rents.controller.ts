@@ -10,6 +10,7 @@ import {
 import { RentsService } from './rents.service';
 import { Rent } from './rent.entity';
 import { CreateRentDto, CreateRentWithUserDto, RentIdDto } from './rent.dto';
+import { UserIdDto } from '../users/user.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -44,6 +45,17 @@ export class RentsController {
   @Get('all')
   getAllRents(@Query() req: Request): Promise<Response<Rent>> {
     return this.rentsService.getAllRents(req);
+  }
+
+  @Get('my/select')
+  selectMyRents(@MyId() myId: number): Promise<Rent[]> {
+    return this.rentsService.selectUserRents(myId);
+  }
+
+  @Public()
+  @Get(':userId/select')
+  selectUserRents(@Param() { userId }: UserIdDto): Promise<Rent[]> {
+    return this.rentsService.selectUserRents(userId);
   }
 
   @Post()
