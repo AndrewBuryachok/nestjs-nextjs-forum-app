@@ -1,8 +1,13 @@
-import { BasePlot } from '../plots/types';
+import { BasePlot, BasePlotWithUserAndCardAndPrice } from '../plots/types';
 import { BaseUser } from '../users/types';
 import { BaseCard } from '../cards/types';
 
 export interface BaseRent {
+  id: number;
+  plot: BasePlot;
+}
+
+export interface BaseRentWithUserAndCard {
   id: number;
   user: BaseUser;
   card: BaseCard;
@@ -10,6 +15,6 @@ export interface BaseRent {
   completedAt: Date;
 }
 
-export interface Rent extends BaseRent {
-  plot: BasePlot;
+export interface Rent extends BaseRentWithUserAndCard {
+  plot: BasePlotWithUserAndCardAndPrice;
 }
