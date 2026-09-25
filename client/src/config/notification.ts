@@ -31,6 +31,8 @@ export const NOTIFICATION_TABS_MAP = {
     create: 'my',
     continue: 'my',
     complete: 'completed',
+    remind: 'my',
+    expire: 'completed',
   },
   shops: {
     create: 'main',
