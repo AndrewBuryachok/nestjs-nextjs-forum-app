@@ -4,9 +4,10 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  OnModuleInit,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, MoreThan, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { Rent } from './rent.entity';
 import { MqttService } from '../mqtt/mqtt.service';
@@ -18,7 +19,7 @@ import { Request, Response } from '../../common/interfaces';
 import { Notification, TransactionType } from '../../common/enums';
 
 @Injectable()
-export class RentsService {
+export class RentsService implements OnModuleInit {
   constructor(
     @InjectRepository(Rent)
     private rentsRepository: Repository<Rent>,
@@ -26,6 +27,15 @@ export class RentsService {
     private transactionsService: TransactionsService,
     private plotsService: PlotsService,
   ) {}
+
+  async onModuleInit() {
+    const rents = await this.rentsRepository.findBy({
+      completedAt: MoreThan(new Date()),
+    });
+    for (const rent of rents) {
+      this.addTimeout(rent.id, rent.userId, rent.completedAt);
+    }
+  }
 
   async getMainRents(req: Request): Promise<Response<Rent>> {
     const [data, total] = await this.getRentsQueryBuilder(req)
@@ -74,6 +84,7 @@ export class RentsService {
       rent.id,
       Notification.CREATE_RENT,
     );
+    this.addTimeout(rent.id, dto.userId, rent.completedAt);
   }
 
   async continueMyRent(myId: number, rentId: number): Promise<void> {
@@ -98,13 +109,15 @@ export class RentsService {
       sum: rent.plot.price,
       description: rent.plot.name,
     });
-    await this.continue(rent.id, rent.completedAt);
+    const date = await this.continue(rent.id, rent.completedAt);
     this.mqttService.publishNotification(
       rent.userId,
       rent.plot.userId,
       rent.id,
       Notification.CONTINUE_RENT,
     );
+    this.removeTimeout(rent.id);
+    this.addTimeout(rent.id, rent.userId, date);
   }
 
   async completeMyRent(myId: number, rentId: number): Promise<void> {
@@ -126,6 +139,7 @@ export class RentsService {
       rent.id,
       Notification.COMPLETE_RENT,
     );
+    this.removeTimeout(rent.id);
   }
 
   async throwIfRentNotFound(rentId: number): Promise<Rent> {
@@ -157,6 +171,34 @@ export class RentsService {
     });
   }
 
+  private addTimeout(id: number, userId: number, date: Date) {
+    const before = new Date(date);
+    before.setDate(before.getDate() - 3);
+    if (before.getTime() > new Date().getTime()) {
+      this.mqttService.scheduleNotification(
+        `rents/${id}/remind`,
+        before,
+        0,
+        userId,
+        id,
+        Notification.REMIND_RENT,
+      );
+    }
+    this.mqttService.scheduleNotification(
+      `rents/${id}/expire`,
+      date,
+      0,
+      userId,
+      id,
+      Notification.EXPIRE_RENT,
+    );
+  }
+
+  private removeTimeout(id: number) {
+    this.mqttService.unscheduleNotification(`rents/${id}/remind`);
+    this.mqttService.unscheduleNotification(`rents/${id}/expire`);
+  }
+
   private async create(dto: CreateRentWithUserDto): Promise<Rent> {
     try {
       const completedAt = new Date();
@@ -174,11 +216,12 @@ export class RentsService {
     }
   }
 
-  private async continue(id: number, date: Date): Promise<void> {
+  private async continue(id: number, date: Date): Promise<Date> {
     try {
       const completedAt = new Date(date);
       completedAt.setDate(completedAt.getDate() + 7);
       await this.rentsRepository.update({ id }, { completedAt });
+      return completedAt;
     } catch (error) {
       throw new InternalServerErrorException(RentError.CONTINUE_FAILED);
     }
