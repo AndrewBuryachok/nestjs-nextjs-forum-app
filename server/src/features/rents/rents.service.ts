@@ -11,6 +11,7 @@ import { Brackets, MoreThan, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { Rent } from './rent.entity';
 import { MqttService } from '../mqtt/mqtt.service';
+import { CardsService } from '../cards/cards.service';
 import { TransactionsService } from '../transactions/transactions.service';
 import { PlotsService } from '../plots/plots.service';
 import { CreateRentWithUserDto } from './rent.dto';
@@ -24,6 +25,7 @@ export class RentsService implements OnModuleInit {
     @InjectRepository(Rent)
     private rentsRepository: Repository<Rent>,
     private mqttService: MqttService,
+    private cardsService: CardsService,
     private transactionsService: TransactionsService,
     private plotsService: PlotsService,
   ) {}
@@ -162,6 +164,15 @@ export class RentsService implements OnModuleInit {
     const rent = await this.throwIfRentNotFound(rentId);
     if (rent.userId !== userId) {
       throw new ForbiddenException(RentError.NOT_OWNER);
+    }
+    return rent;
+  }
+
+  async throwIfNotRentUser(rentId: number, userId: number): Promise<Rent> {
+    const rent = await this.throwIfRentNotFound(rentId);
+    const isCardUser = await this.cardsService.isCardUser(rent.cardId, userId);
+    if (!isCardUser) {
+      throw new ForbiddenException(RentError.NOT_USER);
     }
     return rent;
   }
