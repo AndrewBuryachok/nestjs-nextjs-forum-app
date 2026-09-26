@@ -164,6 +164,7 @@ export default class AppSeeder implements Seeder {
     const rentFactory = factoryManager.get(Rent);
     const rents: Rent[] = [];
     for (let i = 0; i < 20; i++) {
+      const id = i + 1;
       const plot = faker.helpers.arrayElement(
         plots.filter((plot) => !rents.find((rent) => rent.plot.id === plot.id)),
       );
@@ -183,16 +184,25 @@ export default class AppSeeder implements Seeder {
         description: plot.name,
       });
       transactions.push(transfer);
-      const rent = await rentFactory.make({ plot, user, card });
+      const rent = await rentFactory.make({ id, plot, user, card });
       rents.push(rent);
     }
     const productFactory = factoryManager.get(Product);
     const products: Product[] = [];
     for (let i = 0; i < 40; i++) {
       const id = i + 1;
-      const shop = faker.helpers.arrayElement(shops);
-      const user = randomUserOf(shop.card);
-      const product = await productFactory.make({ id, shop, user });
+      const product = await productFactory.make({ id });
+      if (faker.datatype.boolean()) {
+        const shop = faker.helpers.arrayElement(shops);
+        product.shop = shop;
+        product.card = shop.card;
+        product.user = randomUserOf(shop.card);
+      } else {
+        const rent = faker.helpers.arrayElement(rents);
+        product.rent = rent;
+        product.card = rent.card;
+        product.user = randomUserOf(rent.card);
+      }
       products.push(product);
     }
     const purchaseFactory = factoryManager.get(Purchase);
@@ -211,12 +221,12 @@ export default class AppSeeder implements Seeder {
       );
       const amount = faker.number.int({ min: 1, max });
       card.balance -= amount * product.price;
-      product.shop.card.balance += amount * product.price;
+      product.card.balance += amount * product.price;
       const transfer = await transactionFactory.make({
         senderUser: user,
         senderCard: card,
         receiverUser: product.user,
-        receiverCard: product.shop.card,
+        receiverCard: product.card,
         type: TransactionType.BUY_PRODUCT,
         sum: amount * product.price,
         description: product.description,

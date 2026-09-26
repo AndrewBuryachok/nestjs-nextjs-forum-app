@@ -633,89 +633,12 @@ describe('App', () => {
         .get(`/rents/${user.user.id}/select`)
         .expect((res) => expect(res.body.length).toBeGreaterThan(0));
     });
-
-    it('POST /rents/:rentId', () => {
-      return request(app.getHttpServer())
-        .post(`/rents/${rents[0]}`)
-        .set('Authorization', `Bearer ${user.access}`)
-        .expect(201);
-    });
-
-    it('POST /rents/all/:rentId', () => {
-      return request(app.getHttpServer())
-        .post(`/rents/all/${rents[1]}`)
-        .set('Authorization', `Bearer ${admin.access}`)
-        .expect(201);
-    });
-
-    it('DELETE /rents/:rentId', () => {
-      return request(app.getHttpServer())
-        .delete(`/rents/${rents[0]}`)
-        .set('Authorization', `Bearer ${user.access}`)
-        .expect(200);
-    });
-
-    it('DELETE /rents/all/:rentId', () => {
-      return request(app.getHttpServer())
-        .delete(`/rents/all/${rents[1]}`)
-        .set('Authorization', `Bearer ${admin.access}`)
-        .expect(200);
-    });
-
-    it('GET /rents/completed', () => {
-      return request(app.getHttpServer())
-        .get('/rents/completed')
-        .set('Authorization', `Bearer ${user.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
-    });
-  });
-
-  describe('Plots', () => {
-    it('PATCH /plots/:plotId', () => {
-      return request(app.getHttpServer())
-        .patch(`/plots/${plots[0]}`)
-        .set('Authorization', `Bearer ${user.access}`)
-        .send({
-          name: 'Plot',
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
-          price: 10,
-        })
-        .expect(200);
-    });
-
-    it('PATCH /plots/all/:plotId', () => {
-      return request(app.getHttpServer())
-        .patch(`/plots/all/${plots[1]}`)
-        .set('Authorization', `Bearer ${admin.access}`)
-        .send({
-          name: 'Plot',
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
-          price: 10,
-        })
-        .expect(200);
-    });
-
-    it('DELETE /plots/:plotId', () => {
-      return request(app.getHttpServer())
-        .delete(`/plots/${plots[0]}`)
-        .set('Authorization', `Bearer ${user.access}`)
-        .expect(200);
-    });
-
-    it('DELETE /plots/all/:plotId', () => {
-      return request(app.getHttpServer())
-        .delete(`/plots/all/${plots[1]}`)
-        .set('Authorization', `Bearer ${admin.access}`)
-        .expect(200);
-    });
   });
 
   describe('Products', () => {
-    it('POST /products', () => {
+    it('POST /products/shops', () => {
       return request(app.getHttpServer())
-        .post('/products')
+        .post('/products/shops')
         .set('Authorization', `Bearer ${user.access}`)
         .send({
           shopId: shops[1],
@@ -729,12 +652,45 @@ describe('App', () => {
         .expect(201);
     });
 
-    it('POST /products/all', () => {
+    it('POST /products/shops/all', () => {
       return request(app.getHttpServer())
-        .post('/products/all')
+        .post('/products/shops/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .send({
           shopId: shops[0],
+          userId: user.user.id,
+          item: Item.STONE,
+          description: '',
+          amount: 27,
+          batch: 64,
+          unit: Unit.PIECE,
+          price: 10,
+        })
+        .expect(201);
+    });
+
+    it('POST /products/rents', () => {
+      return request(app.getHttpServer())
+        .post('/products/rents')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          rentId: rents[1],
+          item: Item.STONE,
+          description: '',
+          amount: 27,
+          batch: 64,
+          unit: Unit.PIECE,
+          price: 10,
+        })
+        .expect(201);
+    });
+
+    it('POST /products/rents/all', () => {
+      return request(app.getHttpServer())
+        .post('/products/rents/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          rentId: rents[0],
           userId: user.user.id,
           item: Item.STONE,
           description: '',
@@ -879,6 +835,99 @@ describe('App', () => {
     it('DELETE /products/all/:productId', () => {
       return request(app.getHttpServer())
         .delete(`/products/all/${products[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(200);
+    });
+
+    it('DELETE /products/:productId', () => {
+      return request(app.getHttpServer())
+        .delete(`/products/${products[2]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(200);
+    });
+
+    it('DELETE /products/all/:productId', () => {
+      return request(app.getHttpServer())
+        .delete(`/products/all/${products[3]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(200);
+    });
+  });
+
+  describe('Rents', () => {
+    it('POST /rents/:rentId', () => {
+      return request(app.getHttpServer())
+        .post(`/rents/${rents[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(201);
+    });
+
+    it('POST /rents/all/:rentId', () => {
+      return request(app.getHttpServer())
+        .post(`/rents/all/${rents[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(201);
+    });
+
+    it('DELETE /rents/:rentId', () => {
+      return request(app.getHttpServer())
+        .delete(`/rents/${rents[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(200);
+    });
+
+    it('DELETE /rents/all/:rentId', () => {
+      return request(app.getHttpServer())
+        .delete(`/rents/all/${rents[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(200);
+    });
+
+    it('GET /rents/completed', () => {
+      return request(app.getHttpServer())
+        .get('/rents/completed')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+  });
+
+  describe('Plots', () => {
+    it('PATCH /plots/:plotId', () => {
+      return request(app.getHttpServer())
+        .patch(`/plots/${plots[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          name: 'Plot',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+          price: 10,
+        })
+        .expect(200);
+    });
+
+    it('PATCH /plots/all/:plotId', () => {
+      return request(app.getHttpServer())
+        .patch(`/plots/all/${plots[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          name: 'Plot',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+          price: 10,
+        })
+        .expect(200);
+    });
+
+    it('DELETE /plots/:plotId', () => {
+      return request(app.getHttpServer())
+        .delete(`/plots/${plots[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(200);
+    });
+
+    it('DELETE /plots/all/:plotId', () => {
+      return request(app.getHttpServer())
+        .delete(`/plots/all/${plots[1]}`)
         .set('Authorization', `Bearer ${admin.access}`)
         .expect(200);
     });

@@ -11,8 +11,10 @@ import {
 import { ProductsService } from './products.service';
 import { Product } from './product.entity';
 import {
-  CreateProductDto,
-  CreateProductWithUserDto,
+  CreateProductWithRentAndUserDto,
+  CreateProductWithRentDto,
+  CreateProductWithShopAndUserDto,
+  CreateProductWithShopDto,
   EditProductAmountAndPriceDto,
   EditProductDto,
   ProductIdDto,
@@ -45,18 +47,36 @@ export class ProductsController {
     return this.productsService.getAllProducts(req);
   }
 
-  @Post()
-  createMyProduct(
+  @Post('shops')
+  createMyShopProduct(
     @MyId() myId: number,
-    @Body() dto: CreateProductDto,
+    @Body() dto: CreateProductWithShopDto,
   ): Promise<void> {
-    return this.productsService.createProduct({ ...dto, userId: myId });
+    return this.productsService.createShopProduct({ ...dto, userId: myId });
   }
 
   @Roles([Role.ADMIN])
-  @Post('all')
-  createUserProduct(@Body() dto: CreateProductWithUserDto): Promise<void> {
-    return this.productsService.createProduct(dto);
+  @Post('shops/all')
+  createUserShopProduct(
+    @Body() dto: CreateProductWithShopAndUserDto,
+  ): Promise<void> {
+    return this.productsService.createShopProduct(dto);
+  }
+
+  @Post('rents')
+  createMyRentProduct(
+    @MyId() myId: number,
+    @Body() dto: CreateProductWithRentDto,
+  ): Promise<void> {
+    return this.productsService.createRentProduct({ ...dto, userId: myId });
+  }
+
+  @Roles([Role.ADMIN])
+  @Post('rents/all')
+  createUserRentProduct(
+    @Body() dto: CreateProductWithRentAndUserDto,
+  ): Promise<void> {
+    return this.productsService.createRentProduct(dto);
   }
 
   @Patch(':productId/amount-and-price')

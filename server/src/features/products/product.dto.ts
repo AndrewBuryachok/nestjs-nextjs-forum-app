@@ -53,14 +53,28 @@ export class EditProductDto extends EditProductAmountAndPriceDto {
   unit: Unit;
 }
 
-export class CreateProductDto extends EditProductDto {
+export class CreateProductWithShopDto extends EditProductDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
   shopId: number;
 }
 
-export class CreateProductWithUserDto extends CreateProductDto {
+export class CreateProductWithShopAndUserDto extends CreateProductWithShopDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  userId: number;
+}
+
+export class CreateProductWithRentDto extends EditProductDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  rentId: number;
+}
+
+export class CreateProductWithRentAndUserDto extends CreateProductWithRentDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
