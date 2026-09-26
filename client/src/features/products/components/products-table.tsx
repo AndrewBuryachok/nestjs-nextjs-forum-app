@@ -24,10 +24,7 @@ export default function ProductsTable(props: Props) {
         {
           value: 'seller',
           render: (product) => (
-            <CustomAvatarWithCard
-              user={product.user}
-              card={product.shop.card}
-            />
+            <CustomAvatarWithCard user={product.user} card={product.card} />
           ),
         },
         {
@@ -51,7 +48,9 @@ export default function ProductsTable(props: Props) {
         },
         {
           value: 'shop',
-          render: (product) => <PlaceText place={product.shop} />,
+          render: (product) => (
+            <PlaceText place={product.shop ?? product.rent!.plot} />
+          ),
         },
         {
           value: 'created',
