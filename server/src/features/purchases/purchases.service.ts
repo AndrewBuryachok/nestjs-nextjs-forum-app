@@ -60,7 +60,7 @@ export class PurchasesService {
       senderUserId: dto.userId,
       senderCardId: dto.cardId,
       receiverUserId: product.userId,
-      receiverCardId: product.shop.cardId,
+      receiverCardId: product.cardId,
       type: TransactionType.BUY_PRODUCT,
       sum: dto.amount * product.price,
       description: product.description,
@@ -150,12 +150,16 @@ export class PurchasesService {
         'product.batch',
         'product.unit',
       ])
-      .innerJoin('product.shop', 'shop')
+      .leftJoin('product.shop', 'shop')
       .addSelect(['shop.id', 'shop.name', 'shop.x', 'shop.y'])
-      .innerJoin('shop.card', 'sellerCard')
-      .addSelect(['sellerCard.id', 'sellerCard.name'])
+      .leftJoin('product.rent', 'rent')
+      .addSelect(['rent.id'])
+      .leftJoin('rent.plot', 'plot')
+      .addSelect(['plot.id', 'plot.name', 'plot.x', 'plot.y'])
       .innerJoin('product.user', 'sellerUser')
       .addSelect(['sellerUser.id', 'sellerUser.nick', 'sellerUser.avatar'])
+      .innerJoin('product.card', 'sellerCard')
+      .addSelect(['sellerCard.id', 'sellerCard.name'])
       .innerJoin('purchase.user', 'buyerUser')
       .addSelect(['buyerUser.id', 'buyerUser.nick', 'buyerUser.avatar'])
       .innerJoin('purchase.card', 'buyerCard')

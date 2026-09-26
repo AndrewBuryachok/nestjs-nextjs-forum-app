@@ -6,13 +6,15 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, MoreThan, Repository, SelectQueryBuilder } from 'typeorm';
 import { Product } from './product.entity';
 import { MqttService } from '../mqtt/mqtt.service';
 import { CardsService } from '../cards/cards.service';
 import { ShopsService } from '../shops/shops.service';
+import { RentsService } from '../rents/rents.service';
 import {
-  CreateProductWithUserDto,
+  CreateProductWithRentAndUserDto,
+  CreateProductWithShopAndUserDto,
   EditProductAmountAndPriceDto,
   EditProductDto,
 } from './product.dto';
@@ -28,6 +30,7 @@ export class ProductsService {
     private mqttService: MqttService,
     private cardsService: CardsService,
     private shopsService: ShopsService,
+    private rentsService: RentsService,
   ) {}
 
   async getMainProducts(req: Request): Promise<Response<Product>> {
@@ -51,13 +54,32 @@ export class ProductsService {
     return { data, total };
   }
 
-  async createProduct(dto: CreateProductWithUserDto): Promise<void> {
-    await this.shopsService.throwIfNotShopOwner(dto.shopId, dto.userId);
-    const product = await this.create(dto);
-    this.mqttService.publishNotification(
+  async createShopProduct(dto: CreateProductWithShopAndUserDto): Promise<void> {
+    const shop = await this.shopsService.throwIfNotShopOwner(
+      dto.shopId,
       dto.userId,
+    );
+    const product = await this.createShop(dto, shop.cardId);
+    this.publishCreateProductNotification(dto.userId, product.id);
+  }
+
+  async createRentProduct(dto: CreateProductWithRentAndUserDto): Promise<void> {
+    const rent = await this.rentsService.throwIfNotRentUser(
+      dto.rentId,
+      dto.userId,
+    );
+    const product = await this.createRent(dto, rent.cardId);
+    this.publishCreateProductNotification(dto.userId, product.id);
+  }
+
+  private publishCreateProductNotification(
+    userId: number,
+    productId: number,
+  ): void {
+    this.mqttService.publishNotification(
+      userId,
       0,
-      product.id,
+      productId,
       Notification.CREATE_PRODUCT,
     );
   }
@@ -131,7 +153,7 @@ export class ProductsService {
   ): Promise<Product> {
     const product = await this.throwIfProductNotFound(productId);
     const isCardUser = await this.cardsService.isCardUser(
-      product.shop.cardId,
+      product.cardId,
       userId,
     );
     if (!isCardUser) {
@@ -170,17 +192,21 @@ export class ProductsService {
   }
 
   private findProductById(id: number): Promise<Product | null> {
-    return this.productsRepository.findOne({
-      relations: { shop: true },
-      where: { id },
+    return this.productsRepository.findOneBy({
+      id,
+      rent: { completedAt: MoreThan(new Date()) },
     });
   }
 
-  private async create(dto: CreateProductWithUserDto): Promise<Product> {
+  private async createShop(
+    dto: CreateProductWithShopAndUserDto,
+    cardId: number,
+  ): Promise<Product> {
     try {
       const product = this.productsRepository.create({
         shopId: dto.shopId,
         userId: dto.userId,
+        cardId,
         item: dto.item,
         description: dto.description,
         amount: dto.amount,
@@ -191,7 +217,30 @@ export class ProductsService {
       await this.productsRepository.save(product);
       return product;
     } catch (error) {
-      throw new InternalServerErrorException(ProductError.CREATE_FAILED);
+      throw new InternalServerErrorException(ProductError.CREATE_SHOP_FAILED);
+    }
+  }
+
+  private async createRent(
+    dto: CreateProductWithRentAndUserDto,
+    cardId: number,
+  ): Promise<Product> {
+    try {
+      const product = this.productsRepository.create({
+        rentId: dto.rentId,
+        userId: dto.userId,
+        cardId,
+        item: dto.item,
+        description: dto.description,
+        amount: dto.amount,
+        batch: dto.batch,
+        unit: dto.unit,
+        price: dto.price,
+      });
+      await this.productsRepository.save(product);
+      return product;
+    } catch (error) {
+      throw new InternalServerErrorException(ProductError.CREATE_RENT_FAILED);
     }
   }
 
@@ -274,14 +323,19 @@ export class ProductsService {
         'product.price',
         'product.createdAt',
       ])
-      .innerJoin('product.shop', 'shop')
+      .leftJoin('product.shop', 'shop')
       .addSelect(['shop.id', 'shop.name', 'shop.x', 'shop.y'])
-      .innerJoin('shop.card', 'sellerCard')
-      .addSelect(['sellerCard.id', 'sellerCard.name'])
+      .leftJoin('product.rent', 'rent')
+      .addSelect(['rent.id'])
+      .leftJoin('rent.plot', 'plot')
+      .addSelect(['plot.id', 'plot.name', 'plot.x', 'plot.y'])
       .innerJoin('product.user', 'sellerUser')
       .addSelect(['sellerUser.id', 'sellerUser.nick', 'sellerUser.avatar'])
+      .innerJoin('product.card', 'sellerCard')
+      .addSelect(['sellerCard.id', 'sellerCard.name'])
       .loadRelationCountAndMap('product.purchases', 'product.purchases')
-      .where(
+      .where('rent.completedAt > NOW()')
+      .andWhere(
         new Brackets(
           (qb) => req.id && qb.where('product.id = :id', { id: req.id }),
         ),
