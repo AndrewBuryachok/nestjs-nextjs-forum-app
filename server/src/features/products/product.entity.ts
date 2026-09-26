@@ -9,7 +9,9 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
+import { Card } from '../cards/card.entity';
 import { Shop } from '../shops/shop.entity';
+import { Rent } from '../rents/rent.entity';
 import { Purchase } from '../purchases/purchase.entity';
 import { Item, Unit } from '../../common/enums';
 
@@ -18,12 +20,19 @@ export class Product {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'shop_id' })
-  shopId: number;
+  @Column({ name: 'shop_id', nullable: true })
+  shopId?: number;
 
-  @ManyToOne(() => Shop, { nullable: false })
+  @ManyToOne(() => Shop, { nullable: true })
   @JoinColumn({ name: 'shop_id' })
-  shop: Shop;
+  shop?: Shop;
+
+  @Column({ name: 'rent_id', nullable: true })
+  rentId?: number;
+
+  @ManyToOne(() => Rent, { nullable: true })
+  @JoinColumn({ name: 'rent_id' })
+  rent?: Rent;
 
   @Column({ name: 'user_id' })
   userId: number;
@@ -31,6 +40,13 @@ export class Product {
   @ManyToOne(() => User, { nullable: false })
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @Column({ name: 'card_id' })
+  cardId: number;
+
+  @ManyToOne(() => Card, { nullable: false })
+  @JoinColumn({ name: 'card_id' })
+  card: Card;
 
   @Column({ type: 'enum', enum: Item })
   item: Item;
