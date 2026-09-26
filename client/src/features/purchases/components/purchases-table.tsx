@@ -32,7 +32,7 @@ export default function PurchasesTable(props: Props) {
           render: (purchase) => (
             <CustomAvatarWithCard
               user={purchase.product.user}
-              card={purchase.product.shop.card}
+              card={purchase.product.card}
             />
           ),
         },
@@ -65,7 +65,11 @@ export default function PurchasesTable(props: Props) {
         },
         {
           value: 'shop',
-          render: (purchase) => <PlaceText place={purchase.product.shop} />,
+          render: (purchase) => (
+            <PlaceText
+              place={purchase.product.shop ?? purchase.product.rent!.plot}
+            />
+          ),
         },
         {
           value: 'created',

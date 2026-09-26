@@ -3,7 +3,6 @@ import { Item } from '@/constants/items';
 import { Unit } from '@/constants/units';
 
 export const createProductSchema = z.object({
-  shopId: z.number().int().min(1),
   item: z.enum(Item),
   description: z.string().max(32),
   amount: z.number().int().min(1).max(27),
@@ -14,12 +13,38 @@ export const createProductSchema = z.object({
 
 export type CreateProductType = z.infer<typeof createProductSchema>;
 
-export const createProductWithUserSchema = createProductSchema.extend({
-  userId: z.number().int().min(1),
+export const createProductWithShopSchema = createProductSchema.extend({
+  shopId: z.number().int().min(1),
 });
 
-export type CreateProductWithUserType = z.infer<
-  typeof createProductWithUserSchema
+export type CreateProductWithShopType = z.infer<
+  typeof createProductWithShopSchema
+>;
+
+export const createProductWithShopAndUserSchema =
+  createProductWithShopSchema.extend({
+    userId: z.number().int().min(1),
+  });
+
+export type CreateProductWithShopAndUserType = z.infer<
+  typeof createProductWithShopAndUserSchema
+>;
+
+export const createProductWithRentSchema = createProductSchema.extend({
+  rentId: z.number().int().min(1),
+});
+
+export type CreateProductWithRentType = z.infer<
+  typeof createProductWithRentSchema
+>;
+
+export const createProductWithRentAndUserSchema =
+  createProductWithRentSchema.extend({
+    userId: z.number().int().min(1),
+  });
+
+export type CreateProductWithRentAndUserType = z.infer<
+  typeof createProductWithRentAndUserSchema
 >;
 
 export const editProductAmountAndPriceSchema = z.object({
