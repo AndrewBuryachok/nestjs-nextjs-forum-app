@@ -30,7 +30,7 @@ export default function ViewPurchaseForm(props: Props) {
         <Field.Label>{t('columns.seller')}</Field.Label>
         <CardInput
           user={props.purchase.product.user}
-          card={props.purchase.product.shop.card}
+          card={props.purchase.product.card}
         />
       </Field.Root>
       <Field.Root>
@@ -57,7 +57,11 @@ export default function ViewPurchaseForm(props: Props) {
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.shop')}</Field.Label>
-        <PlaceInput place={props.purchase.product.shop} />
+        <PlaceInput
+          place={
+            props.purchase.product.shop ?? props.purchase.product.rent!.plot
+          }
+        />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.created')}</Field.Label>
