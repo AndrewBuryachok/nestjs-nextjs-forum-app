@@ -24,7 +24,7 @@ export default function ViewProductForm(props: Props) {
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.seller')}</Field.Label>
-        <CardInput user={props.product.user} card={props.product.shop.card} />
+        <CardInput user={props.product.user} card={props.product.card} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.item')}</Field.Label>
@@ -50,7 +50,7 @@ export default function ViewProductForm(props: Props) {
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.shop')}</Field.Label>
-        <PlaceInput place={props.product.shop} />
+        <PlaceInput place={props.product.shop ?? props.product.rent!.plot} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.created')}</Field.Label>

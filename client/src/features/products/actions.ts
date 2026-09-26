@@ -3,8 +3,10 @@
 import {
   buyProductSchema,
   buyProductWithUserSchema,
-  createProductSchema,
-  createProductWithUserSchema,
+  createProductWithRentAndUserSchema,
+  createProductWithRentSchema,
+  createProductWithShopAndUserSchema,
+  createProductWithShopSchema,
   deleteProductSchema,
   editProductAmountAndPriceSchema,
   editProductSchema,
@@ -12,16 +14,28 @@ import {
 import { actionClient } from '@/lib/safe-action';
 import { send } from '@/lib/api';
 
-export const createMyProductAction = actionClient
-  .inputSchema(createProductSchema)
+export const createMyShopProductAction = actionClient
+  .inputSchema(createProductWithShopSchema)
   .action(({ parsedInput: body }) => {
-    return send('POST', '/products', body);
+    return send('POST', '/products/shops', body);
   });
 
-export const createUserProductAction = actionClient
-  .inputSchema(createProductWithUserSchema)
+export const createUserShopProductAction = actionClient
+  .inputSchema(createProductWithShopAndUserSchema)
   .action(({ parsedInput: body }) => {
-    return send('POST', '/products/all', body);
+    return send('POST', '/products/shops/all', body);
+  });
+
+export const createMyRentProductAction = actionClient
+  .inputSchema(createProductWithRentSchema)
+  .action(({ parsedInput: body }) => {
+    return send('POST', '/products/rents', body);
+  });
+
+export const createUserRentProductAction = actionClient
+  .inputSchema(createProductWithRentAndUserSchema)
+  .action(({ parsedInput: body }) => {
+    return send('POST', '/products/rents/all', body);
   });
 
 export const editMyProductAmountAndPriceAction = actionClient

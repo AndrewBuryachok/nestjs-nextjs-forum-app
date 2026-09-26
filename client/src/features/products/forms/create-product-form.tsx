@@ -5,16 +5,23 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Field, Input, NumberInput } from '@chakra-ui/react';
-import { createMyProductAction, createUserProductAction } from '../actions';
+import { Field, Input, NumberInput, SegmentGroup } from '@chakra-ui/react';
+import {
+  createMyRentProductAction,
+  createMyShopProductAction,
+  createUserRentProductAction,
+  createUserShopProductAction,
+} from '../actions';
 import { createProductSchema, CreateProductType } from '../schema';
 import { useSelectAllUsers } from '@/features/users/hooks';
 import { useSelectMyShops, useSelectUserShops } from '@/features/shops/hooks';
+import { useSelectMyRents, useSelectUserRents } from '@/features/rents/hooks';
 import { useDialogContext } from '@/providers/dialog-provider';
 import { toaster } from '@/components/ui/toaster';
 import CustomForm from '@/components/custom-form';
 import UsersCombobox from '@/features/users/components/users-combobox';
 import ShopsCombobox from '@/features/shops/components/shops-combobox';
+import RentsCombobox from '@/features/rents/components/rents-combobox';
 import ItemsCombobox from '@/components/items-combobox';
 import UnitsSegmentGroup from '@/components/units-segment-group';
 
@@ -38,12 +45,20 @@ export default function CreateProductForm(props: Props) {
     },
   });
 
+  const [type, setType] = useState('shop');
   const [userId, setUserId] = useState(0);
+  const [shopId, setShopId] = useState(0);
+  const [rentId, setRentId] = useState(0);
 
   const onSubmit = form.handleSubmit(async (data) => {
-    const res = props.isAll
-      ? await createUserProductAction({ ...data, userId })
-      : await createMyProductAction(data);
+    const res =
+      type === 'shop'
+        ? props.isAll
+          ? await createUserShopProductAction({ ...data, shopId, userId })
+          : await createMyShopProductAction({ ...data, shopId })
+        : props.isAll
+          ? await createUserRentProductAction({ ...data, rentId, userId })
+          : await createMyRentProductAction({ ...data, rentId });
     if (res.data) {
       if (res.data.ok) {
         const title = t('toasts.products.create.success');
@@ -59,9 +74,24 @@ export default function CreateProductForm(props: Props) {
 
   const users = useSelectAllUsers(props.isAll);
   const shops = props.isAll ? useSelectUserShops(userId) : useSelectMyShops();
+  const rents = props.isAll ? useSelectUserRents(userId) : useSelectMyRents();
 
   return (
     <CustomForm disabled={form.formState.isSubmitting} onSubmit={onSubmit}>
+      <SegmentGroup.Root
+        w='full'
+        value={type}
+        onValueChange={({ value }) => value && setType(value)}
+      >
+        <SegmentGroup.Indicator />
+        <SegmentGroup.Items
+          w='full'
+          items={['shop', 'rent'].map((type) => ({
+            value: type,
+            label: t(`columns.${type}`),
+          }))}
+        />
+      </SegmentGroup.Root>
       {props.isAll && (
         <Field.Root required>
           <Field.Label>
@@ -77,25 +107,35 @@ export default function CreateProductForm(props: Props) {
           />
         </Field.Root>
       )}
-      <Field.Root disabled={props.isAll && !userId} required>
-        <Field.Label>
-          {t('columns.shop')}
-          <Field.RequiredIndicator />
-        </Field.Label>
-        <Controller
-          control={form.control}
-          name='shopId'
-          render={({ field }) => (
-            <ShopsCombobox
-              data={shops.data}
-              loading={shops.isLoading}
-              placeholder={t('columns.shop')}
-              value={field.value}
-              setValue={field.onChange}
-            />
-          )}
-        />
-      </Field.Root>
+      {type === 'shop' ? (
+        <Field.Root disabled={props.isAll && !userId} required>
+          <Field.Label>
+            {t('columns.shop')}
+            <Field.RequiredIndicator />
+          </Field.Label>
+          <ShopsCombobox
+            data={shops.data}
+            loading={shops.isLoading}
+            placeholder={t('columns.shop')}
+            value={shopId}
+            setValue={setShopId}
+          />
+        </Field.Root>
+      ) : (
+        <Field.Root disabled={props.isAll && !userId} required>
+          <Field.Label>
+            {t('columns.rent')}
+            <Field.RequiredIndicator />
+          </Field.Label>
+          <RentsCombobox
+            data={rents.data}
+            loading={rents.isLoading}
+            placeholder={t('columns.rent')}
+            value={rentId}
+            setValue={setRentId}
+          />
+        </Field.Root>
+      )}
       <Field.Root required>
         <Field.Label>
           {t('columns.item')}
