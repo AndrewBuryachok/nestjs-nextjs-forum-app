@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 import { faker } from '@faker-js/faker';
 import { User } from '../../features/users/user.entity';
+import { Town } from '../../features/towns/town.entity';
 import { Card } from '../../features/cards/card.entity';
 import { CardUser } from '../../features/cards/card-user.entity';
 import { Transaction } from '../../features/transactions/transaction.entity';
@@ -26,6 +27,14 @@ export default class AppSeeder implements Seeder {
       const id = i + 1;
       const user = await userFactory.make({ id });
       users.push(user);
+    }
+    const townFactory = factoryManager.get(Town);
+    const towns: Town[] = [];
+    for (let i = 0; i < 10; i++) {
+      const id = i + 1;
+      const user = faker.helpers.arrayElement(users);
+      const town = await townFactory.make({ id, user });
+      towns.push(town);
     }
     const cardFactory = factoryManager.get(Card);
     const cards: Card[] = [];
@@ -309,6 +318,7 @@ export default class AppSeeder implements Seeder {
       orders.push(order);
     }
     await dataSource.getRepository(User).save(users);
+    await dataSource.getRepository(Town).save(towns);
     await dataSource.getRepository(Card).save(cards);
     await dataSource.getRepository(CardUser).save(cardsUsers);
     await dataSource.getRepository(Transaction).save(transactions);
