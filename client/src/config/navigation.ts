@@ -46,6 +46,11 @@ export const PAGE_TABS_MAP = {
     my: {},
     all: { roles: [Role.ADMIN] },
   },
+  towns: {
+    main: { public: true },
+    my: {},
+    all: { roles: [Role.ADMIN] },
+  },
   transactions: {
     my: {},
     all: { roles: [Role.ADMIN] },
