@@ -168,6 +168,28 @@ describe('App', () => {
     });
   });
 
+  describe('Towns', () => {
+    it('GET /towns', () => {
+      return request(app.getHttpServer())
+        .get('/towns')
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /towns/my', () => {
+      return request(app.getHttpServer())
+        .get('/towns/my')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /towns/all', () => {
+      return request(app.getHttpServer())
+        .get('/towns/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+  });
+
   describe('Cards', () => {
     it('POST /cards', () => {
       return request(app.getHttpServer())
