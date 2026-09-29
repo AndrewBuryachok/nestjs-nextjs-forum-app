@@ -169,6 +169,31 @@ describe('App', () => {
   });
 
   describe('Towns', () => {
+    it('POST /towns', () => {
+      return request(app.getHttpServer())
+        .post('/towns')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          name: 'Town',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+        })
+        .expect(201);
+    });
+
+    it('POST /towns/all', () => {
+      return request(app.getHttpServer())
+        .post('/towns/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          userId: user.user.id,
+          name: 'Town',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+        })
+        .expect(201);
+    });
+
     it('GET /towns', () => {
       return request(app.getHttpServer())
         .get('/towns')
