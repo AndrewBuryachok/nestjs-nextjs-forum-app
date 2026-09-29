@@ -1,7 +1,20 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { TownsService } from './towns.service';
 import { Town } from './town.entity';
-import { CreateTownDto, CreateTownWithUserDto } from './town.dto';
+import {
+  CreateTownDto,
+  CreateTownWithUserDto,
+  EditTownDto,
+  TownIdDto,
+} from './town.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -42,5 +55,23 @@ export class TownsController {
   @Post('all')
   createUserTown(@Body() dto: CreateTownWithUserDto): Promise<void> {
     return this.townsService.createTown(dto);
+  }
+
+  @Patch(':townId')
+  editMyTown(
+    @MyId() myId: number,
+    @Param() { townId }: TownIdDto,
+    @Body() dto: EditTownDto,
+  ): Promise<void> {
+    return this.townsService.editMyTown(myId, townId, dto);
+  }
+
+  @Roles([Role.ADMIN])
+  @Patch('all/:townId')
+  editUserTown(
+    @Param() { townId }: TownIdDto,
+    @Body() dto: EditTownDto,
+  ): Promise<void> {
+    return this.townsService.editUserTown(townId, dto);
   }
 }
