@@ -46,6 +46,7 @@ describe('App', () => {
   let admin: Tokens;
   let user: Tokens;
   let users: number[];
+  let towns: number[];
   let cards: number[];
   let transactions: number[];
   let fines: number[];
@@ -204,7 +205,8 @@ describe('App', () => {
       return request(app.getHttpServer())
         .get('/towns/my')
         .set('Authorization', `Bearer ${user.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
+        .then((res) => (towns = res.body.data.map((town) => town.id)));
     });
 
     it('GET /towns/all', () => {
@@ -212,6 +214,46 @@ describe('App', () => {
         .get('/towns/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('PATCH /towns/:townId', () => {
+      return request(app.getHttpServer())
+        .patch(`/towns/${towns[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({
+          name: 'Town',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+          price: 10,
+        })
+        .expect(200);
+    });
+
+    it('PATCH /towns/all/:townId', () => {
+      return request(app.getHttpServer())
+        .patch(`/towns/all/${towns[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          name: 'Town',
+          x: Math.floor(Math.random() * 2001) - 1000,
+          y: Math.floor(Math.random() * 2001) - 1000,
+          price: 10,
+        })
+        .expect(200);
+    });
+
+    it('DELETE /towns/:townId', () => {
+      return request(app.getHttpServer())
+        .delete(`/towns/${towns[0]}`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect(200);
+    });
+
+    it('DELETE /towns/all/:townId', () => {
+      return request(app.getHttpServer())
+        .delete(`/towns/all/${towns[1]}`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect(200);
     });
   });
 
