@@ -3,6 +3,7 @@ import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 import { faker } from '@faker-js/faker';
 import { User } from '../../features/users/user.entity';
 import { Town } from '../../features/towns/town.entity';
+import { TownUser } from '../../features/towns/town-user.entity';
 import { Card } from '../../features/cards/card.entity';
 import { CardUser } from '../../features/cards/card-user.entity';
 import { Transaction } from '../../features/transactions/transaction.entity';
@@ -32,9 +33,28 @@ export default class AppSeeder implements Seeder {
     const towns: Town[] = [];
     for (let i = 0; i < 10; i++) {
       const id = i + 1;
-      const user = faker.helpers.arrayElement(users);
+      const user = faker.helpers.arrayElement(
+        users.filter((user) => !towns.find((town) => town.user.id === user.id)),
+      );
       const town = await townFactory.make({ id, user });
       towns.push(town);
+    }
+    const townUserFactory = factoryManager.get(TownUser);
+    const townsUsers: TownUser[] = [];
+    for (const town of towns) {
+      const townUser = await townUserFactory.make({ town, user: town.user });
+      townsUsers.push(townUser);
+    }
+    for (let i = 0; i < 5; i++) {
+      const town = faker.helpers.arrayElement(towns);
+      const user = faker.helpers.arrayElement(
+        users.filter(
+          (user) =>
+            !townsUsers.find((townUser) => townUser.user.id === user.id),
+        ),
+      );
+      const townUser = await townUserFactory.make({ town, user });
+      townsUsers.push(townUser);
     }
     const cardFactory = factoryManager.get(Card);
     const cards: Card[] = [];
@@ -319,6 +339,7 @@ export default class AppSeeder implements Seeder {
     }
     await dataSource.getRepository(User).save(users);
     await dataSource.getRepository(Town).save(towns);
+    await dataSource.getRepository(TownUser).save(townsUsers);
     await dataSource.getRepository(Card).save(cards);
     await dataSource.getRepository(CardUser).save(cardsUsers);
     await dataSource.getRepository(Transaction).save(transactions);
