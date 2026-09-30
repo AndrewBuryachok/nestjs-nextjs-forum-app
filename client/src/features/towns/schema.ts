@@ -28,3 +28,10 @@ export const deleteTownSchema = z.object({
 });
 
 export type DeleteTownType = z.infer<typeof deleteTownSchema>;
+
+export const updateTownUserSchema = z.object({
+  townId: z.number().int().min(1),
+  userId: z.number().int().min(1),
+});
+
+export type UpdateTownUserType = z.infer<typeof updateTownUserSchema>;

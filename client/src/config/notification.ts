@@ -39,6 +39,8 @@ export const NOTIFICATION_TABS_MAP = {
   },
   towns: {
     create: 'main',
+    add: 'my',
+    remove: 'my',
   },
   transactions: {
     create: 'my',

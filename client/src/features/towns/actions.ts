@@ -5,6 +5,7 @@ import {
   createTownWithUserSchema,
   deleteTownSchema,
   editTownSchema,
+  updateTownUserSchema,
 } from './schema';
 import { actionClient } from '@/lib/safe-action';
 import { send } from '@/lib/api';
@@ -43,4 +44,28 @@ export const deleteUserTownAction = actionClient
   .inputSchema(deleteTownSchema)
   .action(({ parsedInput: { townId } }) => {
     return send('DELETE', `/towns/all/${townId}`);
+  });
+
+export const addMyTownUserAction = actionClient
+  .inputSchema(updateTownUserSchema)
+  .action(({ parsedInput: { townId, ...body } }) => {
+    return send('POST', `/towns/${townId}/users`, body);
+  });
+
+export const addUserTownUserAction = actionClient
+  .inputSchema(updateTownUserSchema)
+  .action(({ parsedInput: { townId, ...body } }) => {
+    return send('POST', `/towns/all/${townId}/users`, body);
+  });
+
+export const removeMyTownUserAction = actionClient
+  .inputSchema(updateTownUserSchema)
+  .action(({ parsedInput: { townId, ...body } }) => {
+    return send('DELETE', `/towns/${townId}/users`, body);
+  });
+
+export const removeUserTownUserAction = actionClient
+  .inputSchema(updateTownUserSchema)
+  .action(({ parsedInput: { townId, ...body } }) => {
+    return send('DELETE', `/towns/all/${townId}/users`, body);
   });
