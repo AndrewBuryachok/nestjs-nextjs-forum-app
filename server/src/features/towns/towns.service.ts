@@ -13,7 +13,11 @@ import { TownUser } from './town-user.entity';
 import { MqttService } from '../mqtt/mqtt.service';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
-import { CreateTownWithUserDto, EditTownDto } from './town.dto';
+import {
+  CreateTownWithUserDto,
+  EditTownDto,
+  UpdateTownUserDto,
+} from './town.dto';
 import { TownError } from './town-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 import { Notification } from '../../common/enums';
@@ -53,6 +57,12 @@ export class TownsService {
     const townUsers = await this.townsUsersRepository.findBy({ townId });
     const users = townUsers.map((townUser) => townUser.userId);
     return this.usersService.selectUsersByIds(users);
+  }
+
+  async selectNotTownUsers(): Promise<User[]> {
+    const townUsers = await this.townsUsersRepository.find();
+    const users = townUsers.map((townUser) => townUser.userId);
+    return this.usersService.selectUsersByNotIds(users);
   }
 
   async createTown(dto: CreateTownWithUserDto): Promise<void> {
@@ -99,6 +109,70 @@ export class TownsService {
       throw new BadRequestException(TownError.HAS_USER);
     }
     await this.delete(town.id);
+  }
+
+  async addMyTownUser(
+    myId: number,
+    townId: number,
+    dto: UpdateTownUserDto,
+  ): Promise<void> {
+    const town = await this.throwIfNotTownOwner(townId, myId);
+    await this.addTownUser(town, dto.userId);
+  }
+
+  async addUserTownUser(townId: number, dto: UpdateTownUserDto): Promise<void> {
+    const town = await this.throwIfTownNotFound(townId);
+    await this.addTownUser(town, dto.userId);
+  }
+
+  private async addTownUser(town: Town, userId: number): Promise<void> {
+    await this.usersService.throwIfUserNotFound(userId);
+    await this.throwIfUserAlreadyIn(userId);
+    await this.addUser(town.id, userId);
+    this.mqttService.publishNotification(
+      town.userId,
+      userId,
+      town.id,
+      Notification.ADD_TOWN_USER,
+    );
+  }
+
+  async removeMyTownUser(
+    myId: number,
+    townId: number,
+    dto: UpdateTownUserDto,
+  ): Promise<void> {
+    const town = await this.throwIfNotTownOwner(townId, myId);
+    await this.removeTownUser(town, dto.userId);
+  }
+
+  async removeUserTownUser(
+    townId: number,
+    dto: UpdateTownUserDto,
+  ): Promise<void> {
+    const town = await this.throwIfTownNotFound(townId);
+    await this.removeTownUser(town, dto.userId);
+  }
+
+  private async removeTownUser(town: Town, userId: number): Promise<void> {
+    await this.usersService.throwIfUserNotFound(userId);
+    if (town.userId === userId) {
+      throw new BadRequestException(TownError.USER_IS_OWNER);
+    }
+    const townUser = await this.townsUsersRepository.findOneBy({
+      townId: town.id,
+      userId,
+    });
+    if (!townUser) {
+      throw new BadRequestException(TownError.USER_NOT_IN);
+    }
+    await this.removeUser(townUser.id);
+    this.mqttService.publishNotification(
+      town.userId,
+      userId,
+      town.id,
+      Notification.REMOVE_TOWN_USER,
+    );
   }
 
   async throwIfTownNotFound(townId: number): Promise<Town> {
@@ -170,6 +244,23 @@ export class TownsService {
       await this.townsRepository.softDelete({ id });
     } catch (error) {
       throw new InternalServerErrorException(TownError.DELETE_FAILED);
+    }
+  }
+
+  private async addUser(townId: number, userId: number): Promise<void> {
+    try {
+      const townUser = this.townsUsersRepository.create({ townId, userId });
+      await this.townsUsersRepository.save(townUser);
+    } catch (error) {
+      throw new InternalServerErrorException(TownError.ADD_USER_FAILED);
+    }
+  }
+
+  private async removeUser(id: number): Promise<void> {
+    try {
+      await this.townsUsersRepository.softDelete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(TownError.REMOVE_USER_FAILED);
     }
   }
 

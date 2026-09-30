@@ -16,6 +16,7 @@ import {
   CreateTownWithUserDto,
   EditTownDto,
   TownIdDto,
+  UpdateTownUserDto,
 } from './town.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
@@ -43,6 +44,12 @@ export class TownsController {
   @Get('all')
   getAllTowns(@Query() req: Request): Promise<Response<Town>> {
     return this.townsService.getAllTowns(req);
+  }
+
+  @Public()
+  @Get('not/users')
+  selectNotTownUsers(): Promise<User[]> {
+    return this.townsService.selectNotTownUsers();
   }
 
   @Public()
@@ -95,5 +102,41 @@ export class TownsController {
   @Delete('all/:townId')
   deleteUserTown(@Param() { townId }: TownIdDto): Promise<void> {
     return this.townsService.deleteUserTown(townId);
+  }
+
+  @Post(':townId/users')
+  addMyTownUser(
+    @MyId() myId: number,
+    @Param() { townId }: TownIdDto,
+    @Body() dto: UpdateTownUserDto,
+  ): Promise<void> {
+    return this.townsService.addMyTownUser(myId, townId, dto);
+  }
+
+  @Roles([Role.ADMIN])
+  @Post('all/:townId/users')
+  addUserTownUser(
+    @Param() { townId }: TownIdDto,
+    @Body() dto: UpdateTownUserDto,
+  ): Promise<void> {
+    return this.townsService.addUserTownUser(townId, dto);
+  }
+
+  @Delete(':townId/users')
+  removeMyTownUser(
+    @MyId() myId: number,
+    @Param() { townId }: TownIdDto,
+    @Body() dto: UpdateTownUserDto,
+  ): Promise<void> {
+    return this.townsService.removeMyTownUser(myId, townId, dto);
+  }
+
+  @Roles([Role.ADMIN])
+  @Delete('all/:townId/users')
+  removeUserTownUser(
+    @Param() { townId }: TownIdDto,
+    @Body() dto: UpdateTownUserDto,
+  ): Promise<void> {
+    return this.townsService.removeUserTownUser(townId, dto);
   }
 }

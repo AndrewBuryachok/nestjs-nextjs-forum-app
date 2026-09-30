@@ -1,5 +1,7 @@
 export enum Notification {
   CREATE_TOWN = 'create towns',
+  ADD_TOWN_USER = 'add towns',
+  REMOVE_TOWN_USER = 'remove towns',
   ADD_CARD_USER = 'add cards',
   REMOVE_CARD_USER = 'remove cards',
   CREATE_TRANSACTION = 'create transactions',

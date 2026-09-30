@@ -222,6 +222,44 @@ describe('App', () => {
         .expect((res) => expect(res.body.length).toBeGreaterThan(0));
     });
 
+    it('GET /towns/not/users', () => {
+      return request(app.getHttpServer())
+        .get('/towns/not/users')
+        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+    });
+
+    it('POST /towns/:townId/users', () => {
+      return request(app.getHttpServer())
+        .post(`/towns/${towns[0]}/users`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ userId: admin.user.id })
+        .expect(201);
+    });
+
+    it('DELETE /towns/:townId/users', () => {
+      return request(app.getHttpServer())
+        .delete(`/towns/${towns[0]}/users`)
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ userId: admin.user.id })
+        .expect(200);
+    });
+
+    it('POST /towns/all/:townId/users', () => {
+      return request(app.getHttpServer())
+        .post(`/towns/all/${towns[0]}/users`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({ userId: admin.user.id })
+        .expect(201);
+    });
+
+    it('DELETE /towns/all/:townId/users', () => {
+      return request(app.getHttpServer())
+        .delete(`/towns/all/${towns[0]}/users`)
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({ userId: admin.user.id })
+        .expect(200);
+    });
+
     it('PATCH /towns/:townId', () => {
       return request(app.getHttpServer())
         .patch(`/towns/${towns[0]}`)

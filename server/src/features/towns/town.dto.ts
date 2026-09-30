@@ -15,3 +15,10 @@ export class CreateTownDto extends CreatePlaceDto {}
 export class CreateTownWithUserDto extends CreatePlaceWithUserDto {}
 
 export class EditTownDto extends CreatePlaceDto {}
+
+export class UpdateTownUserDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  userId: number;
+}
