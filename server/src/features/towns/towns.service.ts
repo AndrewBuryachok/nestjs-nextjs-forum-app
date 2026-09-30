@@ -6,7 +6,9 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { Transactional } from 'typeorm-transactional';
 import { Town } from './town.entity';
+import { ResidentsService } from './residents.service';
 import { MqttService } from '../mqtt/mqtt.service';
 import { UsersService } from '../users/users.service';
 import { CreateTownWithUserDto, EditTownDto } from './town.dto';
@@ -19,6 +21,7 @@ export class TownsService {
   constructor(
     @InjectRepository(Town)
     private townsRepository: Repository<Town>,
+    private residentsService: ResidentsService,
     private mqttService: MqttService,
     private usersService: UsersService,
   ) {}
@@ -31,7 +34,8 @@ export class TownsService {
 
   async getMyTowns(myId: number, req: Request): Promise<Response<Town>> {
     const [data, total] = await this.getTownsQueryBuilder(req)
-      .andWhere('ownerUser.id = :myId', { myId })
+      .innerJoin('town.townUsers', 'townUsers')
+      .andWhere('townUsers.userId = :myId', { myId })
       .getManyAndCount();
     return { data, total };
   }
@@ -42,9 +46,12 @@ export class TownsService {
     return { data, total };
   }
 
+  @Transactional()
   async createTown(dto: CreateTownWithUserDto): Promise<void> {
     await this.usersService.throwIfUserNotFound(dto.userId);
+    await this.residentsService.throwIfResidentAlreadyExists(dto.userId);
     const town = await this.create(dto);
+    await this.residentsService.createResident(town.id, dto.userId);
     this.mqttService.publishNotification(
       dto.userId,
       0,
@@ -119,6 +126,7 @@ export class TownsService {
       .select(['town.id', 'town.name', 'town.x', 'town.y', 'town.createdAt'])
       .innerJoin('town.user', 'ownerUser')
       .addSelect(['ownerUser.id', 'ownerUser.nick', 'ownerUser.avatar'])
+      .loadRelationCountAndMap('town.users', 'town.townUsers')
       .where(
         new Brackets(
           (qb) => req.id && qb.where('town.id = :id', { id: req.id }),
