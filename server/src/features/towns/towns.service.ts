@@ -1,12 +1,15 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, IsNull, Repository, SelectQueryBuilder } from 'typeorm';
+import { Transactional } from 'typeorm-transactional';
 import { Town } from './town.entity';
+import { TownUser } from './town-user.entity';
 import { MqttService } from '../mqtt/mqtt.service';
 import { UsersService } from '../users/users.service';
 import { CreateTownWithUserDto, EditTownDto } from './town.dto';
@@ -19,6 +22,8 @@ export class TownsService {
   constructor(
     @InjectRepository(Town)
     private townsRepository: Repository<Town>,
+    @InjectRepository(TownUser)
+    private townsUsersRepository: Repository<TownUser>,
     private mqttService: MqttService,
     private usersService: UsersService,
   ) {}
@@ -31,7 +36,8 @@ export class TownsService {
 
   async getMyTowns(myId: number, req: Request): Promise<Response<Town>> {
     const [data, total] = await this.getTownsQueryBuilder(req)
-      .andWhere('ownerUser.id = :myId', { myId })
+      .innerJoin('town.townUsers', 'townUsers')
+      .andWhere('townUsers.userId = :myId', { myId })
       .getManyAndCount();
     return { data, total };
   }
@@ -44,6 +50,7 @@ export class TownsService {
 
   async createTown(dto: CreateTownWithUserDto): Promise<void> {
     await this.usersService.throwIfUserNotFound(dto.userId);
+    await this.throwIfUserAlreadyIn(dto.userId);
     const town = await this.create(dto);
     this.mqttService.publishNotification(
       dto.userId,
@@ -68,13 +75,23 @@ export class TownsService {
   }
 
   async deleteMyTown(myId: number, townId: number): Promise<void> {
-    await this.throwIfNotTownOwner(townId, myId);
-    await this.delete(townId);
+    const town = await this.throwIfNotTownOwner(townId, myId);
+    await this.deleteTown(town);
   }
 
   async deleteUserTown(townId: number): Promise<void> {
-    await this.throwIfTownNotFound(townId);
-    await this.delete(townId);
+    const town = await this.throwIfTownNotFound(townId);
+    await this.deleteTown(town);
+  }
+
+  private async deleteTown(town: Town): Promise<void> {
+    const users = await this.townsUsersRepository.countBy({
+      townId: town.id,
+    });
+    if (users > 1) {
+      throw new BadRequestException(TownError.HAS_USER);
+    }
+    await this.delete(town.id);
   }
 
   async throwIfTownNotFound(townId: number): Promise<Town> {
@@ -93,10 +110,18 @@ export class TownsService {
     return town;
   }
 
+  async throwIfUserAlreadyIn(userId: number): Promise<void> {
+    const townUser = await this.townsUsersRepository.findOneBy({ userId });
+    if (townUser) {
+      throw new BadRequestException(TownError.USER_ALREADY_IN);
+    }
+  }
+
   private findTownById(id: number): Promise<Town | null> {
     return this.townsRepository.findOneBy({ id });
   }
 
+  @Transactional()
   private async create(dto: CreateTownWithUserDto): Promise<Town> {
     try {
       const town = this.townsRepository.create({
@@ -106,6 +131,11 @@ export class TownsService {
         y: dto.y,
       });
       await this.townsRepository.save(town);
+      const townUser = this.townsUsersRepository.create({
+        townId: town.id,
+        userId: dto.userId,
+      });
+      await this.townsUsersRepository.save(townUser);
       return town;
     } catch (error) {
       throw new InternalServerErrorException(TownError.CREATE_FAILED);
@@ -123,8 +153,13 @@ export class TownsService {
     }
   }
 
+  @Transactional()
   private async delete(id: number): Promise<void> {
     try {
+      await this.townsUsersRepository.softDelete({
+        townId: id,
+        deletedAt: IsNull(),
+      });
       await this.townsRepository.softDelete({ id });
     } catch (error) {
       throw new InternalServerErrorException(TownError.DELETE_FAILED);
@@ -137,6 +172,7 @@ export class TownsService {
       .select(['town.id', 'town.name', 'town.x', 'town.y', 'town.createdAt'])
       .innerJoin('town.user', 'ownerUser')
       .addSelect(['ownerUser.id', 'ownerUser.nick', 'ownerUser.avatar'])
+      .loadRelationCountAndMap('town.users', 'town.townUsers')
       .where(
         new Brackets(
           (qb) => req.id && qb.where('town.id = :id', { id: req.id }),
