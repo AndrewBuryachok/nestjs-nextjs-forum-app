@@ -1,3 +1,4 @@
+import { BaseTownWithUser } from '../towns/types';
 import { Role } from '@/constants/roles';
 
 export interface BaseUser {
@@ -11,5 +12,6 @@ export interface BaseUserWithRoles extends BaseUser {
 }
 
 export interface User extends BaseUserWithRoles {
+  town?: BaseTownWithUser;
   createdAt: Date;
 }
