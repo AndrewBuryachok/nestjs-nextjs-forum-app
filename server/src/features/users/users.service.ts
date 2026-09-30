@@ -220,12 +220,27 @@ export class UsersService {
   private getUsersQueryBuilder(req: Request): SelectQueryBuilder<User> {
     return this.usersRepository
       .createQueryBuilder('user')
+      .leftJoin('user.townUsers', 'townUser')
+      .leftJoinAndMapOne(
+        'user.town',
+        'towns',
+        'town',
+        'town.id = townUser.townId',
+      )
+      .leftJoin('town.user', 'ownerUser')
       .select([
         'user.id',
         'user.nick',
         'user.avatar',
         'user.roles',
         'user.createdAt',
+        'town.id',
+        'town.name',
+        'town.x',
+        'town.y',
+        'ownerUser.id',
+        'ownerUser.nick',
+        'ownerUser.avatar',
       ])
       .where(
         new Brackets(
