@@ -12,6 +12,7 @@ import { Town } from './town.entity';
 import { TownUser } from './town-user.entity';
 import { MqttService } from '../mqtt/mqtt.service';
 import { UsersService } from '../users/users.service';
+import { User } from '../users/user.entity';
 import { CreateTownWithUserDto, EditTownDto } from './town.dto';
 import { TownError } from './town-errors.enum';
 import { Request, Response } from '../../common/interfaces';
@@ -46,6 +47,12 @@ export class TownsService {
     const [data, total] =
       await this.getTownsQueryBuilder(req).getManyAndCount();
     return { data, total };
+  }
+
+  async selectTownUsers(townId: number): Promise<User[]> {
+    const townUsers = await this.townsUsersRepository.findBy({ townId });
+    const users = townUsers.map((townUser) => townUser.userId);
+    return this.usersService.selectUsersByIds(users);
   }
 
   async createTown(dto: CreateTownWithUserDto): Promise<void> {

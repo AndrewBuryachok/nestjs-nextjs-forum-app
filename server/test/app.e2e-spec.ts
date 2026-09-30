@@ -216,6 +216,12 @@ describe('App', () => {
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
 
+    it('GET /towns/:townId/users', () => {
+      return request(app.getHttpServer())
+        .get(`/towns/${towns[0]}/users`)
+        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+    });
+
     it('PATCH /towns/:townId', () => {
       return request(app.getHttpServer())
         .patch(`/towns/${towns[0]}`)

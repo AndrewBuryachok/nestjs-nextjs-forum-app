@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { TownsService } from './towns.service';
 import { Town } from './town.entity';
+import { User } from '../users/user.entity';
 import {
   CreateTownDto,
   CreateTownWithUserDto,
@@ -42,6 +43,12 @@ export class TownsController {
   @Get('all')
   getAllTowns(@Query() req: Request): Promise<Response<Town>> {
     return this.townsService.getAllTowns(req);
+  }
+
+  @Public()
+  @Get(':townId/users')
+  selectTownUsers(@Param() { townId }: TownIdDto): Promise<User[]> {
+    return this.townsService.selectTownUsers(townId);
   }
 
   @Post()
