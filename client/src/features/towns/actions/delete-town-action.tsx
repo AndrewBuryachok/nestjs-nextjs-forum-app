@@ -7,6 +7,8 @@ export const deleteTownFactory = (town: Town, isAll: boolean) => ({
   action: 'delete',
   dialog: 'town',
   color: Color.RED,
+  disabled: town.users > 1,
+  userId: isAll ? 0 : town.user.id,
   icon: <LuTrash2 />,
   body: <DeleteTownForm town={town} isAll={isAll} />,
 });
