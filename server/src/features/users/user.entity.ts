@@ -2,8 +2,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { TownUser } from '../towns/town-user.entity';
 import { Role } from '../../common/enums';
 
 @Entity('users')
@@ -28,4 +30,7 @@ export class User {
 
   @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
   createdAt: Date;
+
+  @OneToMany(() => TownUser, (townUser) => townUser.user)
+  townUsers: TownUser[];
 }
