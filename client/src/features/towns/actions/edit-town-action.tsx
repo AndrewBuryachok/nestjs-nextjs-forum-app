@@ -7,6 +7,7 @@ export const editTownFactory = (town: Town, isAll: boolean) => ({
   action: 'edit',
   dialog: 'town',
   color: Color.YELLOW,
+  userId: isAll ? 0 : town.user.id,
   icon: <LuPencil />,
   body: <EditTownForm town={town} isAll={isAll} />,
 });
