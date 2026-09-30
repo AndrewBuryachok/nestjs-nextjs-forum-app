@@ -3,4 +3,5 @@ import { BaseUser } from '../users/types';
 
 export interface Town extends Place {
   user: BaseUser;
+  users: number;
 }
