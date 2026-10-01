@@ -243,6 +243,7 @@ export class UsersService {
         'user.createdAt',
         'town.id',
         'town.name',
+        'town.world',
         'town.x',
         'town.y',
         'ownerUser.id',

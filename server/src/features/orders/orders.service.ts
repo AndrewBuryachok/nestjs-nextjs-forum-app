@@ -459,7 +459,13 @@ export class OrdersService {
         'order.completedAt',
       ])
       .innerJoin('order.locker', 'locker')
-      .addSelect(['locker.id', 'locker.name', 'locker.x', 'locker.y'])
+      .addSelect([
+        'locker.id',
+        'locker.name',
+        'locker.world',
+        'locker.x',
+        'locker.y',
+      ])
       .innerJoin('order.customerUser', 'customerUser')
       .addSelect([
         'customerUser.id',
