@@ -11,6 +11,7 @@ import { editTownSchema, EditTownType } from '../schema';
 import { useDialogContext } from '@/providers/dialog-provider';
 import { toaster } from '@/components/ui/toaster';
 import CustomForm from '@/components/custom-form';
+import WorldsSegmentGroup from '@/components/worlds-segment-group';
 
 type Props = {
   town: Town;
@@ -29,6 +30,7 @@ export default function EditTownForm(props: Props) {
     defaultValues: {
       townId: props.town.id,
       name: props.town.name,
+      world: props.town.world,
       x: props.town.x,
       y: props.town.y,
     },
@@ -63,6 +65,19 @@ export default function EditTownForm(props: Props) {
         </Field.Label>
         <Input {...form.register('name')} placeholder={t('columns.name')} />
         <Field.ErrorText>{form.formState.errors.name?.message}</Field.ErrorText>
+      </Field.Root>
+      <Field.Root required>
+        <Field.Label>
+          {t('columns.world')}
+          <Field.RequiredIndicator />
+        </Field.Label>
+        <Controller
+          control={form.control}
+          name='world'
+          render={({ field }) => (
+            <WorldsSegmentGroup value={field.value} setValue={field.onChange} />
+          )}
+        />
       </Field.Root>
       <Field.Root invalid={!!form.formState.errors.x} required>
         <Field.Label>
