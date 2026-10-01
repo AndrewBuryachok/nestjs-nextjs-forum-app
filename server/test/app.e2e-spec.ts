@@ -9,7 +9,7 @@ import { AppModule } from '../src/app.module';
 import { User } from '../src/features/users/user.entity';
 import { Tokens } from '../src/common/interfaces';
 import { hashData } from '../src/common/utils';
-import { Item, Role, Unit } from '../src/common/enums';
+import { Item, Role, Unit, World } from '../src/common/enums';
 
 jest.mock('mqtt', () => ({
   connect: () => ({
@@ -176,6 +176,7 @@ describe('App', () => {
         .set('Authorization', `Bearer ${user.access}`)
         .send({
           name: 'Town',
+          world: World.OVERWORLD,
           x: Math.floor(Math.random() * 2001) - 1000,
           y: Math.floor(Math.random() * 2001) - 1000,
         })
@@ -189,6 +190,7 @@ describe('App', () => {
         .send({
           userId: user.user.id,
           name: 'Town',
+          world: World.OVERWORLD,
           x: Math.floor(Math.random() * 2001) - 1000,
           y: Math.floor(Math.random() * 2001) - 1000,
         })
@@ -240,6 +242,7 @@ describe('App', () => {
         .set('Authorization', `Bearer ${user.access}`)
         .send({
           name: 'Town',
+          world: World.OVERWORLD,
           x: Math.floor(Math.random() * 2001) - 1000,
           y: Math.floor(Math.random() * 2001) - 1000,
           price: 10,
@@ -253,6 +256,7 @@ describe('App', () => {
         .set('Authorization', `Bearer ${admin.access}`)
         .send({
           name: 'Town',
+          world: World.OVERWORLD,
           x: Math.floor(Math.random() * 2001) - 1000,
           y: Math.floor(Math.random() * 2001) - 1000,
           price: 10,
@@ -569,6 +573,7 @@ describe('App', () => {
         .send({
           cardId: cards[1],
           name: 'Shop',
+          world: World.OVERWORLD,
           x: Math.floor(Math.random() * 2001) - 1000,
           y: Math.floor(Math.random() * 2001) - 1000,
         })
@@ -583,6 +588,7 @@ describe('App', () => {
           userId: user.user.id,
           cardId: cards[0],
           name: 'Shop',
+          world: World.OVERWORLD,
           x: Math.floor(Math.random() * 2001) - 1000,
           y: Math.floor(Math.random() * 2001) - 1000,
         })
@@ -632,6 +638,7 @@ describe('App', () => {
         .send({
           cardId: cards[1],
           name: 'Plot',
+          world: World.OVERWORLD,
           x: Math.floor(Math.random() * 2001) - 1000,
           y: Math.floor(Math.random() * 2001) - 1000,
           price: 10,
@@ -647,6 +654,7 @@ describe('App', () => {
           userId: user.user.id,
           cardId: cards[0],
           name: 'Plot',
+          world: World.OVERWORLD,
           x: Math.floor(Math.random() * 2001) - 1000,
           y: Math.floor(Math.random() * 2001) - 1000,
           price: 10,
@@ -991,6 +999,7 @@ describe('App', () => {
         .set('Authorization', `Bearer ${user.access}`)
         .send({
           name: 'Plot',
+          world: World.OVERWORLD,
           x: Math.floor(Math.random() * 2001) - 1000,
           y: Math.floor(Math.random() * 2001) - 1000,
           price: 10,
@@ -1004,6 +1013,7 @@ describe('App', () => {
         .set('Authorization', `Bearer ${admin.access}`)
         .send({
           name: 'Plot',
+          world: World.OVERWORLD,
           x: Math.floor(Math.random() * 2001) - 1000,
           y: Math.floor(Math.random() * 2001) - 1000,
           price: 10,
@@ -1033,6 +1043,7 @@ describe('App', () => {
         .set('Authorization', `Bearer ${user.access}`)
         .send({
           name: 'Shop',
+          world: World.OVERWORLD,
           x: Math.floor(Math.random() * 2001) - 1000,
           y: Math.floor(Math.random() * 2001) - 1000,
         })
@@ -1045,6 +1056,7 @@ describe('App', () => {
         .set('Authorization', `Bearer ${admin.access}`)
         .send({
           name: 'Shop',
+          world: World.OVERWORLD,
           x: Math.floor(Math.random() * 2001) - 1000,
           y: Math.floor(Math.random() * 2001) - 1000,
         })
@@ -1073,6 +1085,7 @@ describe('App', () => {
         .set('Authorization', `Bearer ${user.access}`)
         .send({
           name: 'Locker',
+          world: World.OVERWORLD,
           x: Math.floor(Math.random() * 2001) - 1000,
           y: Math.floor(Math.random() * 2001) - 1000,
         })
@@ -1086,6 +1099,7 @@ describe('App', () => {
         .send({
           userId: user.user.id,
           name: 'Locker',
+          world: World.OVERWORLD,
           x: Math.floor(Math.random() * 2001) - 1000,
           y: Math.floor(Math.random() * 2001) - 1000,
         })
@@ -1345,6 +1359,7 @@ describe('App', () => {
         .set('Authorization', `Bearer ${user.access}`)
         .send({
           name: 'Locker',
+          world: World.OVERWORLD,
           x: Math.floor(Math.random() * 2001) - 1000,
           y: Math.floor(Math.random() * 2001) - 1000,
         })
@@ -1357,6 +1372,7 @@ describe('App', () => {
         .set('Authorization', `Bearer ${admin.access}`)
         .send({
           name: 'Locker',
+          world: World.OVERWORLD,
           x: Math.floor(Math.random() * 2001) - 1000,
           y: Math.floor(Math.random() * 2001) - 1000,
         })

@@ -119,6 +119,7 @@ export class PlotsService {
         userId: dto.userId,
         cardId: dto.cardId,
         name: dto.name,
+        world: dto.world,
         x: dto.x,
         y: dto.y,
         price: dto.price,
@@ -134,7 +135,13 @@ export class PlotsService {
     try {
       await this.plotsRepository.update(
         { id },
-        { name: dto.name, x: dto.x, y: dto.y, price: dto.price },
+        {
+          name: dto.name,
+          world: dto.world,
+          x: dto.x,
+          y: dto.y,
+          price: dto.price,
+        },
       );
     } catch (error) {
       throw new InternalServerErrorException(PlotError.EDIT_FAILED);
@@ -155,6 +162,7 @@ export class PlotsService {
       .select([
         'plot.id',
         'plot.name',
+        'plot.world',
         'plot.x',
         'plot.y',
         'plot.price',

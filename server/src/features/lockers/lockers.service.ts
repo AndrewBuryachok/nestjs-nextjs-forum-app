@@ -122,6 +122,7 @@ export class LockersService {
       const locker = this.lockersRepository.create({
         userId: dto.userId,
         name: dto.name,
+        world: dto.world,
         x: dto.x,
         y: dto.y,
       });
@@ -136,7 +137,7 @@ export class LockersService {
     try {
       await this.lockersRepository.update(
         { id },
-        { name: dto.name, x: dto.x, y: dto.y },
+        { name: dto.name, world: dto.world, x: dto.x, y: dto.y },
       );
     } catch (error) {
       throw new InternalServerErrorException(LockerError.EDIT_FAILED);
@@ -154,7 +155,13 @@ export class LockersService {
   private selectLockersQueryBuilder(): SelectQueryBuilder<Locker> {
     return this.lockersRepository
       .createQueryBuilder('locker')
-      .select(['locker.id', 'locker.name', 'locker.x', 'locker.y'])
+      .select([
+        'locker.id',
+        'locker.name',
+        'locker.world',
+        'locker.x',
+        'locker.y',
+      ])
       .orderBy('locker.name', 'ASC');
   }
 
@@ -164,6 +171,7 @@ export class LockersService {
       .select([
         'locker.id',
         'locker.name',
+        'locker.world',
         'locker.x',
         'locker.y',
         'locker.createdAt',

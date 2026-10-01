@@ -1,4 +1,5 @@
 import {
+  IsEnum,
   IsInt,
   IsNotEmpty,
   IsString,
@@ -6,12 +7,17 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { World } from '../../common/enums';
 
 export class CreatePlaceDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(16)
   name: string;
+
+  @IsNotEmpty()
+  @IsEnum(World)
+  world: World;
 
   @IsNotEmpty()
   @IsInt()
