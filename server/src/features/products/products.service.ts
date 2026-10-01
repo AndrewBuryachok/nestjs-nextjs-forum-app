@@ -330,11 +330,11 @@ export class ProductsService {
         'product.createdAt',
       ])
       .leftJoin('product.shop', 'shop')
-      .addSelect(['shop.id', 'shop.name', 'shop.x', 'shop.y'])
+      .addSelect(['shop.id', 'shop.name', 'shop.world', 'shop.x', 'shop.y'])
       .leftJoin('product.rent', 'rent')
       .addSelect(['rent.id'])
       .leftJoin('rent.plot', 'plot')
-      .addSelect(['plot.id', 'plot.name', 'plot.x', 'plot.y'])
+      .addSelect(['plot.id', 'plot.name', 'plot.world', 'plot.x', 'plot.y'])
       .innerJoin('product.user', 'sellerUser')
       .addSelect(['sellerUser.id', 'sellerUser.nick', 'sellerUser.avatar'])
       .innerJoin('product.card', 'sellerCard')

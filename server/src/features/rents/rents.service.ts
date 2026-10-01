@@ -259,7 +259,7 @@ export class RentsService implements OnModuleInit {
       .createQueryBuilder('rent')
       .select(['rent.id'])
       .innerJoin('rent.plot', 'plot')
-      .addSelect(['plot.id', 'plot.name', 'plot.x', 'plot.y'])
+      .addSelect(['plot.id', 'plot.name', 'plot.world', 'plot.x', 'plot.y'])
       .where('rent.completedAt > NOW()')
       .orderBy('plot.name', 'ASC');
   }
@@ -286,7 +286,14 @@ export class RentsService implements OnModuleInit {
       .createQueryBuilder('rent')
       .select(['rent.id', 'rent.createdAt', 'rent.completedAt'])
       .innerJoin('rent.plot', 'plot')
-      .addSelect(['plot.id', 'plot.name', 'plot.x', 'plot.y', 'plot.price'])
+      .addSelect([
+        'plot.id',
+        'plot.name',
+        'plot.world',
+        'plot.x',
+        'plot.y',
+        'plot.price',
+      ])
       .innerJoin('plot.user', 'ownerUser')
       .addSelect(['ownerUser.id', 'ownerUser.nick', 'ownerUser.avatar'])
       .innerJoin('plot.card', 'ownerCard')

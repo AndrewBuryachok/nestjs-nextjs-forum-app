@@ -208,6 +208,7 @@ export class TownsService {
       const town = this.townsRepository.create({
         userId: dto.userId,
         name: dto.name,
+        world: dto.world,
         x: dto.x,
         y: dto.y,
       });
@@ -227,7 +228,7 @@ export class TownsService {
     try {
       await this.townsRepository.update(
         { id },
-        { name: dto.name, x: dto.x, y: dto.y },
+        { name: dto.name, world: dto.world, x: dto.x, y: dto.y },
       );
     } catch (error) {
       throw new InternalServerErrorException(TownError.EDIT_FAILED);
@@ -267,7 +268,14 @@ export class TownsService {
   private getTownsQueryBuilder(req: Request): SelectQueryBuilder<Town> {
     return this.townsRepository
       .createQueryBuilder('town')
-      .select(['town.id', 'town.name', 'town.x', 'town.y', 'town.createdAt'])
+      .select([
+        'town.id',
+        'town.name',
+        'town.world',
+        'town.x',
+        'town.y',
+        'town.createdAt',
+      ])
       .innerJoin('town.user', 'ownerUser')
       .addSelect(['ownerUser.id', 'ownerUser.nick', 'ownerUser.avatar'])
       .loadRelationCountAndMap('town.users', 'town.townUsers')
