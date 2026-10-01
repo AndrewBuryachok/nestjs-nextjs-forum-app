@@ -2,7 +2,7 @@ import { PAGE_TABS_MAP } from '@/config/navigation';
 import { Shop } from '../types';
 import CustomTable from '@/components/custom-table';
 import CustomAvatarWithCard from '@/components/custom-avatar-with-card';
-import CustomText from '@/components/custom-text';
+import PlaceText from '@/components/place-text';
 import DateText from '@/components/date-text';
 import ShopsActions from './shops-actions';
 
@@ -26,15 +26,7 @@ export default function ShopsTable(props: Props) {
         },
         {
           value: 'shop',
-          render: (shop) => <CustomText value={shop.name} />,
-        },
-        {
-          value: 'x',
-          render: (shop) => <CustomText value={`${shop.x}`} />,
-        },
-        {
-          value: 'y',
-          render: (shop) => <CustomText value={`${shop.y}`} />,
+          render: (shop) => <PlaceText place={shop} />,
         },
         {
           value: 'created',

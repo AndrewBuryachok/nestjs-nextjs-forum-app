@@ -1,7 +1,9 @@
 import { z } from 'zod';
+import { World } from '@/constants/worlds';
 
 export const createLockerSchema = z.object({
   name: z.string().min(1).max(16),
+  world: z.enum(World),
   x: z.number().int().min(-1000).max(1000),
   y: z.number().int().min(-1000).max(1000),
 });
@@ -19,6 +21,7 @@ export type CreateLockerWithUserType = z.infer<
 export const editLockerSchema = z.object({
   lockerId: z.number().int().min(1),
   name: z.string().min(1).max(16),
+  world: z.enum(World),
   x: z.number().int().min(-1000).max(1000),
   y: z.number().int().min(-1000).max(1000),
 });

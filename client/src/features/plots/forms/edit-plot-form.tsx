@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Field, Input } from '@chakra-ui/react';
 import { Plot } from '../types';
@@ -11,6 +11,7 @@ import { editPlotSchema, EditPlotType } from '../schema';
 import { useDialogContext } from '@/providers/dialog-provider';
 import { toaster } from '@/components/ui/toaster';
 import CustomForm from '@/components/custom-form';
+import WorldsSegmentGroup from '@/components/worlds-segment-group';
 
 type Props = {
   plot: Plot;
@@ -29,6 +30,7 @@ export default function EditPlotForm(props: Props) {
     defaultValues: {
       plotId: props.plot.id,
       name: props.plot.name,
+      world: props.plot.world,
       x: props.plot.x,
       y: props.plot.y,
       price: props.plot.price,
@@ -65,6 +67,19 @@ export default function EditPlotForm(props: Props) {
         </Field.Label>
         <Input {...form.register('name')} placeholder={t('columns.name')} />
         <Field.ErrorText>{form.formState.errors.name?.message}</Field.ErrorText>
+      </Field.Root>
+      <Field.Root required>
+        <Field.Label>
+          {t('columns.world')}
+          <Field.RequiredIndicator />
+        </Field.Label>
+        <Controller
+          control={form.control}
+          name='world'
+          render={({ field }) => (
+            <WorldsSegmentGroup value={field.value} setValue={field.onChange} />
+          )}
+        />
       </Field.Root>
       <Field.Root invalid={!!form.formState.errors.x} required>
         <Field.Label>
