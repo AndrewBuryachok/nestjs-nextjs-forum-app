@@ -3,6 +3,7 @@ import { Field, Input } from '@chakra-ui/react';
 import { Locker } from '../types';
 import ViewForm from '@/components/view-form';
 import UserInput from '@/components/user-input';
+import PlaceInput from '@/components/place-input';
 import DateInput from '@/components/date-input';
 
 type Props = {
@@ -24,15 +25,7 @@ export default function ViewLockerForm(props: Props) {
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.locker')}</Field.Label>
-        <Input readOnly value={props.locker.name} />
-      </Field.Root>
-      <Field.Root>
-        <Field.Label>{t('columns.x')}</Field.Label>
-        <Input readOnly value={props.locker.x} />
-      </Field.Root>
-      <Field.Root>
-        <Field.Label>{t('columns.y')}</Field.Label>
-        <Input readOnly value={props.locker.y} />
+        <PlaceInput place={props.locker} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.created')}</Field.Label>
