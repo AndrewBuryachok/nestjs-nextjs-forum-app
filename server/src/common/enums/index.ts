@@ -4,3 +4,4 @@ export * from './roles.enum';
 export * from './statuses.enum';
 export * from './transaction-types.enum';
 export * from './units.enum';
+export * from './world.enum';

@@ -125,6 +125,7 @@ export class ShopsService {
         userId: dto.userId,
         cardId: dto.cardId,
         name: dto.name,
+        world: dto.world,
         x: dto.x,
         y: dto.y,
       });
@@ -139,7 +140,7 @@ export class ShopsService {
     try {
       await this.shopsRepository.update(
         { id },
-        { name: dto.name, x: dto.x, y: dto.y },
+        { name: dto.name, world: dto.world, x: dto.x, y: dto.y },
       );
     } catch (error) {
       throw new InternalServerErrorException(ShopError.EDIT_FAILED);
@@ -157,14 +158,21 @@ export class ShopsService {
   private selectShopsQueryBuilder(): SelectQueryBuilder<Shop> {
     return this.shopsRepository
       .createQueryBuilder('shop')
-      .select(['shop.id', 'shop.name', 'shop.x', 'shop.y'])
+      .select(['shop.id', 'shop.name', 'shop.world', 'shop.x', 'shop.y'])
       .orderBy('shop.name', 'ASC');
   }
 
   private getShopsQueryBuilder(req: Request): SelectQueryBuilder<Shop> {
     return this.shopsRepository
       .createQueryBuilder('shop')
-      .select(['shop.id', 'shop.name', 'shop.x', 'shop.y', 'shop.createdAt'])
+      .select([
+        'shop.id',
+        'shop.name',
+        'shop.world',
+        'shop.x',
+        'shop.y',
+        'shop.createdAt',
+      ])
       .innerJoin('shop.user', 'ownerUser')
       .addSelect(['ownerUser.id', 'ownerUser.nick', 'ownerUser.avatar'])
       .innerJoin('shop.card', 'ownerCard')
