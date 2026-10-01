@@ -2,6 +2,7 @@ import { PAGE_TABS_MAP } from '@/config/navigation';
 import { Plot } from '../types';
 import CustomTable from '@/components/custom-table';
 import CustomAvatarWithCard from '@/components/custom-avatar-with-card';
+import PlaceText from '@/components/place-text';
 import CustomText from '@/components/custom-text';
 import CurrencyText from '@/components/currency-text';
 import DateText from '@/components/date-text';
@@ -27,15 +28,7 @@ export default function PlotsTable(props: Props) {
         },
         {
           value: 'plot',
-          render: (plot) => <CustomText value={plot.name} />,
-        },
-        {
-          value: 'x',
-          render: (plot) => <CustomText value={`${plot.x}`} />,
-        },
-        {
-          value: 'y',
-          render: (plot) => <CustomText value={`${plot.y}`} />,
+          render: (plot) => <PlaceText place={plot} />,
         },
         {
           value: 'price',
