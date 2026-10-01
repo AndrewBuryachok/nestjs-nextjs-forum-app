@@ -2,7 +2,7 @@ import { PAGE_TABS_MAP } from '@/config/navigation';
 import { Locker } from '../types';
 import CustomTable from '@/components/custom-table';
 import CustomAvatarWithUser from '@/components/custom-avatar-with-user';
-import CustomText from '@/components/custom-text';
+import PlaceText from '@/components/place-text';
 import DateText from '@/components/date-text';
 import LockersActions from './lockers-actions';
 
@@ -24,15 +24,7 @@ export default function LockersTable(props: Props) {
         },
         {
           value: 'locker',
-          render: (locker) => <CustomText value={locker.name} />,
-        },
-        {
-          value: 'x',
-          render: (locker) => <CustomText value={`${locker.x}`} />,
-        },
-        {
-          value: 'y',
-          render: (locker) => <CustomText value={`${locker.y}`} />,
+          render: (locker) => <PlaceText place={locker} />,
         },
         {
           value: 'created',

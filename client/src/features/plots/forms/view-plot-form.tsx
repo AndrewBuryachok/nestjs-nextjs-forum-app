@@ -3,6 +3,7 @@ import { Field, Input } from '@chakra-ui/react';
 import { Plot } from '../types';
 import ViewForm from '@/components/view-form';
 import CardInput from '@/components/card-input';
+import PlaceInput from '@/components/place-input';
 import CurrencyInput from '@/components/currency-input';
 import DateInput from '@/components/date-input';
 
@@ -25,15 +26,7 @@ export default function ViewPlotForm(props: Props) {
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.plot')}</Field.Label>
-        <Input readOnly value={props.plot.name} />
-      </Field.Root>
-      <Field.Root>
-        <Field.Label>{t('columns.x')}</Field.Label>
-        <Input readOnly value={props.plot.x} />
-      </Field.Root>
-      <Field.Root>
-        <Field.Label>{t('columns.y')}</Field.Label>
-        <Input readOnly value={props.plot.y} />
+        <PlaceInput place={props.plot} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.price')}</Field.Label>

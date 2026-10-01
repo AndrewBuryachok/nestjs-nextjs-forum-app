@@ -2,7 +2,7 @@ import { PAGE_TABS_MAP } from '@/config/navigation';
 import { Town } from '../../towns/types';
 import CustomTable from '@/components/custom-table';
 import CustomAvatarWithUser from '@/components/custom-avatar-with-user';
-import CustomText from '@/components/custom-text';
+import PlaceText from '@/components/place-text';
 import LevelBadge from '@/components/level-badge';
 import TownsResidentsActions from '../../towns/components/towns-residents-actions';
 import DateText from '@/components/date-text';
@@ -26,15 +26,7 @@ export default function SentApplicationsTable(props: Props) {
         },
         {
           value: 'town',
-          render: (town) => <CustomText value={town.name} />,
-        },
-        {
-          value: 'x',
-          render: (town) => <CustomText value={`${town.x}`} />,
-        },
-        {
-          value: 'y',
-          render: (town) => <CustomText value={`${town.y}`} />,
+          render: (town) => <PlaceText place={town} />,
         },
         {
           value: 'level',

@@ -13,6 +13,7 @@ import { useDialogContext } from '@/providers/dialog-provider';
 import { toaster } from '@/components/ui/toaster';
 import CustomForm from '@/components/custom-form';
 import UsersCombobox from '@/features/users/components/users-combobox';
+import WorldsSegmentGroup from '@/components/worlds-segment-group';
 
 type Props = {
   isAll: boolean;
@@ -78,6 +79,19 @@ export default function CreateLockerForm(props: Props) {
         </Field.Label>
         <Input {...form.register('name')} placeholder={t('columns.name')} />
         <Field.ErrorText>{form.formState.errors.name?.message}</Field.ErrorText>
+      </Field.Root>
+      <Field.Root required>
+        <Field.Label>
+          {t('columns.world')}
+          <Field.RequiredIndicator />
+        </Field.Label>
+        <Controller
+          control={form.control}
+          name='world'
+          render={({ field }) => (
+            <WorldsSegmentGroup value={field.value} setValue={field.onChange} />
+          )}
+        />
       </Field.Root>
       <Field.Root invalid={!!form.formState.errors.x} required>
         <Field.Label>
