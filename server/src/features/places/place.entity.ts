@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Card } from '../cards/card.entity';
 import { User } from '../users/user.entity';
+import { World } from '../../common/enums';
 
 export abstract class Place {
   @PrimaryGeneratedColumn()
@@ -15,6 +16,9 @@ export abstract class Place {
 
   @Column()
   name: string;
+
+  @Column({ type: 'enum', enum: World })
+  world: World;
 
   @Column()
   x: number;
