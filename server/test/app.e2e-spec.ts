@@ -177,8 +177,8 @@ describe('App', () => {
         .send({
           name: 'Town',
           world: World.OVERWORLD,
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
+          x: 0,
+          y: 0,
         })
         .expect(201);
     });
@@ -191,8 +191,8 @@ describe('App', () => {
           userId: user.user.id,
           name: 'Town',
           world: World.OVERWORLD,
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
+          x: 0,
+          y: 0,
         })
         .expect(201);
     });
@@ -269,8 +269,8 @@ describe('App', () => {
         .send({
           name: 'Town',
           world: World.OVERWORLD,
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
+          x: 0,
+          y: 0,
           price: 10,
         })
         .expect(200);
@@ -283,8 +283,8 @@ describe('App', () => {
         .send({
           name: 'Town',
           world: World.OVERWORLD,
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
+          x: 0,
+          y: 0,
           price: 10,
         })
         .expect(200);
@@ -614,8 +614,8 @@ describe('App', () => {
           cardId: cards[1],
           name: 'Shop',
           world: World.OVERWORLD,
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
+          x: 0,
+          y: 0,
         })
         .expect(201);
     });
@@ -629,8 +629,8 @@ describe('App', () => {
           cardId: cards[0],
           name: 'Shop',
           world: World.OVERWORLD,
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
+          x: 0,
+          y: 0,
         })
         .expect(201);
     });
@@ -679,8 +679,8 @@ describe('App', () => {
           cardId: cards[1],
           name: 'Plot',
           world: World.OVERWORLD,
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
+          x: 0,
+          y: 0,
           price: 10,
         })
         .expect(201);
@@ -695,8 +695,8 @@ describe('App', () => {
           cardId: cards[0],
           name: 'Plot',
           world: World.OVERWORLD,
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
+          x: 0,
+          y: 0,
           price: 10,
         })
         .expect(201);
@@ -1040,8 +1040,8 @@ describe('App', () => {
         .send({
           name: 'Plot',
           world: World.OVERWORLD,
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
+          x: 0,
+          y: 0,
           price: 10,
         })
         .expect(200);
@@ -1054,8 +1054,8 @@ describe('App', () => {
         .send({
           name: 'Plot',
           world: World.OVERWORLD,
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
+          x: 0,
+          y: 0,
           price: 10,
         })
         .expect(200);
@@ -1084,8 +1084,8 @@ describe('App', () => {
         .send({
           name: 'Shop',
           world: World.OVERWORLD,
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
+          x: 0,
+          y: 0,
         })
         .expect(200);
     });
@@ -1097,8 +1097,8 @@ describe('App', () => {
         .send({
           name: 'Shop',
           world: World.OVERWORLD,
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
+          x: 0,
+          y: 0,
         })
         .expect(200);
     });
@@ -1126,8 +1126,8 @@ describe('App', () => {
         .send({
           name: 'Locker',
           world: World.OVERWORLD,
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
+          x: 0,
+          y: 0,
         })
         .expect(201);
     });
@@ -1140,8 +1140,8 @@ describe('App', () => {
           userId: user.user.id,
           name: 'Locker',
           world: World.OVERWORLD,
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
+          x: 0,
+          y: 0,
         })
         .expect(201);
     });
@@ -1400,8 +1400,8 @@ describe('App', () => {
         .send({
           name: 'Locker',
           world: World.OVERWORLD,
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
+          x: 0,
+          y: 0,
         })
         .expect(200);
     });
@@ -1413,8 +1413,8 @@ describe('App', () => {
         .send({
           name: 'Locker',
           world: World.OVERWORLD,
-          x: Math.floor(Math.random() * 2001) - 1000,
-          y: Math.floor(Math.random() * 2001) - 1000,
+          x: 0,
+          y: 0,
         })
         .expect(200);
     });

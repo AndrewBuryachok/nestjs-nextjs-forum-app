@@ -8,6 +8,12 @@ import {
   Min,
 } from 'class-validator';
 import { World } from '../../common/enums';
+import {
+  PLACE_X_MAX,
+  PLACE_X_MIN,
+  PLACE_Y_MAX,
+  PLACE_Y_MIN,
+} from '../../common/constants';
 
 export class CreatePlaceDto {
   @IsNotEmpty()
@@ -21,14 +27,14 @@ export class CreatePlaceDto {
 
   @IsNotEmpty()
   @IsInt()
-  @Min(-1000)
-  @Max(1000)
+  @Min(PLACE_X_MIN)
+  @Max(PLACE_X_MAX)
   x: number;
 
   @IsNotEmpty()
   @IsInt()
-  @Min(-1000)
-  @Max(1000)
+  @Min(PLACE_Y_MIN)
+  @Max(PLACE_Y_MAX)
   y: number;
 }
 
