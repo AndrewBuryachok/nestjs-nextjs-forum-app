@@ -15,6 +15,9 @@ export const PAGE_TABS_MAP = {
     my: {},
     all: { roles: [Role.ADMIN] },
   },
+  licenses: {
+    main: { public: true },
+  },
   lockers: {
     main: { public: true },
     my: {},
