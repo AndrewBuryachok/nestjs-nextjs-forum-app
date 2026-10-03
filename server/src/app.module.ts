@@ -9,6 +9,7 @@ import { addTransactionalDataSource } from 'typeorm-transactional';
 import { MqttModule } from './features/mqtt/mqtt.module';
 import { AuthModule } from './features/auth/auth.module';
 import { UsersModule } from './features/users/users.module';
+import { LicensesModule } from './features/licenses/licenses.module';
 import { TownsModule } from './features/towns/towns.module';
 import { LandmarksModule } from './features/landmarks/landmarks.module';
 import { CardsModule } from './features/cards/cards.module';
@@ -54,6 +55,7 @@ import { AtGuard, RolesGuard } from './common/guards';
     MqttModule,
     AuthModule,
     UsersModule,
+    LicensesModule,
     TownsModule,
     LandmarksModule,
     CardsModule,

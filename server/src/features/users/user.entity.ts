@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { TownUser } from '../towns/town-user.entity';
+import { License } from '../licenses/license.entity';
 import { Role } from '../../common/enums';
 
 @Entity('users')
@@ -39,4 +40,7 @@ export class User {
 
   @OneToMany(() => TownUser, (townUser) => townUser.user)
   townUsers: TownUser[];
+
+  @OneToMany(() => License, (license) => license.user)
+  licenses: License[];
 }
