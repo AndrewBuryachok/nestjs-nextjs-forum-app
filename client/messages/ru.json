@@ -46,6 +46,7 @@
     "level": "Уровень",
     "locker": "Почтомат",
     "mayor": "Мэр",
+    "message": "Сообщение",
     "name": "Название",
     "newPassword": "Новый пароль",
     "nick": "Ник",
@@ -200,6 +201,8 @@
     }
   },
   "errors": {
+    "complaint_closed": "Жалобу закрыто",
+    "not_complaint_user": "Вы не участник жалобы",
     "not_enough_balance": "Недостаточный баланс на карте"
   },
   "home": {
@@ -1846,6 +1849,7 @@
   "pages": {
     "applications": "Заявки",
     "cards": "Карты",
+    "complaint": "Жалоба",
     "complaints": "Жалобы",
     "fines": "Штрафы",
     "home": "Главная",
