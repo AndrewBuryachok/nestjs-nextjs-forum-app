@@ -9,10 +9,8 @@ type Props = {
 
 export default function UsersPage(props: Props) {
   return (
-    <CustomPage
-      page='users'
-      tab={props.tab}
-      table={<UsersTable tab={props.tab} searchParams={props.searchParams} />}
-    />
+    <CustomPage page='users' tab={props.tab}>
+      <UsersTable tab={props.tab} searchParams={props.searchParams} />
+    </CustomPage>
   );
 }

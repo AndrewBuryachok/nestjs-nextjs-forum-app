@@ -14,7 +14,8 @@ export default function OrdersPage(props: Props) {
       page='orders'
       tab={props.tab}
       action={<OrdersAction tab={props.tab} />}
-      table={<OrdersTable tab={props.tab} searchParams={props.searchParams} />}
-    />
+    >
+      <OrdersTable tab={props.tab} searchParams={props.searchParams} />
+    </CustomPage>
   );
 }

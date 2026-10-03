@@ -10,13 +10,8 @@ type Props = {
 
 export default function LicensesPage(props: Props) {
   return (
-    <CustomPage
-      page='licenses'
-      tab={props.tab}
-      action={<LicensesAction />}
-      table={
-        <LicensesTable tab={props.tab} searchParams={props.searchParams} />
-      }
-    />
+    <CustomPage page='licenses' tab={props.tab} action={<LicensesAction />}>
+      <LicensesTable tab={props.tab} searchParams={props.searchParams} />
+    </CustomPage>
   );
 }

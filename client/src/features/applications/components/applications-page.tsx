@@ -15,19 +15,18 @@ export default function ApplicationsPage(props: Props) {
       page='applications'
       tab={props.tab}
       action={<ApplicationsAction tab={props.tab} />}
-      table={
-        props.tab === 'sent' ? (
-          <SentApplicationsTable
-            tab={props.tab}
-            searchParams={props.searchParams}
-          />
-        ) : (
-          <ReceivedApplicationsTable
-            tab={props.tab}
-            searchParams={props.searchParams}
-          />
-        )
-      }
-    />
+    >
+      {props.tab === 'sent' ? (
+        <SentApplicationsTable
+          tab={props.tab}
+          searchParams={props.searchParams}
+        />
+      ) : (
+        <ReceivedApplicationsTable
+          tab={props.tab}
+          searchParams={props.searchParams}
+        />
+      )}
+    </CustomPage>
   );
 }

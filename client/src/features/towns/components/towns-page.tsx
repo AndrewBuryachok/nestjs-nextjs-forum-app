@@ -14,7 +14,8 @@ export default function TownsPage(props: Props) {
       page='towns'
       tab={props.tab}
       action={<TownsAction tab={props.tab} />}
-      table={<TownsTable tab={props.tab} searchParams={props.searchParams} />}
-    />
+    >
+      <TownsTable tab={props.tab} searchParams={props.searchParams} />
+    </CustomPage>
   );
 }
