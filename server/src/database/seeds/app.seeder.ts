@@ -3,6 +3,7 @@ import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 import { faker } from '@faker-js/faker';
 import { User } from '../../features/users/user.entity';
 import { Complaint } from '../../features/complaints/complaint.entity';
+import { ComplaintMessage } from '../../features/complaints/complaint-message.entity';
 import { Town } from '../../features/towns/town.entity';
 import { TownUser } from '../../features/towns/town-user.entity';
 import { Landmark } from '../../features/landmarks/landmark.entity';
@@ -33,9 +34,11 @@ export default class AppSeeder implements Seeder {
     const complaintFactory = factoryManager.get(Complaint);
     const complaints: Complaint[] = [];
     for (let i = 0; i < 40; i++) {
+      const id = i + 1;
       const senderUser = faker.helpers.arrayElement(users);
       const receiverUser = faker.helpers.arrayElement(users);
       const complaint = await complaintFactory.make({
+        id,
         senderUser,
         receiverUser,
       });
@@ -44,6 +47,19 @@ export default class AppSeeder implements Seeder {
         complaint.judgeUser = faker.helpers.arrayElement(users);
       }
       complaints.push(complaint);
+    }
+    const complaintMessageFactory = factoryManager.get(ComplaintMessage);
+    const complaintsMessages: ComplaintMessage[] = [];
+    for (let i = 0; i < 200; i++) {
+      const complaint = faker.helpers.arrayElement(complaints);
+      const user = faker.datatype.boolean()
+        ? complaint.senderUser
+        : complaint.receiverUser;
+      const complaintMessage = await complaintMessageFactory.make({
+        complaint,
+        user,
+      });
+      complaintsMessages.push(complaintMessage);
     }
     const townFactory = factoryManager.get(Town);
     const towns: Town[] = [];
@@ -328,6 +344,7 @@ export default class AppSeeder implements Seeder {
     }
     await dataSource.getRepository(User).save(users);
     await dataSource.getRepository(Complaint).save(complaints);
+    await dataSource.getRepository(ComplaintMessage).save(complaintsMessages);
     await dataSource.getRepository(Town).save(towns);
     await dataSource.getRepository(TownUser).save(townsUsers);
     await dataSource.getRepository(Landmark).save(landmarks);
