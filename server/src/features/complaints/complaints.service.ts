@@ -54,6 +54,15 @@ export class ComplaintsService {
     return { data, total };
   }
 
+  async getOneComplaint(id: number): Promise<Complaint> {
+    return this.getComplaintsQueryBuilder({ id })
+      .leftJoin('complaint.messages', 'message')
+      .addSelect(['message.id', 'message.text', 'message.createdAt'])
+      .leftJoin('message.user', 'messageUser')
+      .addSelect(['messageUser.id', 'messageUser.nick', 'messageUser.avatar'])
+      .getOneOrFail();
+  }
+
   async createComplaint(dto: CreateComplaintWithUserDto): Promise<void> {
     await this.usersService.throwIfUserNotFound(dto.senderUserId);
     await this.usersService.throwIfUserNotFound(dto.receiverUserId);
