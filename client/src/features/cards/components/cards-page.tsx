@@ -14,7 +14,8 @@ export default function CardsPage(props: Props) {
       page='cards'
       tab={props.tab}
       action={<CardsAction tab={props.tab} />}
-      table={<CardsTable tab={props.tab} searchParams={props.searchParams} />}
-    />
+    >
+      <CardsTable tab={props.tab} searchParams={props.searchParams} />
+    </CustomPage>
   );
 }

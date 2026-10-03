@@ -14,7 +14,8 @@ export default function PlotsPage(props: Props) {
       page='plots'
       tab={props.tab}
       action={<PlotsAction tab={props.tab} />}
-      table={<PlotsTable tab={props.tab} searchParams={props.searchParams} />}
-    />
+    >
+      <PlotsTable tab={props.tab} searchParams={props.searchParams} />
+    </CustomPage>
   );
 }

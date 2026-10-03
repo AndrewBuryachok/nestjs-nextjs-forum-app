@@ -14,9 +14,8 @@ export default function LandmarksPage(props: Props) {
       page='landmarks'
       tab={props.tab}
       action={<LandmarksAction tab={props.tab} />}
-      table={
-        <LandmarksTable tab={props.tab} searchParams={props.searchParams} />
-      }
-    />
+    >
+      <LandmarksTable tab={props.tab} searchParams={props.searchParams} />
+    </CustomPage>
   );
 }

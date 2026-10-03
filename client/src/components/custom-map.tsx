@@ -4,8 +4,8 @@ import { get } from '@/lib/api';
 import PlaceLineWithCircle from './place-line-with-circle';
 
 export default async function CustomMap() {
-  const shops = await get<Shop>('/shops', { page: 0 });
-  const lockers = await get<Locker>('/lockers', { page: 0 });
+  const shops = await get<Shop>('/shops', { page: 0 }, 0);
+  const lockers = await get<Locker>('/lockers', { page: 0 }, 0);
 
   return (
     <>

@@ -1,17 +1,15 @@
-import { Suspense } from 'react';
 import { ButtonGroup, Flex } from '@chakra-ui/react';
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomHeading from './custom-heading';
 import SearchButton from './search-button';
 import SortButton from './sort-button';
 import CustomTabs from './custom-tabs';
-import TableSkeleton from './table-skeleton';
 
 type Props = {
   page: keyof typeof PAGE_TABS_MAP;
   tab: string;
   action?: React.ReactNode;
-  table: React.ReactNode;
+  children: React.ReactNode;
 };
 
 export default function CustomPage(props: Props) {
@@ -26,7 +24,7 @@ export default function CustomPage(props: Props) {
         </ButtonGroup>
       </Flex>
       <CustomTabs page={props.page} tab={props.tab} />
-      <Suspense fallback={<TableSkeleton />}>{props.table}</Suspense>
+      {props.children}
     </>
   );
 }
