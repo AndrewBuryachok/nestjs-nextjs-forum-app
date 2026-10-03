@@ -1,6 +1,7 @@
 import { Stack } from '@chakra-ui/react';
 import {
   LuBuilding,
+  LuGavel,
   LuIdCard,
   LuLandmark,
   LuMailbox,
@@ -38,6 +39,7 @@ export default function CustomNavbar() {
       icon: <LuMailbox />,
       links: [{ value: 'orders' }, { value: 'lockers' }],
     },
+    // { value: 'complaints', icon: <LuGavel /> },
     {
       value: 'towns',
       icon: <LuBuilding />,
