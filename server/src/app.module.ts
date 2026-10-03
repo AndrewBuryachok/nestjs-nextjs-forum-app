@@ -10,6 +10,7 @@ import { MqttModule } from './features/mqtt/mqtt.module';
 import { RedisModule } from './features/redis/redis.module';
 import { AuthModule } from './features/auth/auth.module';
 import { UsersModule } from './features/users/users.module';
+import { LicensesModule } from './features/licenses/licenses.module';
 import { TownsModule } from './features/towns/towns.module';
 import { LandmarksModule } from './features/landmarks/landmarks.module';
 import { CardsModule } from './features/cards/cards.module';
@@ -57,6 +58,7 @@ import { AtGuard, RolesGuard } from './common/guards';
     RedisModule,
     AuthModule,
     UsersModule,
+    LicensesModule,
     TownsModule,
     LandmarksModule,
     CardsModule,
