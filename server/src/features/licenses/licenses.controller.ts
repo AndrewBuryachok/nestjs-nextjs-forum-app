@@ -16,13 +16,13 @@ export class LicensesController {
     return this.licensesService.getMainLicenses(req);
   }
 
-  @Roles([Role.ADMIN])
+  @Roles([Role.ECONOMIST])
   @Post(':userId')
   createLicense(@Param() { userId }: UserIdDto): Promise<void> {
     return this.licensesService.createLicense(userId);
   }
 
-  @Roles([Role.ADMIN])
+  @Roles([Role.ECONOMIST])
   @Delete(':userId')
   deleteLicense(@Param() { userId }: UserIdDto): Promise<void> {
     return this.licensesService.deleteLicense(userId);
