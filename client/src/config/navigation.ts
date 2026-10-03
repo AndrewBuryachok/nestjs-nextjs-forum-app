@@ -18,6 +18,9 @@ export const PAGE_TABS_MAP = {
     sent: {},
     received: {},
   },
+  licenses: {
+    main: { public: true },
+  },
   lockers: {
     main: { public: true },
     my: {},
