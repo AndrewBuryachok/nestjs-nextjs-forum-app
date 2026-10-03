@@ -1,7 +1,6 @@
 import { useTranslations } from 'next-intl';
 import { Badge } from '@chakra-ui/react';
 import { Role } from '@/constants/roles';
-import { Color } from '@/constants/colors';
 
 type Props = {
   role: Role | 'user';
@@ -11,9 +10,15 @@ export default function RoleBadge(props: Props) {
   const t = useTranslations();
 
   const color = {
-    admin: Color.RED,
-    banker: Color.YELLOW,
-    economist: Color.GREEN,
+    admin: 'red',
+    banker: 'yellow',
+    economist: 'green',
+    end: 'purple',
+    hub: 'orange',
+    inspector: 'blue',
+    lor: 'orange',
+    president: 'purple',
+    spawn: 'green',
     user: undefined,
   }[props.role];
 
