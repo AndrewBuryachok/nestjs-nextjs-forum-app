@@ -169,6 +169,34 @@ describe('App', () => {
     });
   });
 
+  describe('Complaints', () => {
+    it('GET /complaints', () => {
+      return request(app.getHttpServer())
+        .get('/complaints')
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /complaints/closed', () => {
+      return request(app.getHttpServer())
+        .get('/complaints/closed')
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /complaints/my', () => {
+      return request(app.getHttpServer())
+        .get('/complaints/my')
+        .set('Authorization', `Bearer ${user.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+
+    it('GET /complaints/all', () => {
+      return request(app.getHttpServer())
+        .get('/complaints/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
+    });
+  });
+
   describe('Towns', () => {
     it('POST /towns', () => {
       return request(app.getHttpServer())
