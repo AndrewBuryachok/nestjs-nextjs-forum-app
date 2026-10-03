@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ComplaintsService } from './complaints.service';
 import { Complaint } from './complaint.entity';
 import {
+  ComplaintIdDto,
   CreateComplaintDto,
   CreateComplaintWithUserDto,
 } from './complaint.dto';
@@ -37,6 +38,14 @@ export class ComplaintsController {
   @Get('all')
   getAllComplaints(@Query() req: Request): Promise<Response<Complaint>> {
     return this.complaintsService.getAllComplaints(req);
+  }
+
+  @Public()
+  @Get(':complaintId')
+  getOneComplaint(
+    @Param() { complaintId }: ComplaintIdDto,
+  ): Promise<Complaint> {
+    return this.complaintsService.getOneComplaint(complaintId);
   }
 
   @Post()

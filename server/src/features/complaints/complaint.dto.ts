@@ -1,4 +1,13 @@
 import { IsInt, IsNotEmpty, IsString, MaxLength, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class ComplaintIdDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
+  complaintId: number;
+}
 
 export class CreateComplaintDto {
   @IsNotEmpty()

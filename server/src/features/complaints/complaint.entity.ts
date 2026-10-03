@@ -4,9 +4,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
+import { ComplaintMessage } from './complaint-message.entity';
 
 @Entity('complaints')
 export class Complaint {
@@ -42,4 +44,7 @@ export class Complaint {
 
   @Column({ type: 'timestamptz', name: 'closed_at', nullable: true })
   closedAt?: Date;
+
+  @OneToMany(() => ComplaintMessage, (message) => message.complaint)
+  messages: ComplaintMessage[];
 }
