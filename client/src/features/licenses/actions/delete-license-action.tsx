@@ -8,7 +8,7 @@ export const deleteLicenseAction = (user: User) => ({
   action: 'delete',
   dialog: 'license',
   color: Color.RED,
-  role: Role.ADMIN,
+  role: Role.ECONOMIST,
   icon: <LuTrash2 />,
   body: <TakeLicenseForm user={user} />,
 });
