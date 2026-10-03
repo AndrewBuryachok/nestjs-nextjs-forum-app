@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 import { faker } from '@faker-js/faker';
 import { User } from '../../features/users/user.entity';
+import { Complaint } from '../../features/complaints/complaint.entity';
 import { Town } from '../../features/towns/town.entity';
 import { TownUser } from '../../features/towns/town-user.entity';
 import { Landmark } from '../../features/landmarks/landmark.entity';
@@ -28,6 +29,21 @@ export default class AppSeeder implements Seeder {
       const id = i + 1;
       const user = await userFactory.make({ id });
       users.push(user);
+    }
+    const complaintFactory = factoryManager.get(Complaint);
+    const complaints: Complaint[] = [];
+    for (let i = 0; i < 40; i++) {
+      const senderUser = faker.helpers.arrayElement(users);
+      const receiverUser = faker.helpers.arrayElement(users);
+      const complaint = await complaintFactory.make({
+        senderUser,
+        receiverUser,
+      });
+      if (faker.datatype.boolean()) {
+        complaint.closedAt = new Date();
+        complaint.judgeUser = faker.helpers.arrayElement(users);
+      }
+      complaints.push(complaint);
     }
     const townFactory = factoryManager.get(Town);
     const towns: Town[] = [];
@@ -311,6 +327,7 @@ export default class AppSeeder implements Seeder {
       orders.push(order);
     }
     await dataSource.getRepository(User).save(users);
+    await dataSource.getRepository(Complaint).save(complaints);
     await dataSource.getRepository(Town).save(towns);
     await dataSource.getRepository(TownUser).save(townsUsers);
     await dataSource.getRepository(Landmark).save(landmarks);
