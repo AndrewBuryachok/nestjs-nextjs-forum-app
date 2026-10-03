@@ -7,7 +7,7 @@ export default function LicensesAction() {
     <CustomAction
       action='create'
       dialog='license'
-      role={Role.ADMIN}
+      role={Role.ECONOMIST}
       body={<GiveLicenseForm />}
     />
   );
