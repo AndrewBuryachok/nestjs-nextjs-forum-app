@@ -1,13 +1,19 @@
-import { PAGE_SIZE } from '@/constants/pagination';
+import { Text } from '@chakra-ui/react';
 
 type Props = {
   page: number;
+  take: number;
   total: number;
 };
 
 export default function PaginationText(props: Props) {
-  const from = (props.page - 1) * PAGE_SIZE + 1;
-  const to = Math.min(props.page * PAGE_SIZE, props.total);
+  const from = (props.page - 1) * props.take + 1;
+  const to = Math.min(props.page * props.take, props.total);
+  const text = `${from} - ${to} / ${props.total}`;
 
-  return `${from} - ${to} / ${props.total}`;
+  return (
+    <Text fontSize='xs' textAlign='center'>
+      {text}
+    </Text>
+  );
 }

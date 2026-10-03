@@ -15,19 +15,18 @@ export default function InvitationsPage(props: Props) {
       page='invitations'
       tab={props.tab}
       action={<InvitationsAction tab={props.tab} />}
-      table={
-        props.tab === 'sent' ? (
-          <SentInvitationsTable
-            tab={props.tab}
-            searchParams={props.searchParams}
-          />
-        ) : (
-          <ReceivedInvitationsTable
-            tab={props.tab}
-            searchParams={props.searchParams}
-          />
-        )
-      }
-    />
+    >
+      {props.tab === 'sent' ? (
+        <SentInvitationsTable
+          tab={props.tab}
+          searchParams={props.searchParams}
+        />
+      ) : (
+        <ReceivedInvitationsTable
+          tab={props.tab}
+          searchParams={props.searchParams}
+        />
+      )}
+    </CustomPage>
   );
 }

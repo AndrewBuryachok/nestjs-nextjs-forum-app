@@ -14,9 +14,8 @@ export default function TransactionsPage(props: Props) {
       page='transactions'
       tab={props.tab}
       action={<TransactionsAction tab={props.tab} />}
-      table={
-        <TransactionsTable tab={props.tab} searchParams={props.searchParams} />
-      }
-    />
+    >
+      <TransactionsTable tab={props.tab} searchParams={props.searchParams} />
+    </CustomPage>
   );
 }

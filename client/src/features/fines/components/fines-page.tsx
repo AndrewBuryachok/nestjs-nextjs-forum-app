@@ -14,7 +14,8 @@ export default function FinesPage(props: Props) {
       page='fines'
       tab={props.tab}
       action={<FinesAction tab={props.tab} />}
-      table={<FinesTable tab={props.tab} searchParams={props.searchParams} />}
-    />
+    >
+      <FinesTable tab={props.tab} searchParams={props.searchParams} />
+    </CustomPage>
   );
 }

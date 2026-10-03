@@ -3,7 +3,6 @@ import xior, { isXiorError, merge } from 'xior';
 import { getAccessToken } from './tokens';
 import { Request } from '@/types/request';
 import { Response } from '@/types/response';
-import { PAGE_SIZE } from '@/constants/pagination';
 
 const api = xior.create({
   baseURL: process.env.API_URL,
@@ -17,11 +16,13 @@ api.interceptors.request.use(async (config) => {
   return merge(config, { headers: { Authorization: `Bearer ${token}` } });
 });
 
-export async function get<T>(route: string, { page, ...req }: Request) {
+export async function get<T>(
+  route: string,
+  { page, ...req }: Request,
+  take: number,
+) {
   try {
-    const params = page
-      ? { ...req, skip: (page - 1) * PAGE_SIZE, take: PAGE_SIZE }
-      : req;
+    const params = page ? { ...req, skip: (page - 1) * take, take } : req;
     const res = await api.get<Response<T>>(route, { params });
     return res.data;
   } catch (error) {

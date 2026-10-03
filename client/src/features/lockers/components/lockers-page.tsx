@@ -14,7 +14,8 @@ export default function LockersPage(props: Props) {
       page='lockers'
       tab={props.tab}
       action={<LockersAction tab={props.tab} />}
-      table={<LockersTable tab={props.tab} searchParams={props.searchParams} />}
-    />
+    >
+      <LockersTable tab={props.tab} searchParams={props.searchParams} />
+    </CustomPage>
   );
 }

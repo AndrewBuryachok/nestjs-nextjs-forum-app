@@ -14,7 +14,8 @@ export default function ShopsPage(props: Props) {
       page='shops'
       tab={props.tab}
       action={<ShopsAction tab={props.tab} />}
-      table={<ShopsTable tab={props.tab} searchParams={props.searchParams} />}
-    />
+    >
+      <ShopsTable tab={props.tab} searchParams={props.searchParams} />
+    </CustomPage>
   );
 }

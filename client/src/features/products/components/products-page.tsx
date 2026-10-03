@@ -14,9 +14,8 @@ export default function ProductsPage(props: Props) {
       page='products'
       tab={props.tab}
       action={<ProductsAction tab={props.tab} />}
-      table={
-        <ProductsTable tab={props.tab} searchParams={props.searchParams} />
-      }
-    />
+    >
+      <ProductsTable tab={props.tab} searchParams={props.searchParams} />
+    </CustomPage>
   );
 }

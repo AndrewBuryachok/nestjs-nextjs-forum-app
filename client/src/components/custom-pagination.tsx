@@ -3,10 +3,10 @@
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { ButtonGroup, IconButton, Pagination } from '@chakra-ui/react';
-import { PAGE_SIZE } from '@/constants/pagination';
 
 type Props = {
   page: number;
+  take: number;
   total: number;
 };
 
@@ -26,7 +26,11 @@ export default function CustomPagination(props: Props) {
   };
 
   return (
-    <Pagination.Root count={props.total} page={props.page} pageSize={PAGE_SIZE}>
+    <Pagination.Root
+      count={props.total}
+      page={props.page}
+      pageSize={props.take}
+    >
       <ButtonGroup size='xs' variant={{ base: 'ghost', _selected: 'subtle' }}>
         <Pagination.Items
           render={(page) => (

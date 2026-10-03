@@ -10,13 +10,8 @@ type Props = {
 
 export default function ResidentsPage(props: Props) {
   return (
-    <CustomPage
-      page='residents'
-      tab={props.tab}
-      action={<ResidentsAction />}
-      table={
-        <ResidentsTable tab={props.tab} searchParams={props.searchParams} />
-      }
-    />
+    <CustomPage page='residents' tab={props.tab} action={<ResidentsAction />}>
+      <ResidentsTable tab={props.tab} searchParams={props.searchParams} />
+    </CustomPage>
   );
 }
