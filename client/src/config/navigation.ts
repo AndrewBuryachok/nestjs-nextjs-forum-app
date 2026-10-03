@@ -9,6 +9,12 @@ export const PAGE_TABS_MAP = {
     my: {},
     all: { roles: [Role.ADMIN] },
   },
+  complaints: {
+    main: { public: true },
+    closed: { public: true },
+    my: {},
+    all: { roles: [Role.ADMIN] },
+  },
   fines: {
     my: {},
     paid: {},
