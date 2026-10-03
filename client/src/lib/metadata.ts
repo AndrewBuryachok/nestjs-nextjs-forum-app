@@ -12,3 +12,10 @@ export async function generateMetadata(props: Props) {
     title: `SpringPlus - ${t(`tabs.${props.tab}`)} ${t(`pages.${props.page}`)}`,
   };
 }
+
+export async function generateIdMetadata(page: string, id: string) {
+  const t = await getTranslations();
+  return {
+    title: `SpringPlus - ${t(`pages.${page}`)} #${id}`,
+  };
+}
