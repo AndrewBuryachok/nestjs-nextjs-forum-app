@@ -5,6 +5,7 @@ import {
   LuBuilding,
   LuCalendarDays,
   LuCreditCard,
+  LuGavel,
   LuIdCard,
   LuLandmark,
   LuLandPlot,
@@ -29,6 +30,7 @@ export default function CustomEmptyState(props: Props) {
   const icon = {
     applications: <LuMail />,
     cards: <LuCreditCard />,
+    complaints: <LuGavel />,
     fines: <LuReceipt />,
     invitations: <LuMail />,
     landmarks: <LuLandmark />,
