@@ -1,12 +1,7 @@
 import { useTranslations } from 'next-intl';
-import {
-  DataList,
-  HStack,
-  Skeleton,
-  SkeletonText,
-  Table,
-} from '@chakra-ui/react';
+import { DataList, SkeletonText, Table } from '@chakra-ui/react';
 import TableWrapper from './table-wrapper';
+import PaginationSkeleton from './pagination-skeleton';
 import { TABLE_PAGE_SIZE } from '@/constants/pagination';
 
 type Props = {
@@ -60,11 +55,7 @@ export default function TableSkeleton(props: Props) {
           ))}
         </Table.Body>
       </TableWrapper>
-      <HStack>
-        {Array.from({ length: 7 }).map((_, i) => (
-          <Skeleton key={i} h='8' w='8' />
-        ))}
-      </HStack>
+      <PaginationSkeleton />
     </>
   );
 }
