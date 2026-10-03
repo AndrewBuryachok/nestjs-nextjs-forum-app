@@ -9,3 +9,14 @@ export interface Complaint {
   judgeUser?: BaseUser;
   closedAt?: Date;
 }
+
+export interface ComplaintMessage {
+  id: number;
+  user: BaseUser;
+  text: string;
+  createdAt: Date;
+}
+
+export interface ComplaintWithMessages extends Complaint {
+  messages: ComplaintMessage[];
+}
