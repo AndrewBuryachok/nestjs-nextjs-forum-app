@@ -21,7 +21,9 @@ export default function CustomGallery<T extends Data>(props: Props<T>) {
         tab={props.tab}
         take={GALLERY_PAGE_SIZE}
         searchParams={props.searchParams}
-        render={(data) => <GalleryData data={data} render={props.render} />}
+        render={(data) => (
+          <GalleryData page={props.page} data={data} render={props.render} />
+        )}
       />
     </Suspense>
   );
