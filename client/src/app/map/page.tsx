@@ -17,8 +17,8 @@ export async function generateMetadata() {
 
 export default function Page() {
   const lines = [
-    { x: 0, y: PLACE_Y_MAX, color: Color.RED },
-    { x: 0, y: PLACE_Y_MIN, color: Color.YELLOW },
+    { x: 0, y: PLACE_Y_MAX, color: Color.YELLOW },
+    { x: 0, y: PLACE_Y_MIN, color: Color.RED },
     { x: PLACE_X_MAX, y: 0, color: Color.GREEN },
     { x: PLACE_X_MIN, y: 0, color: Color.BLUE },
   ];
