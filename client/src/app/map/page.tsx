@@ -12,7 +12,7 @@ import { colorToVar } from '@/lib/color';
 
 export async function generateMetadata() {
   const t = await getTranslations();
-  return { title: t('pages.map') };
+  return { title: `SpringPlus - ${t('pages.map')}` };
 }
 
 export default function Page() {
