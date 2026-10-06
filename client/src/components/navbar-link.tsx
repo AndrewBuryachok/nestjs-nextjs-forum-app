@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Button, HStack, useDrawerContext } from '@chakra-ui/react';
 import { LuChevronDown, LuChevronRight, LuDot } from 'react-icons/lu';
+import { useAuthContext } from '@/providers/auth-provider';
 import { useMqttContext } from '@/providers/mqtt-provider';
 import NotificationsBadge from './notifications-badge';
 
@@ -36,6 +37,8 @@ export default function NavbarLink(props: Props) {
     setDrawerOpen(false);
   };
 
+  const { user } = useAuthContext();
+
   return props.links ? (
     <>
       <Button
@@ -65,6 +68,7 @@ export default function NavbarLink(props: Props) {
             justifyContent='flex-start'
             size='xs'
             variant={link.value === page ? 'subtle' : 'ghost'}
+            disabled={(link.my || link.sent) && !user}
             onClick={() => onClick(link.value)}
           >
             <Link
