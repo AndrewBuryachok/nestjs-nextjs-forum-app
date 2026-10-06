@@ -6,6 +6,9 @@ export const NOTIFICATION_TABS_MAP = {
     add: 'my',
     remove: 'my',
   },
+  complaints: {
+    create: 'my',
+  },
   fines: {
     create: 'my',
     pay: 'paid',

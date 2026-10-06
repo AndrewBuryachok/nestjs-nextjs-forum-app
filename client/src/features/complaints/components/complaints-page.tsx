@@ -1,5 +1,6 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
+import ComplaintsAction from './complaints-action';
 import ComplaintsGallery from './complaints-gallery';
 
 type Props = {
@@ -9,7 +10,11 @@ type Props = {
 
 export default function ComplaintsPage(props: Props) {
   return (
-    <CustomPage page='complaints' tab={props.tab}>
+    <CustomPage
+      page='complaints'
+      tab={props.tab}
+      action={<ComplaintsAction tab={props.tab} />}
+    >
       <ComplaintsGallery tab={props.tab} searchParams={props.searchParams} />
     </CustomPage>
   );
