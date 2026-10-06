@@ -1,14 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Complaint } from './complaint.entity';
+import { MqttService } from '../mqtt/mqtt.service';
+import { UsersService } from '../users/users.service';
+import { CreateComplaintWithUserDto } from './complaint.dto';
+import { ComplaintError } from './complaint-errors.enum';
 import { Request, Response } from '../../common/interfaces';
+import { Notification } from '../../common/enums';
 
 @Injectable()
 export class ComplaintsService {
   constructor(
     @InjectRepository(Complaint)
     private complaintsRepository: Repository<Complaint>,
+    private mqttService: MqttService,
+    private usersService: UsersService,
   ) {}
 
   async getMainComplaints(req: Request): Promise<Response<Complaint>> {
@@ -45,6 +52,32 @@ export class ComplaintsService {
     const [data, total] =
       await this.getComplaintsQueryBuilder(req).getManyAndCount();
     return { data, total };
+  }
+
+  async createComplaint(dto: CreateComplaintWithUserDto): Promise<void> {
+    await this.usersService.throwIfUserNotFound(dto.senderUserId);
+    await this.usersService.throwIfUserNotFound(dto.receiverUserId);
+    const complaint = await this.create(dto);
+    this.mqttService.publishNotification(
+      dto.senderUserId,
+      dto.receiverUserId,
+      complaint.id,
+      Notification.CREATE_COMPLAINT,
+    );
+  }
+
+  private async create(dto: CreateComplaintWithUserDto): Promise<Complaint> {
+    try {
+      const complaint = this.complaintsRepository.create({
+        senderUserId: dto.senderUserId,
+        receiverUserId: dto.receiverUserId,
+        title: dto.title,
+      });
+      await this.complaintsRepository.save(complaint);
+      return complaint;
+    } catch (error) {
+      throw new InternalServerErrorException(ComplaintError.CREATE_FAILED);
+    }
   }
 
   private getComplaintsQueryBuilder(
