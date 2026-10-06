@@ -45,13 +45,13 @@ export class EditUserProfileDto {
 export class ChangeMyPasswordDto {
   @IsNotEmpty()
   @IsString()
-  @MinLength(8)
+  @MinLength(6)
   @MaxLength(32)
   oldPassword: string;
 
   @IsNotEmpty()
   @IsString()
-  @MinLength(8)
+  @MinLength(6)
   @MaxLength(32)
   newPassword: string;
 }
@@ -59,7 +59,7 @@ export class ChangeMyPasswordDto {
 export class ChangeUserPasswordDto {
   @IsNotEmpty()
   @IsString()
-  @MinLength(8)
+  @MinLength(6)
   @MaxLength(32)
   password: string;
 }
