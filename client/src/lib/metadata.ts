@@ -8,5 +8,7 @@ type Props = {
 
 export async function generateMetadata(props: Props) {
   const t = await getTranslations();
-  return { title: `${t(`tabs.${props.tab}`)} ${t(`pages.${props.page}`)}` };
+  return {
+    title: `SpringPlus - ${t(`tabs.${props.tab}`)} ${t(`pages.${props.page}`)}`,
+  };
 }
