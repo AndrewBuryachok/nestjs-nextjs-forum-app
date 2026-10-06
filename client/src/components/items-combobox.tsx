@@ -14,7 +14,11 @@ export default function ItemsCombobox(props: Props) {
 
   return (
     <CustomCombobox
-      data={Object.values(Item)}
+      data={Object.values(Item).filter(
+        (item) =>
+          !item.endsWith('spawn_egg') &&
+          !(item === Item.BEDROCK || item === Item.DRAGON_EGG),
+      )}
       empty='items'
       placeholder={t('columns.item')}
       start={(item) => <ItemImage item={item} />}
