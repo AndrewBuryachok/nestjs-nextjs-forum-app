@@ -1,6 +1,10 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ComplaintsService } from './complaints.service';
 import { Complaint } from './complaint.entity';
+import {
+  CreateComplaintDto,
+  CreateComplaintWithUserDto,
+} from './complaint.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -33,5 +37,22 @@ export class ComplaintsController {
   @Get('all')
   getAllComplaints(@Query() req: Request): Promise<Response<Complaint>> {
     return this.complaintsService.getAllComplaints(req);
+  }
+
+  @Post()
+  createMyComplaint(
+    @MyId() myId: number,
+    @Body() dto: CreateComplaintDto,
+  ): Promise<void> {
+    return this.complaintsService.createComplaint({
+      ...dto,
+      senderUserId: myId,
+    });
+  }
+
+  @Roles([Role.ADMIN])
+  @Post('all')
+  createUserComplaint(@Body() dto: CreateComplaintWithUserDto): Promise<void> {
+    return this.complaintsService.createComplaint(dto);
   }
 }

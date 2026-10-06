@@ -170,6 +170,26 @@ describe('App', () => {
   });
 
   describe('Complaints', () => {
+    it('POST /complaints', () => {
+      return request(app.getHttpServer())
+        .post('/complaints')
+        .set('Authorization', `Bearer ${user.access}`)
+        .send({ receiverUserId: admin.user.id, title: 'Complaint' })
+        .expect(201);
+    });
+
+    it('POST /complaints/all', () => {
+      return request(app.getHttpServer())
+        .post('/complaints/all')
+        .set('Authorization', `Bearer ${admin.access}`)
+        .send({
+          senderUserId: user.user.id,
+          receiverUserId: admin.user.id,
+          title: 'Complaint',
+        })
+        .expect(201);
+    });
+
     it('GET /complaints', () => {
       return request(app.getHttpServer())
         .get('/complaints')
