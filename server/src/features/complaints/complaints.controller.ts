@@ -4,6 +4,7 @@ import { Complaint } from './complaint.entity';
 import {
   ComplaintIdDto,
   CreateComplaintDto,
+  CreateComplaintMessageDto,
   CreateComplaintWithUserDto,
 } from './complaint.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
@@ -63,5 +64,13 @@ export class ComplaintsController {
   @Post('all')
   createUserComplaint(@Body() dto: CreateComplaintWithUserDto): Promise<void> {
     return this.complaintsService.createComplaint(dto);
+  }
+
+  @Post('messages')
+  createComplaintMessage(
+    @MyId() myId: number,
+    @Body() dto: CreateComplaintMessageDto,
+  ): Promise<void> {
+    return this.complaintsService.createComplaintMessage(myId, dto);
   }
 }
