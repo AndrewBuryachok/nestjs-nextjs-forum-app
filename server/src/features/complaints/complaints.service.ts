@@ -1,10 +1,20 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Complaint } from './complaint.entity';
+import { ComplaintMessage } from './complaint-message.entity';
 import { MqttService } from '../mqtt/mqtt.service';
 import { UsersService } from '../users/users.service';
-import { CreateComplaintWithUserDto } from './complaint.dto';
+import {
+  CreateComplaintMessageDto,
+  CreateComplaintWithUserDto,
+} from './complaint.dto';
 import { ComplaintError } from './complaint-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 import { Notification } from '../../common/enums';
@@ -14,6 +24,8 @@ export class ComplaintsService {
   constructor(
     @InjectRepository(Complaint)
     private complaintsRepository: Repository<Complaint>,
+    @InjectRepository(ComplaintMessage)
+    private complaintsMessagesRepository: Repository<ComplaintMessage>,
     private mqttService: MqttService,
     private usersService: UsersService,
   ) {}
@@ -75,6 +87,57 @@ export class ComplaintsService {
     );
   }
 
+  async createComplaintMessage(
+    myId: number,
+    dto: CreateComplaintMessageDto,
+  ): Promise<void> {
+    const complaint = await this.throwIfNotComplaintUser(dto.complaintId, myId);
+    this.throwIfComplaintAlreadyClosed(complaint);
+    await this.createMessage(myId, dto);
+    const userId =
+      complaint.senderUserId === myId
+        ? complaint.receiverUserId
+        : complaint.senderUserId;
+    this.mqttService.publishNotification(
+      myId,
+      userId,
+      dto.complaintId,
+      Notification.MESSAGE_COMPLAINT,
+    );
+  }
+
+  async throwIfComplaintNotFound(complaintId: number): Promise<Complaint> {
+    const complaint = await this.findComplaintById(complaintId);
+    if (!complaint) {
+      throw new NotFoundException(ComplaintError.NOT_FOUND);
+    }
+    return complaint;
+  }
+
+  async throwIfNotComplaintUser(
+    complaintId: number,
+    userId: number,
+  ): Promise<Complaint> {
+    const complaint = await this.throwIfComplaintNotFound(complaintId);
+    if (
+      complaint.senderUserId !== userId &&
+      complaint.receiverUserId !== userId
+    ) {
+      throw new ForbiddenException(ComplaintError.NOT_USER);
+    }
+    return complaint;
+  }
+
+  private throwIfComplaintAlreadyClosed(complaint: Complaint): void {
+    if (complaint.closedAt) {
+      throw new BadRequestException(ComplaintError.ALREADY_CLOSED);
+    }
+  }
+
+  private findComplaintById(id: number): Promise<Complaint | null> {
+    return this.complaintsRepository.findOneBy({ id });
+  }
+
   private async create(dto: CreateComplaintWithUserDto): Promise<Complaint> {
     try {
       const complaint = this.complaintsRepository.create({
@@ -86,6 +149,25 @@ export class ComplaintsService {
       return complaint;
     } catch (error) {
       throw new InternalServerErrorException(ComplaintError.CREATE_FAILED);
+    }
+  }
+
+  private async createMessage(
+    myId: number,
+    dto: CreateComplaintMessageDto,
+  ): Promise<ComplaintMessage> {
+    try {
+      const complaintMessage = this.complaintsMessagesRepository.create({
+        complaintId: dto.complaintId,
+        userId: myId,
+        text: dto.text,
+      });
+      await this.complaintsMessagesRepository.save(complaintMessage);
+      return complaintMessage;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        ComplaintError.CREATE_MESSAGE_FAILED,
+      );
     }
   }
 
