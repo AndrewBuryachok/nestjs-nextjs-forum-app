@@ -163,11 +163,25 @@ export class ForumService {
     return this.transactionsService.createDepositTransaction(myId, dto);
   }
 
+  createTempDepositTransaction(
+    myId: number,
+    dto: CreateTransactionDto,
+  ): Promise<void> {
+    return this.transactionsService.createTempDepositTransaction(myId, dto);
+  }
+
   createWithdrawTransaction(
     myId: number,
     dto: CreateTransactionDto,
   ): Promise<void> {
     return this.transactionsService.createWithdrawTransaction(myId, dto);
+  }
+
+  createTempWithdrawTransaction(
+    myId: number,
+    dto: CreateTransactionDto,
+  ): Promise<void> {
+    return this.transactionsService.createTempWithdrawTransaction(myId, dto);
   }
 
   createTransferTransaction(
