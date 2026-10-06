@@ -1,5 +1,6 @@
 export enum Notification {
   CREATE_COMPLAINT = 'create complaints',
+  MESSAGE_COMPLAINT = 'message complaints',
   CREATE_TOWN = 'create towns',
   LEAVE_TOWN = 'leave residents',
   DELETE_RESIDENT = 'delete residents',
