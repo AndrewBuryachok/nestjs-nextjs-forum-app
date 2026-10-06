@@ -4,4 +4,6 @@ export enum TransactionError {
   CREATE_DECREASE_FAILED = 'Не удалось создать транзакцию-уменьшение',
   CREATE_TRANSFER_FAILED = 'Не удалось создать транзакцию-перевод',
   DELETE_FAILED = 'Не удалось удалить транзакцию',
+  GIVE_DIAMODS_FAILED = 'Не удалось выдать АРы',
+  TAKE_DIAMODS_FAILED = 'Не удалось забрать АРы',
 }
