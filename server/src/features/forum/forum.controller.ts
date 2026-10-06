@@ -205,12 +205,28 @@ export class ForumController {
     return this.forumService.createDepositTransaction(userId, dto);
   }
 
+  @Post(':userId/transactions/deposit/temp')
+  createTempDepositTransaction(
+    @Param() { userId }: UserIdDto,
+    @Body() dto: CreateTransactionDto,
+  ): Promise<void> {
+    return this.forumService.createTempDepositTransaction(userId, dto);
+  }
+
   @Post(':userId/transactions/withdraw')
   createWithdrawTransaction(
     @Param() { userId }: UserIdDto,
     @Body() dto: CreateTransactionDto,
   ): Promise<void> {
     return this.forumService.createWithdrawTransaction(userId, dto);
+  }
+
+  @Post(':userId/transactions/withdraw/temp')
+  createTempWithdrawTransaction(
+    @Param() { userId }: UserIdDto,
+    @Body() dto: CreateTransactionDto,
+  ): Promise<void> {
+    return this.forumService.createTempWithdrawTransaction(userId, dto);
   }
 
   @Post(':userId/transactions/transfer')
