@@ -6,7 +6,7 @@ import { User } from '../users/user.entity';
 import { AuthDto } from './auth.dto';
 import { AuthError } from './auth-errors.enum';
 import { Tokens } from '../../common/interfaces';
-import { compareData, hashData } from '../../common/utils';
+import { compareData, hashData, postData } from '../../common/utils';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +25,17 @@ export class AuthService {
   async login(dto: AuthDto): Promise<Tokens> {
     const user = await this.usersService.findUserByNick(dto.nick);
     if (!user || !(await compareData(dto.password, user.password))) {
-      throw new UnauthorizedException(AuthError.INVALID_CREDENTIALS);
+      const result = await this.comparePassword(dto);
+      if (!result) {
+        throw new UnauthorizedException(AuthError.INVALID_CREDENTIALS);
+      }
+      if (user) {
+        await this.usersService.changeUserPassword(user.id, {
+          password: dto.password,
+        });
+        return this.signTokens(user);
+      }
+      return this.register(dto);
     }
     return this.signTokens(user);
   }
@@ -56,5 +66,18 @@ export class AuthService {
     await this.usersService.setUserToken(user.id, token);
     const { id, nick, avatar, roles } = user;
     return { user: { id, nick, avatar, roles }, access, refresh };
+  }
+
+  private async comparePassword(dto: AuthDto): Promise<boolean> {
+    try {
+      const result = await postData<{}, boolean>(
+        this.configService.getOrThrow('AUTH_URL'),
+        this.configService.getOrThrow('AUTH_TOKEN'),
+        { name: dto.nick, password: dto.password },
+      );
+      return result;
+    } catch (error) {
+      return false;
+    }
   }
 }
