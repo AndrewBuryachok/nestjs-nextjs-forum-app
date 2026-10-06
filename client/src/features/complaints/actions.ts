@@ -1,6 +1,7 @@
 'use server';
 
 import {
+  createComplaintMessageSchema,
   createComplaintWithReceiverSchema,
   createComplaintWithSenderSchema,
 } from './schema';
@@ -17,4 +18,10 @@ export const createUserComplaintAction = actionClient
   .inputSchema(createComplaintWithSenderSchema)
   .action(({ parsedInput: body }) => {
     return send('POST', '/complaints/all', body);
+  });
+
+export const createComplaintMessageAction = actionClient
+  .inputSchema(createComplaintMessageSchema)
+  .action(({ parsedInput: body }) => {
+    return send('POST', '/complaints/messages', body);
   });
