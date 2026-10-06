@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Button, HStack, useDrawerContext } from '@chakra-ui/react';
 import { LuChevronDown, LuChevronRight, LuDot } from 'react-icons/lu';
+import { useAuthContext } from '@/providers/auth-provider';
 
 type Props = {
   value: string;
@@ -23,6 +24,8 @@ export default function NavbarLink(props: Props) {
   const { setOpen: setDrawerOpen } = useDrawerContext();
 
   const closeDrawer = () => setDrawerOpen(false);
+
+  const { user } = useAuthContext();
 
   return props.links ? (
     <>
@@ -48,6 +51,7 @@ export default function NavbarLink(props: Props) {
             justifyContent='flex-start'
             size='xs'
             variant={link.value === page ? 'subtle' : 'ghost'}
+            disabled={link.my && !user}
             onClick={closeDrawer}
           >
             <Link href={`/${link.value}${link.my ? '/my' : ''}`}>
