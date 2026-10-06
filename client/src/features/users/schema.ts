@@ -14,15 +14,15 @@ export const editUserProfileSchema = editMyProfileSchema.extend({
 export type EditUserProfileType = z.infer<typeof editUserProfileSchema>;
 
 export const changeMyPasswordSchema = z.object({
-  oldPassword: z.string().min(8).max(32),
-  newPassword: z.string().min(8).max(32),
+  oldPassword: z.string().min(6).max(32),
+  newPassword: z.string().min(6).max(32),
 });
 
 export type ChangeMyPasswordType = z.infer<typeof changeMyPasswordSchema>;
 
 export const changeUserPasswordSchema = z.object({
   userId: z.number().int().min(1),
-  password: z.string().min(8).max(32),
+  password: z.string().min(6).max(32),
 });
 
 export type ChangeUserPasswordType = z.infer<typeof changeUserPasswordSchema>;
