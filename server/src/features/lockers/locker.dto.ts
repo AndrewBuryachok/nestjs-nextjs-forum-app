@@ -10,8 +10,23 @@ export class LockerIdDto {
   lockerId: number;
 }
 
-export class CreateLockerDto extends CreatePlaceDto {}
+export class CreateLockerDto extends CreatePlaceDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  cells: number;
+}
 
-export class CreateLockerWithUserDto extends CreatePlaceWithUserDto {}
+export class CreateLockerWithUserDto extends CreatePlaceWithUserDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  cells: number;
+}
 
-export class EditLockerDto extends CreatePlaceDto {}
+export class EditLockerDto extends CreatePlaceDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  cells: number;
+}

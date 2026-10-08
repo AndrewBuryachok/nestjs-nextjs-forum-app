@@ -212,7 +212,10 @@ export class OrdersService {
 
   private async executeOrder(order: Order): Promise<void> {
     this.throwIfOrderNotTaken(order);
-    await this.execute(order.id);
+    const cell = await this.lockersService.throwIfLockerCellsBusy(
+      order.lockerId,
+    );
+    await this.execute(order.id, cell);
     this.mqttService.publishNotification(
       order.executorUserId!,
       order.customerUserId,
@@ -407,9 +410,12 @@ export class OrdersService {
     }
   }
 
-  private async execute(id: number): Promise<void> {
+  private async execute(id: number, cell: number): Promise<void> {
     try {
-      await this.ordersRepository.update({ id }, { status: Status.EXECUTED });
+      await this.ordersRepository.update(
+        { id },
+        { status: Status.EXECUTED, cell },
+      );
     } catch (error) {
       throw new InternalServerErrorException(OrderError.EXECUTE_FAILED);
     }
@@ -455,6 +461,7 @@ export class OrdersService {
         'order.unit',
         'order.sum',
         'order.status',
+        'order.cell',
         'order.createdAt',
         'order.completedAt',
       ])
