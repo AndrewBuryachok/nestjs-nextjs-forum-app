@@ -65,7 +65,7 @@ export default function ViewOrderForm(props: Props) {
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.locker')}</Field.Label>
-        <PlaceInput place={props.order.locker} />
+        <PlaceInput place={props.order.locker} cell={props.order.cell} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.created')}</Field.Label>
