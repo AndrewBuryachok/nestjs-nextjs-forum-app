@@ -58,6 +58,9 @@ export class Order {
   @Column({ type: 'enum', enum: Status })
   status: Status;
 
+  @Column({ nullable: true })
+  cell?: number;
+
   @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
   createdAt: Date;
 
