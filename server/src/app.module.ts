@@ -19,6 +19,8 @@ import { RentsModule } from './features/rents/rents.module';
 import { ProductsModule } from './features/products/products.module';
 import { LockersModule } from './features/lockers/lockers.module';
 import { OrdersModule } from './features/orders/orders.module';
+import { ForumController } from './features/forum/forum.controller';
+import { ForumService } from './features/forum/forum.service';
 import { AtGuard, RolesGuard } from './common/guards';
 
 @Module({
@@ -61,7 +63,9 @@ import { AtGuard, RolesGuard } from './common/guards';
     LockersModule,
     OrdersModule,
   ],
+  controllers: [ForumController],
   providers: [
+    ForumService,
     { provide: APP_GUARD, useClass: AtGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
     {

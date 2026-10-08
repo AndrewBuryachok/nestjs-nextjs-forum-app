@@ -10,5 +10,6 @@ import { FinesService } from './fines.service';
   imports: [TypeOrmModule.forFeature([Fine]), CardsModule, TransactionsModule],
   controllers: [FinesController],
   providers: [FinesService],
+  exports: [FinesService],
 })
 export class FinesModule {}

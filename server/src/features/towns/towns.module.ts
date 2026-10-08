@@ -38,5 +38,11 @@ import { ApplicationsService } from './applications.service';
     InvitationsService,
     ApplicationsService,
   ],
+  exports: [
+    TownsService,
+    ResidentsService,
+    InvitationsService,
+    ApplicationsService,
+  ],
 })
 export class TownsModule {}
