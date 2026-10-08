@@ -14,5 +14,6 @@ export default setSeederFactory(Locker, (faker) => {
   locker.world = faker.helpers.enumValue(World);
   locker.x = faker.number.int({ min: PLACE_X_MIN, max: PLACE_X_MAX });
   locker.y = faker.number.int({ min: PLACE_Y_MIN, max: PLACE_Y_MAX });
+  locker.cells = faker.number.int({ min: 1, max: 9 });
   return locker;
 });

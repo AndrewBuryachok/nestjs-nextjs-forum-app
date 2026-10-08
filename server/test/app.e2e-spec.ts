@@ -1128,6 +1128,7 @@ describe('App', () => {
           world: World.OVERWORLD,
           x: 0,
           y: 0,
+          cells: 9,
         })
         .expect(201);
     });
@@ -1142,6 +1143,7 @@ describe('App', () => {
           world: World.OVERWORLD,
           x: 0,
           y: 0,
+          cells: 9,
         })
         .expect(201);
     });

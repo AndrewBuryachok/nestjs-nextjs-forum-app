@@ -13,7 +13,7 @@ import { UsersService } from '../users/users.service';
 import { CreateLockerWithUserDto, EditLockerDto } from './locker.dto';
 import { LockerError } from './locker-errors.enum';
 import { Request, Response } from '../../common/interfaces';
-import { Notification } from '../../common/enums';
+import { Notification, Status } from '../../common/enums';
 
 @Injectable()
 export class LockersService {
@@ -113,6 +113,20 @@ export class LockersService {
     }
   }
 
+  async throwIfLockerCellsBusy(id: number): Promise<number> {
+    const locker = await this.lockersRepository.findOneOrFail({
+      relations: { orders: true },
+      where: { id, orders: { status: Status.EXECUTED } },
+    });
+    const cells = Array.from({ length: locker.cells }, (_, i) => i + 1).filter(
+      (cell) => !locker.orders.find((order) => order.cell === cell),
+    );
+    if (!cells.length) {
+      throw new BadRequestException(LockerError.BUSY_CELLS);
+    }
+    return cells[Math.floor(Math.random() * cells.length)];
+  }
+
   private findLockerById(id: number): Promise<Locker | null> {
     return this.lockersRepository.findOneBy({ id });
   }
@@ -125,6 +139,7 @@ export class LockersService {
         world: dto.world,
         x: dto.x,
         y: dto.y,
+        cells: dto.cells,
       });
       await this.lockersRepository.save(locker);
       return locker;
@@ -137,7 +152,13 @@ export class LockersService {
     try {
       await this.lockersRepository.update(
         { id },
-        { name: dto.name, world: dto.world, x: dto.x, y: dto.y },
+        {
+          name: dto.name,
+          world: dto.world,
+          x: dto.x,
+          y: dto.y,
+          cells: dto.cells,
+        },
       );
     } catch (error) {
       throw new InternalServerErrorException(LockerError.EDIT_FAILED);
@@ -174,10 +195,17 @@ export class LockersService {
         'locker.world',
         'locker.x',
         'locker.y',
+        'locker.cells',
         'locker.createdAt',
       ])
       .innerJoin('locker.user', 'ownerUser')
       .addSelect(['ownerUser.id', 'ownerUser.nick', 'ownerUser.avatar'])
+      .loadRelationCountAndMap(
+        'locker.orders',
+        'locker.orders',
+        'order',
+        (qb) => qb.where('order.status = :status', { status: Status.EXECUTED }),
+      )
       .where(
         new Brackets(
           (qb) => req.id && qb.where('locker.id = :id', { id: req.id }),
