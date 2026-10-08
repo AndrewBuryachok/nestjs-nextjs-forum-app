@@ -3,6 +3,7 @@ import { Locker } from '../types';
 import CustomTable from '@/components/custom-table';
 import CustomAvatarWithUser from '@/components/custom-avatar-with-user';
 import PlaceText from '@/components/place-text';
+import CustomText from '@/components/custom-text';
 import DateText from '@/components/date-text';
 import LockersActions from './lockers-actions';
 
@@ -25,6 +26,14 @@ export default function LockersTable(props: Props) {
         {
           value: 'locker',
           render: (locker) => <PlaceText place={locker} />,
+        },
+        {
+          value: 'cells',
+          render: (locker) => (
+            <CustomText
+              value={`${locker.cells - locker.orders}/${locker.cells}`}
+            />
+          ),
         },
         {
           value: 'created',

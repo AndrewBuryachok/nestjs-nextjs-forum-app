@@ -33,6 +33,7 @@ export default function EditLockerForm(props: Props) {
       world: props.locker.world,
       x: props.locker.x,
       y: props.locker.y,
+      cells: props.locker.cells,
     },
   });
 
@@ -120,6 +121,29 @@ export default function EditLockerForm(props: Props) {
           )}
         />
         <Field.ErrorText>{form.formState.errors.y?.message}</Field.ErrorText>
+      </Field.Root>
+      <Field.Root invalid={!!form.formState.errors.y} required>
+        <Field.Label>
+          {t('columns.cells')}
+          <Field.RequiredIndicator />
+        </Field.Label>
+        <Controller
+          control={form.control}
+          name='cells'
+          render={({ field }) => (
+            <NumberInput.Root
+              w='full'
+              value={String(field.value)}
+              onValueChange={(d) => field.onChange(d.valueAsNumber)}
+            >
+              <NumberInput.Control />
+              <NumberInput.Input placeholder={t('columns.cells')} />
+            </NumberInput.Root>
+          )}
+        />
+        <Field.ErrorText>
+          {form.formState.errors.cells?.message}
+        </Field.ErrorText>
       </Field.Root>
     </CustomForm>
   );

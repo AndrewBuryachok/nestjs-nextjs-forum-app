@@ -5,6 +5,7 @@ import { placeColor } from '@/lib/place';
 
 type Props = {
   place: BasePlace;
+  cell?: number;
 };
 
 export default function PlaceText(props: Props) {
@@ -18,7 +19,11 @@ export default function PlaceText(props: Props) {
 
   return (
     <div>
-      <CustomText value={props.place.name} />
+      <CustomText
+        value={
+          props.cell ? `${props.place.name} #{props.cell}` : props.place.name
+        }
+      />
       <CustomText color={color} value={value} />
     </div>
   );

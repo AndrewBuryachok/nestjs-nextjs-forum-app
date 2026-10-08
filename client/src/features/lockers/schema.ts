@@ -12,6 +12,7 @@ export const createLockerSchema = z.object({
   world: z.enum(World),
   x: z.number().int().min(PLACE_X_MIN).max(PLACE_X_MAX),
   y: z.number().int().min(PLACE_Y_MIN).max(PLACE_Y_MAX),
+  cells: z.number().int().min(1),
 });
 
 export type CreateLockerType = z.infer<typeof createLockerSchema>;
@@ -30,6 +31,7 @@ export const editLockerSchema = z.object({
   world: z.enum(World),
   x: z.number().int().min(PLACE_X_MIN).max(PLACE_X_MAX),
   y: z.number().int().min(PLACE_Y_MIN).max(PLACE_Y_MAX),
+  cells: z.number().int().min(1),
 });
 
 export type EditLockerType = z.infer<typeof editLockerSchema>;

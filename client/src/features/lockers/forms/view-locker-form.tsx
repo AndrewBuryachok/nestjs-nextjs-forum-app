@@ -28,6 +28,13 @@ export default function ViewLockerForm(props: Props) {
         <PlaceInput place={props.locker} />
       </Field.Root>
       <Field.Root>
+        <Field.Label>{t('columns.cells')}</Field.Label>
+        <Input
+          readOnly
+          value={`${props.locker.cells - props.locker.orders}/${props.locker.cells}`}
+        />
+      </Field.Root>
+      <Field.Root>
         <Field.Label>{t('columns.created')}</Field.Label>
         <DateInput value={props.locker.createdAt} />
       </Field.Root>
