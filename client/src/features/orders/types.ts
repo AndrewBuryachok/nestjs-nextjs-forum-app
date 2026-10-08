@@ -17,6 +17,7 @@ export interface Order {
   unit: Unit;
   sum: number;
   status: Status;
+  cell?: number;
   createdAt: Date;
   executorUser?: BaseUser;
   executorCard?: BaseCard;
