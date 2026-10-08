@@ -33,6 +33,7 @@ export default function EditLockerForm(props: Props) {
       world: props.locker.world,
       x: props.locker.x,
       y: props.locker.y,
+      cells: props.locker.cells,
     },
   });
 
@@ -103,6 +104,20 @@ export default function EditLockerForm(props: Props) {
           type='number'
         />
         <Field.ErrorText>{form.formState.errors.y?.message}</Field.ErrorText>
+      </Field.Root>
+      <Field.Root invalid={!!form.formState.errors.cells} required>
+        <Field.Label>
+          {t('columns.cells')}
+          <Field.RequiredIndicator />
+        </Field.Label>
+        <Input
+          {...form.register('cells', { valueAsNumber: true })}
+          placeholder={t('columns.cells')}
+          type='number'
+        />
+        <Field.ErrorText>
+          {form.formState.errors.cells?.message}
+        </Field.ErrorText>
       </Field.Root>
     </CustomForm>
   );

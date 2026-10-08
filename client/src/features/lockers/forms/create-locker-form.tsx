@@ -31,6 +31,7 @@ export default function CreateLockerForm(props: Props) {
     defaultValues: {
       x: 0,
       y: 0,
+      cells: 1,
     },
   });
 
@@ -116,6 +117,20 @@ export default function CreateLockerForm(props: Props) {
           type='number'
         />
         <Field.ErrorText>{form.formState.errors.y?.message}</Field.ErrorText>
+      </Field.Root>
+      <Field.Root invalid={!!form.formState.errors.cells} required>
+        <Field.Label>
+          {t('columns.cells')}
+          <Field.RequiredIndicator />
+        </Field.Label>
+        <Input
+          {...form.register('cells', { valueAsNumber: true })}
+          placeholder={t('columns.cells')}
+          type='number'
+        />
+        <Field.ErrorText>
+          {form.formState.errors.cells?.message}
+        </Field.ErrorText>
       </Field.Root>
     </CustomForm>
   );

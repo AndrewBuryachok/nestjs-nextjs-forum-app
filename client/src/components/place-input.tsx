@@ -4,6 +4,7 @@ import PlaceIcon from './place-icon';
 
 type Props = {
   place: BasePlace;
+  cell?: number;
 };
 
 export default function PlaceInput(props: Props) {
@@ -11,7 +12,7 @@ export default function PlaceInput(props: Props) {
 
   return (
     <InputGroup startAddon={<PlaceIcon place={props.place} />}>
-      <Input readOnly value={value} />
+      <Input readOnly value={props.cell ? `${value} #${props.cell}` : value} />
     </InputGroup>
   );
 }
