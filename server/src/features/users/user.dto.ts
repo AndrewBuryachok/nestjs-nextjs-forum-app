@@ -20,6 +20,14 @@ export class UserIdDto {
   userId: number;
 }
 
+export class UserNickDto {
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(3)
+  @MaxLength(16)
+  nick: string;
+}
+
 export class CreateUserDto extends AuthDto {}
 
 export class EditUserProfileDto {
