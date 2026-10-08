@@ -47,6 +47,12 @@ export class UsersService {
       .getOneOrFail();
   }
 
+  selectOneUserByNick(nick: string): Promise<User> {
+    return this.selectUsersQueryBuilder()
+      .where('user.nick = :nick', { nick })
+      .getOneOrFail();
+  }
+
   selectUsersByIds(ids: number[]): Promise<User[]> {
     return this.selectUsersQueryBuilder()
       .where('user.id = ANY (:ids)', { ids })
