@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CardsService } from './cards.service';
 import { Card } from './card.entity';
@@ -18,8 +19,9 @@ import {
   EditCardDto,
   UpdateCardUserDto,
 } from './card.dto';
-import { UserIdDto } from '../users/user.dto';
+import { UserIdDto, UserNickDto } from '../users/user.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
+import { ModApiKeyGuard } from '../../common/guards';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
 
@@ -68,6 +70,13 @@ export class CardsController {
   @Get(':cardId/not-users')
   selectNotCardUsers(@Param() { cardId }: CardIdDto): Promise<User[]> {
     return this.cardsService.selectNotCardUsers(cardId);
+  }
+
+  @Public()
+  @UseGuards(ModApiKeyGuard)
+  @Get(':nick/sum')
+  getUserCardsSum(@Param() { nick }: UserNickDto): Promise<number> {
+    return this.cardsService.getUserCardsSum(nick);
   }
 
   @Post()

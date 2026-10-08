@@ -69,6 +69,15 @@ export class CardsService {
     return this.usersService.selectUsersByNotIds(users);
   }
 
+  async getUserCardsSum(nick: string): Promise<number> {
+    const user = await this.usersService.findUserByNick(nick);
+    if (!user) {
+      throw new NotFoundException();
+    }
+    const sum = await this.cardsRepository.sum('balance', { userId: user.id });
+    return sum ?? 0;
+  }
+
   async createCard(dto: CreateCardWithUserDto): Promise<void> {
     await this.usersService.throwIfUserNotFound(dto.userId);
     await this.create(dto);

@@ -31,5 +31,6 @@ import { ApplicationsService } from './applications.service';
     InvitationsService,
     ApplicationsService,
   ],
+  exports: [TownsService, ResidentsService],
 })
 export class TownsModule {}
