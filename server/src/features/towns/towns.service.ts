@@ -76,6 +76,13 @@ export class TownsService {
     return this.selectTownsQueryBuilder().getMany();
   }
 
+  selectAllTownsWithChunks(): Promise<Town[]> {
+    return this.selectTownsQueryBuilder()
+      .leftJoin('town.townChunks', 'townChunk')
+      .addSelect(['townChunk.id', 'townChunk.x', 'townChunk.y'])
+      .getMany();
+  }
+
   selectAllChunks(): Promise<TownChunk[]> {
     return this.selectTownsChunksQueryBuilder()
       .addSelect(['townChunk.townId'])
