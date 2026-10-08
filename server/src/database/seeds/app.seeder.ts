@@ -283,7 +283,11 @@ export default class AppSeeder implements Seeder {
     const orderFactory = factoryManager.get(Order);
     const orders: Order[] = [];
     for (let i = 0; i < 40; i++) {
-      const locker = faker.helpers.arrayElement(lockers);
+      const locker = faker.helpers.arrayElement(
+        lockers.filter(
+          (l) => l.cells > orders.filter((o) => o.locker.id === l.id).length,
+        ),
+      );
       const sum = faker.number.int({ min: 1, max: 1000 });
       const customerCard = faker.helpers.arrayElement(
         cards.filter((card) => card.balance >= sum),
