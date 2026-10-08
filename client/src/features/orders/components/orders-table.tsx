@@ -57,7 +57,9 @@ export default function OrdersTable(props: Props) {
         },
         {
           value: 'locker',
-          render: (order) => <PlaceText place={order.locker} />,
+          render: (order) => (
+            <PlaceText place={order.locker} cell={order.cell} />
+          ),
         },
         props.tab === 'main' || props.tab === 'my'
           ? {
