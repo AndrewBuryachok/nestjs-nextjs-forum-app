@@ -8,6 +8,7 @@ export const NOTIFICATION_TABS_MAP = {
   },
   complaints: {
     create: 'my',
+    close: 'closed',
     message: 'my',
   },
   fines: {
