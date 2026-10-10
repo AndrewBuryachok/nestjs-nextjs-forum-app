@@ -7,11 +7,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { Transactional } from 'typeorm-transactional';
 import { Complaint } from './complaint.entity';
 import { ComplaintMessage } from './complaint-message.entity';
 import { MqttService } from '../mqtt/mqtt.service';
 import { UsersService } from '../users/users.service';
 import {
+  CloseComplaintDto,
   CreateComplaintMessageDto,
   CreateComplaintWithUserDto,
 } from './complaint.dto';
@@ -87,6 +89,24 @@ export class ComplaintsService {
     );
   }
 
+  @Transactional()
+  async closeComplaint(
+    myId: number,
+    complaintId: number,
+    dto: CloseComplaintDto,
+  ): Promise<void> {
+    const complaint = await this.throwIfComplaintNotFound(complaintId);
+    this.throwIfComplaintAlreadyClosed(complaint);
+    await this.createMessage(myId, { ...dto, complaintId });
+    await this.close(complaintId, myId);
+    this.mqttService.publishNotification(
+      myId,
+      complaint.senderUserId,
+      complaint.id,
+      Notification.CLOSE_COMPLAINT,
+    );
+  }
+
   async createComplaintMessage(
     myId: number,
     dto: CreateComplaintMessageDto,
@@ -149,6 +169,17 @@ export class ComplaintsService {
       return complaint;
     } catch (error) {
       throw new InternalServerErrorException(ComplaintError.CREATE_FAILED);
+    }
+  }
+
+  private async close(id: number, myId: number): Promise<void> {
+    try {
+      await this.complaintsRepository.update(
+        { id },
+        { judgeUserId: myId, closedAt: new Date() },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(ComplaintError.CLOSE_FAILED);
     }
   }
 

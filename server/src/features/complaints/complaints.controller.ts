@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ComplaintsService } from './complaints.service';
 import { Complaint } from './complaint.entity';
 import {
+  CloseComplaintDto,
   ComplaintIdDto,
   CreateComplaintDto,
   CreateComplaintMessageDto,
@@ -72,5 +73,15 @@ export class ComplaintsController {
     @Body() dto: CreateComplaintMessageDto,
   ): Promise<void> {
     return this.complaintsService.createComplaintMessage(myId, dto);
+  }
+
+  @Roles([Role.ADMIN])
+  @Post(':complaintId')
+  closeComplaint(
+    @MyId() myId: number,
+    @Param() { complaintId }: ComplaintIdDto,
+    @Body() dto: CloseComplaintDto,
+  ): Promise<void> {
+    return this.complaintsService.closeComplaint(myId, complaintId, dto);
   }
 }
