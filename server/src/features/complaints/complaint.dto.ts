@@ -28,14 +28,16 @@ export class CreateComplaintWithUserDto extends CreateComplaintDto {
   senderUserId: number;
 }
 
-export class CreateComplaintMessageDto {
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  complaintId: number;
-
+export class CloseComplaintDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(2000)
   text: string;
+}
+
+export class CreateComplaintMessageDto extends CloseComplaintDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  complaintId: number;
 }
