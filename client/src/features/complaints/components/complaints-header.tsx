@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl';
-import { Alert, Flex, HStack, IconButton, Stack } from '@chakra-ui/react';
-import { LuArchive } from 'react-icons/lu';
+import { Alert, ButtonGroup, Flex, HStack, Stack } from '@chakra-ui/react';
 import { ComplaintWithMessages } from '../types';
+import CloseComplaintAction from '../actions/close-complaint-action';
 import BackButton from '@/components/back-button';
 import CustomText from '@/components/custom-text';
 import MomentText from '@/components/moment-text';
@@ -22,13 +22,9 @@ export default function ComplaintsHeader(props: Props) {
           <BackButton />
           <CustomText value={title} />
         </HStack>
-        <IconButton
-          size='xs'
-          variant='ghost'
-          disabled={!!props.complaint.closedAt}
-        >
-          <LuArchive />
-        </IconButton>
+        <ButtonGroup size='xs' variant='ghost'>
+          <CloseComplaintAction complaint={props.complaint} />
+        </ButtonGroup>
       </Flex>
       {props.complaint.closedAt && (
         <Alert.Root size='sm' status='error'>
