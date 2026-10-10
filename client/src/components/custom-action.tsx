@@ -11,6 +11,7 @@ import { Role } from '@/constants/roles';
 type Props = {
   action: string;
   dialog: string;
+  disabled?: boolean;
   role?: Role;
   icon?: React.ReactNode;
   body: React.ReactNode;
@@ -34,7 +35,9 @@ export default function CustomAction(props: Props) {
 
   return (
     <IconButton
-      disabled={!!props.role && !user?.roles.includes(props.role)}
+      disabled={
+        props.disabled || (!!props.role && !user?.roles.includes(props.role))
+      }
       onClick={user ? openActionDialog : openAuthDialog}
     >
       {props.icon ?? <LuPlus />}
