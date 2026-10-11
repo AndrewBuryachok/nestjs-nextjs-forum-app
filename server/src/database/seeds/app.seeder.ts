@@ -12,7 +12,6 @@ import { Shop } from '../../features/shops/shop.entity';
 import { Plot } from '../../features/plots/plot.entity';
 import { Rent } from '../../features/rents/rent.entity';
 import { Product } from '../../features/products/product.entity';
-import { Purchase } from '../../features/purchases/purchase.entity';
 import { Locker } from '../../features/lockers/locker.entity';
 import { Order } from '../../features/orders/order.entity';
 import { Status, TransactionType } from '../../common/enums';
@@ -219,8 +218,7 @@ export default class AppSeeder implements Seeder {
     const productFactory = factoryManager.get(Product);
     const products: Product[] = [];
     for (let i = 0; i < 40; i++) {
-      const id = i + 1;
-      const product = await productFactory.make({ id });
+      const product = await productFactory.make();
       if (faker.datatype.boolean()) {
         const shop = faker.helpers.arrayElement(shops);
         product.shop = shop;
@@ -233,44 +231,6 @@ export default class AppSeeder implements Seeder {
         product.user = randomUserOf(rent.card);
       }
       products.push(product);
-    }
-    const purchaseFactory = factoryManager.get(Purchase);
-    const purchases: Purchase[] = [];
-    for (let i = 0; i < 40; i++) {
-      const product = faker.helpers.arrayElement(
-        products.filter((product) => product.amount > 0),
-      );
-      const card = faker.helpers.arrayElement(
-        cards.filter((card) => card.balance >= product.price),
-      );
-      const user = randomUserOf(card);
-      const max = Math.min(
-        product.amount,
-        Math.floor(card.balance / product.price),
-      );
-      const amount = faker.number.int({ min: 1, max });
-      card.balance -= amount * product.price;
-      product.card.balance += amount * product.price;
-      const transfer = await transactionFactory.make({
-        senderUser: user,
-        senderCard: card,
-        receiverUser: product.user,
-        receiverCard: product.card,
-        type: TransactionType.BUY_PRODUCT,
-        sum: amount * product.price,
-        description: product.description,
-        item: product.item,
-      });
-      transactions.push(transfer);
-      product.amount -= amount;
-      const purchase = await purchaseFactory.make({
-        product,
-        user,
-        card,
-        amount,
-        price: product.price,
-      });
-      purchases.push(purchase);
     }
     const lockerFactory = factoryManager.get(Locker);
     const lockers: Locker[] = [];
@@ -352,7 +312,6 @@ export default class AppSeeder implements Seeder {
     await dataSource.getRepository(Plot).save(plots);
     await dataSource.getRepository(Rent).save(rents);
     await dataSource.getRepository(Product).save(products);
-    await dataSource.getRepository(Purchase).save(purchases);
     await dataSource.getRepository(Locker).save(lockers);
     await dataSource.getRepository(Order).save(orders);
   }
