@@ -28,10 +28,6 @@ export const NOTIFICATION_TABS_MAP = {
   },
   products: {
     create: 'main',
-    end: 'my',
-  },
-  purchases: {
-    create: 'my',
   },
   rents: {
     create: 'my',
