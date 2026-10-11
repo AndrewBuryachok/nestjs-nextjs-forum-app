@@ -5,7 +5,7 @@ import { BaseCard } from '../cards/types';
 import { Item } from '@/constants/items';
 import { Unit } from '@/constants/units';
 
-export interface BaseProduct {
+export interface Product {
   id: number;
   shop?: BaseShop;
   rent?: BaseRent;
@@ -13,13 +13,9 @@ export interface BaseProduct {
   card: BaseCard;
   item: Item;
   description: string;
+  amount: number;
   batch: number;
   unit: Unit;
-}
-
-export interface Product extends BaseProduct {
-  amount: number;
   price: number;
   createdAt: Date;
-  purchases: number;
 }

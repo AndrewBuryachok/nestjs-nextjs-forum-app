@@ -24,11 +24,7 @@ export default function CustomNavbar() {
     {
       value: 'trade',
       icon: <LuStore />,
-      links: [
-        { value: 'products' },
-        { value: 'purchases', my: true },
-        { value: 'shops' },
-      ],
+      links: [{ value: 'products' }, { value: 'shops' }],
     },
     {
       value: 'property',
