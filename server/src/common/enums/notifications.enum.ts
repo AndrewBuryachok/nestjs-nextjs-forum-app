@@ -24,8 +24,6 @@ export enum Notification {
   REMIND_RENT = 'remind rents',
   EXPIRE_RENT = 'expire rents',
   CREATE_PRODUCT = 'create products',
-  END_PRODUCT = 'end products',
-  CREATE_PURCHASE = 'create purchases',
   CREATE_LOCKER = 'create lockers',
   CREATE_ORDER = 'create orders',
   TAKE_ORDER = 'take orders',

@@ -19,20 +19,7 @@ export class ProductIdDto {
   productId: number;
 }
 
-export class EditProductAmountAndPriceDto {
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  @Max(27)
-  amount: number;
-
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  price: number;
-}
-
-export class EditProductDto extends EditProductAmountAndPriceDto {
+export class EditProductDto {
   @IsNotEmpty()
   @IsEnum(Item)
   item: Item;
@@ -45,12 +32,23 @@ export class EditProductDto extends EditProductAmountAndPriceDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
+  @Max(27)
+  amount: number;
+
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
   @Max(64)
   batch: number;
 
   @IsNotEmpty()
   @IsEnum(Unit)
   unit: Unit;
+
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  price: number;
 }
 
 export class CreateProductWithShopDto extends EditProductDto {
