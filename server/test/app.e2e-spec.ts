@@ -744,8 +744,7 @@ describe('App', () => {
           shopId: shops[1],
           item: Item.STONE,
           description: '',
-          amount: 27,
-          batch: 64,
+          amount: 64,
           unit: Unit.PIECE,
           price: 10,
         })
@@ -761,8 +760,7 @@ describe('App', () => {
           userId: user.user.id,
           item: Item.STONE,
           description: '',
-          amount: 27,
-          batch: 64,
+          amount: 64,
           unit: Unit.PIECE,
           price: 10,
         })
@@ -777,8 +775,7 @@ describe('App', () => {
           rentId: rents[1],
           item: Item.STONE,
           description: '',
-          amount: 27,
-          batch: 64,
+          amount: 64,
           unit: Unit.PIECE,
           price: 10,
         })
@@ -794,8 +791,7 @@ describe('App', () => {
           userId: user.user.id,
           item: Item.STONE,
           description: '',
-          amount: 27,
-          batch: 64,
+          amount: 64,
           unit: Unit.PIECE,
           price: 10,
         })
@@ -830,8 +826,7 @@ describe('App', () => {
         .send({
           item: Item.STONE,
           description: '',
-          amount: 27,
-          batch: 64,
+          amount: 64,
           unit: Unit.PIECE,
           price: 10,
         })
@@ -845,8 +840,7 @@ describe('App', () => {
         .send({
           item: Item.STONE,
           description: '',
-          amount: 27,
-          batch: 64,
+          amount: 64,
           unit: Unit.PIECE,
           price: 10,
         })
@@ -1073,8 +1067,7 @@ describe('App', () => {
           cardId: cards[0],
           item: Item.STONE,
           description: '',
-          amount: 27,
-          batch: 64,
+          amount: 64,
           unit: Unit.PIECE,
           sum: 10,
         })
@@ -1090,8 +1083,7 @@ describe('App', () => {
           cardId: cards[0],
           item: Item.STONE,
           description: '',
-          amount: 27,
-          batch: 64,
+          amount: 64,
           unit: Unit.PIECE,
           sum: 10,
         })
@@ -1108,8 +1100,7 @@ describe('App', () => {
           cardId: cards[0],
           item: Item.STONE,
           description: '',
-          amount: 27,
-          batch: 64,
+          amount: 64,
           unit: Unit.PIECE,
           sum: 10,
         })
@@ -1126,8 +1117,7 @@ describe('App', () => {
           cardId: cards[0],
           item: Item.STONE,
           description: '',
-          amount: 27,
-          batch: 64,
+          amount: 64,
           unit: Unit.PIECE,
           sum: 10,
         })
@@ -1243,8 +1233,7 @@ describe('App', () => {
         .send({
           item: Item.STONE,
           description: '',
-          amount: 27,
-          batch: 64,
+          amount: 64,
           unit: Unit.PIECE,
           sum: 10,
         })
@@ -1258,8 +1247,7 @@ describe('App', () => {
         .send({
           item: Item.STONE,
           description: '',
-          amount: 27,
-          batch: 64,
+          amount: 64,
           unit: Unit.PIECE,
           sum: 10,
         })

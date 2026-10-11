@@ -32,14 +32,8 @@ export class EditOrderDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
-  @Max(27)
-  amount: number;
-
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
   @Max(64)
-  batch: number;
+  amount: number;
 
   @IsNotEmpty()
   @IsEnum(Unit)

@@ -46,9 +46,6 @@ export class Order {
   @Column()
   amount: number;
 
-  @Column()
-  batch: number;
-
   @Column({ type: 'enum', enum: Unit })
   unit: Unit;
 
