@@ -39,7 +39,7 @@ export default function ProductsTable(props: Props) {
         {
           value: 'amount',
           render: (product) => (
-            <AmountText value={[product.amount, product.batch, product.unit]} />
+            <AmountText amount={product.amount} unit={product.unit} />
           ),
         },
         {

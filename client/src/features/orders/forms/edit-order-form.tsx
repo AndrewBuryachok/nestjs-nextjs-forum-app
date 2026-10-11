@@ -38,7 +38,6 @@ export default function EditOrderForm(props: Props) {
       item: props.order.item,
       description: props.order.description,
       amount: props.order.amount,
-      batch: props.order.batch,
       unit: props.order.unit,
       sum: props.order.sum,
     },
@@ -123,20 +122,6 @@ export default function EditOrderForm(props: Props) {
         />
         <Field.ErrorText>
           {form.formState.errors.amount?.message}
-        </Field.ErrorText>
-      </Field.Root>
-      <Field.Root invalid={!!form.formState.errors.batch} required>
-        <Field.Label>
-          {t('columns.batch')}
-          <Field.RequiredIndicator />
-        </Field.Label>
-        <Input
-          {...form.register('batch', { valueAsNumber: true })}
-          placeholder={t('columns.batch')}
-          type='number'
-        />
-        <Field.ErrorText>
-          {form.formState.errors.batch?.message}
         </Field.ErrorText>
       </Field.Root>
       <Field.Root required>

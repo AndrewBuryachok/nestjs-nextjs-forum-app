@@ -13,7 +13,6 @@ export interface Order {
   item: Item;
   description: string;
   amount: number;
-  batch: number;
   unit: Unit;
   sum: number;
   status: Status;

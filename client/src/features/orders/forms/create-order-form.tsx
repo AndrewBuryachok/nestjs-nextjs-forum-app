@@ -38,7 +38,6 @@ export default function CreateOrderForm(props: Props) {
     resolver: zodResolver(createOrderSchema),
     defaultValues: {
       amount: 1,
-      batch: 1,
       sum: 1,
     },
   });
@@ -174,20 +173,6 @@ export default function CreateOrderForm(props: Props) {
         />
         <Field.ErrorText>
           {form.formState.errors.amount?.message}
-        </Field.ErrorText>
-      </Field.Root>
-      <Field.Root invalid={!!form.formState.errors.batch} required>
-        <Field.Label>
-          {t('columns.batch')}
-          <Field.RequiredIndicator />
-        </Field.Label>
-        <Input
-          {...form.register('batch', { valueAsNumber: true })}
-          placeholder={t('columns.batch')}
-          type='number'
-        />
-        <Field.ErrorText>
-          {form.formState.errors.batch?.message}
         </Field.ErrorText>
       </Field.Root>
       <Field.Root required>
