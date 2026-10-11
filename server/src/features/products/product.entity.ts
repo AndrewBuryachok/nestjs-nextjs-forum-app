@@ -5,14 +5,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Card } from '../cards/card.entity';
 import { Shop } from '../shops/shop.entity';
 import { Rent } from '../rents/rent.entity';
-import { Purchase } from '../purchases/purchase.entity';
 import { Item, Unit } from '../../common/enums';
 
 @Entity('products')
@@ -71,7 +69,4 @@ export class Product {
 
   @DeleteDateColumn({ type: 'timestamptz', name: 'deleted_at', nullable: true })
   deletedAt?: Date;
-
-  @OneToMany(() => Purchase, (purchase) => purchase.product)
-  purchases: Purchase[];
 }
