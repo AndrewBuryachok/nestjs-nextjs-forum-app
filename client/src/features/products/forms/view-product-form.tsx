@@ -36,13 +36,7 @@ export default function ViewProductForm(props: Props) {
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.amount')}</Field.Label>
-        <AmountInput
-          value={[
-            props.product.amount,
-            props.product.batch,
-            props.product.unit,
-          ]}
-        />
+        <AmountInput amount={props.product.amount} unit={props.product.unit} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.price')}</Field.Label>

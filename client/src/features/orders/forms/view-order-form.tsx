@@ -40,9 +40,7 @@ export default function ViewOrderForm(props: Props) {
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.amount')}</Field.Label>
-        <AmountInput
-          value={[props.order.amount, props.order.batch, props.order.unit]}
-        />
+        <AmountInput amount={props.order.amount} unit={props.order.unit} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.sum')}</Field.Label>

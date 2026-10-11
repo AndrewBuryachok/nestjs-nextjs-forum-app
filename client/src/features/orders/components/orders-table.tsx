@@ -44,7 +44,7 @@ export default function OrdersTable(props: Props) {
         {
           value: 'amount',
           render: (order) => (
-            <AmountText value={[order.amount, order.batch, order.unit]} />
+            <AmountText amount={order.amount} unit={order.unit} />
           ),
         },
         {

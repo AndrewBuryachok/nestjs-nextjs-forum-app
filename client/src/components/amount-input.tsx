@@ -3,13 +3,14 @@ import { Input } from '@chakra-ui/react';
 import { Unit } from '@/constants/units';
 
 type Props = {
-  value: [number, number, Unit];
+  amount: number;
+  unit: Unit;
 };
 
 export default function AmountInput(props: Props) {
   const t = useTranslations();
 
-  const value = `${props.value[0]} * ${props.value[1]} ${t(`units.${props.value[2]}`)}`;
+  const value = `${props.amount} ${t(`units.${props.unit}`)}`;
 
   return <Input readOnly value={value} />;
 }
