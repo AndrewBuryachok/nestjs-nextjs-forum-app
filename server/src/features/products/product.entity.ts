@@ -55,9 +55,6 @@ export class Product {
   @Column()
   amount: number;
 
-  @Column()
-  batch: number;
-
   @Column({ type: 'enum', enum: Unit })
   unit: Unit;
 
