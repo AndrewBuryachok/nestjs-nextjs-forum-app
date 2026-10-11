@@ -11,7 +11,6 @@ import {
   LuReceipt,
   LuShoppingBag,
   LuShoppingBasket,
-  LuShoppingCart,
   LuStore,
   LuUsers,
 } from 'react-icons/lu';
@@ -35,7 +34,6 @@ export default function CustomEmptyState(props: Props) {
     orders: <LuShoppingBag />,
     plots: <LuLandPlot />,
     products: <LuShoppingBasket />,
-    purchases: <LuShoppingCart />,
     rents: <LuCalendarDays />,
     residents: <LuUsers />,
     shops: <LuStore />,

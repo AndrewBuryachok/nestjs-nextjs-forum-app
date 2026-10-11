@@ -1,14 +1,11 @@
 'use server';
 
 import {
-  buyProductSchema,
-  buyProductWithUserSchema,
   createProductWithRentAndUserSchema,
   createProductWithRentSchema,
   createProductWithShopAndUserSchema,
   createProductWithShopSchema,
   deleteProductSchema,
-  editProductAmountAndPriceSchema,
   editProductSchema,
 } from './schema';
 import { actionClient } from '@/lib/safe-action';
@@ -38,18 +35,6 @@ export const createUserRentProductAction = actionClient
     return send('POST', '/products/rents/all', body);
   });
 
-export const editMyProductAmountAndPriceAction = actionClient
-  .inputSchema(editProductAmountAndPriceSchema)
-  .action(({ parsedInput: { productId, ...body } }) => {
-    return send('PATCH', `/products/${productId}/amount-and-price`, body);
-  });
-
-export const editUserProductAmountAndPriceAction = actionClient
-  .inputSchema(editProductAmountAndPriceSchema)
-  .action(({ parsedInput: { productId, ...body } }) => {
-    return send('PATCH', `/products/all/${productId}/amount-and-price`, body);
-  });
-
 export const editMyProductAction = actionClient
   .inputSchema(editProductSchema)
   .action(({ parsedInput: { productId, ...body } }) => {
@@ -72,16 +57,4 @@ export const deleteUserProductAction = actionClient
   .inputSchema(deleteProductSchema)
   .action(({ parsedInput: { productId } }) => {
     return send('DELETE', `/products/all/${productId}`);
-  });
-
-export const buyMyProductAction = actionClient
-  .inputSchema(buyProductSchema)
-  .action(({ parsedInput: body }) => {
-    return send('POST', '/purchases', body);
-  });
-
-export const buyUserProductAction = actionClient
-  .inputSchema(buyProductWithUserSchema)
-  .action(({ parsedInput: body }) => {
-    return send('POST', '/purchases/all', body);
   });

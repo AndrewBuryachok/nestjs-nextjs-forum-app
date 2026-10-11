@@ -2,14 +2,6 @@ import { PAGE_TABS_MAP } from '@/config/navigation';
 import { Product } from '../types';
 import { viewProductAction } from '../actions/view-product-action';
 import {
-  buyMyProductAction,
-  buyUserProductAction,
-} from '../actions/buy-product-action';
-import {
-  editMyProductAmountAndPriceAction,
-  editUserProductAmountAndPriceAction,
-} from '../actions/edit-product-amount-and-price-action';
-import {
   editMyProductAction,
   editUserProductAction,
 } from '../actions/edit-product-action';
@@ -26,20 +18,9 @@ type Props = {
 
 export default function ProductsActions(props: Props) {
   const actions = {
-    main: [buyMyProductAction],
-    my: [
-      props.product.purchases
-        ? editMyProductAmountAndPriceAction
-        : editMyProductAction,
-      deleteMyProductAction,
-    ],
-    all: [
-      buyUserProductAction,
-      props.product.purchases
-        ? editUserProductAmountAndPriceAction
-        : editUserProductAction,
-      deleteUserProductAction,
-    ],
+    main: [],
+    my: [editMyProductAction, deleteMyProductAction],
+    all: [editUserProductAction, deleteUserProductAction],
   }[props.tab];
 
   return (
