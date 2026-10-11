@@ -153,7 +153,6 @@ export class ProductsService {
         item: dto.item,
         description: dto.description,
         amount: dto.amount,
-        batch: dto.batch,
         unit: dto.unit,
         price: dto.price,
       });
@@ -176,7 +175,6 @@ export class ProductsService {
         item: dto.item,
         description: dto.description,
         amount: dto.amount,
-        batch: dto.batch,
         unit: dto.unit,
         price: dto.price,
       });
@@ -195,7 +193,6 @@ export class ProductsService {
           item: dto.item,
           description: dto.description,
           amount: dto.amount,
-          batch: dto.batch,
           unit: dto.unit,
           price: dto.price,
         },
@@ -221,7 +218,6 @@ export class ProductsService {
         'product.item',
         'product.description',
         'product.amount',
-        'product.batch',
         'product.unit',
         'product.price',
         'product.createdAt',
