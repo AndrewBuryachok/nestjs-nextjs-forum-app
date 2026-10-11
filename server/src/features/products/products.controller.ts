@@ -15,7 +15,6 @@ import {
   CreateProductWithRentDto,
   CreateProductWithShopAndUserDto,
   CreateProductWithShopDto,
-  EditProductAmountAndPriceDto,
   EditProductDto,
   ProductIdDto,
 } from './product.dto';
@@ -77,28 +76,6 @@ export class ProductsController {
     @Body() dto: CreateProductWithRentAndUserDto,
   ): Promise<void> {
     return this.productsService.createRentProduct(dto);
-  }
-
-  @Patch(':productId/amount-and-price')
-  editMyProductAmountAndPrice(
-    @MyId() myId: number,
-    @Param() { productId }: ProductIdDto,
-    @Body() dto: EditProductAmountAndPriceDto,
-  ): Promise<void> {
-    return this.productsService.editMyProductAmountAndPrice(
-      myId,
-      productId,
-      dto,
-    );
-  }
-
-  @Roles([Role.ADMIN])
-  @Patch('all/:productId/amount-and-price')
-  editUserProductAmountAndPrice(
-    @Param() { productId }: ProductIdDto,
-    @Body() dto: EditProductAmountAndPriceDto,
-  ): Promise<void> {
-    return this.productsService.editUserProductAmountAndPrice(productId, dto);
   }
 
   @Patch(':productId')

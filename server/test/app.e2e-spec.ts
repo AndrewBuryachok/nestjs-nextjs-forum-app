@@ -54,7 +54,6 @@ describe('App', () => {
   let plots: number[];
   let rents: number[];
   let products: number[];
-  let purchases: number[];
   let lockers: number[];
   let orders: number[];
 
@@ -823,79 +822,7 @@ describe('App', () => {
         .set('Authorization', `Bearer ${admin.access}`)
         .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
     });
-  });
 
-  describe('Purchases', () => {
-    it('POST /purchases', () => {
-      return request(app.getHttpServer())
-        .post('/purchases')
-        .set('Authorization', `Bearer ${user.access}`)
-        .send({ productId: products[1], cardId: cards[0], amount: 1 })
-        .expect(201);
-    });
-
-    it('POST /purchases/all', () => {
-      return request(app.getHttpServer())
-        .post('/purchases/all')
-        .set('Authorization', `Bearer ${admin.access}`)
-        .send({
-          productId: products[0],
-          userId: user.user.id,
-          cardId: cards[0],
-          amount: 1,
-        })
-        .expect(201);
-    });
-
-    it('PATCH /products/:productId/amount-and-price', () => {
-      return request(app.getHttpServer())
-        .patch(`/products/${products[0]}/amount-and-price`)
-        .set('Authorization', `Bearer ${user.access}`)
-        .send({ amount: 18, price: 10 })
-        .expect(200);
-    });
-
-    it('PATCH /products/all/:productId/amount-and-price', () => {
-      return request(app.getHttpServer())
-        .patch(`/products/all/${products[1]}/amount-and-price`)
-        .set('Authorization', `Bearer ${admin.access}`)
-        .send({ amount: 18, price: 10 })
-        .expect(200);
-    });
-
-    it('GET /purchases/my', () => {
-      return request(app.getHttpServer())
-        .get('/purchases/my')
-        .set('Authorization', `Bearer ${user.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0))
-        .then(
-          (res) => (purchases = res.body.data.map((purchase) => purchase.id)),
-        );
-    });
-
-    it('GET /purchases/all', () => {
-      return request(app.getHttpServer())
-        .get('/purchases/all')
-        .set('Authorization', `Bearer ${admin.access}`)
-        .expect((res) => expect(res.body.data.length).toBeGreaterThan(0));
-    });
-
-    it('DELETE /purchases/:purchaseId', () => {
-      return request(app.getHttpServer())
-        .delete(`/purchases/${purchases[0]}`)
-        .set('Authorization', `Bearer ${admin.access}`)
-        .expect(200);
-    });
-
-    it('DELETE /purchases/:purchaseId', () => {
-      return request(app.getHttpServer())
-        .delete(`/purchases/${purchases[1]}`)
-        .set('Authorization', `Bearer ${admin.access}`)
-        .expect(200);
-    });
-  });
-
-  describe('Products', () => {
     it('PATCH /products/:productId', () => {
       return request(app.getHttpServer())
         .patch(`/products/${products[0]}`)
