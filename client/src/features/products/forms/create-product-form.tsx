@@ -40,7 +40,6 @@ export default function CreateProductForm(props: Props) {
     resolver: zodResolver(createProductSchema),
     defaultValues: {
       amount: 1,
-      batch: 1,
       price: 1,
     },
   });
@@ -180,29 +179,6 @@ export default function CreateProductForm(props: Props) {
         />
         <Field.ErrorText>
           {form.formState.errors.amount?.message}
-        </Field.ErrorText>
-      </Field.Root>
-      <Field.Root invalid={!!form.formState.errors.batch} required>
-        <Field.Label>
-          {t('columns.batch')}
-          <Field.RequiredIndicator />
-        </Field.Label>
-        <Controller
-          control={form.control}
-          name='batch'
-          render={({ field }) => (
-            <NumberInput.Root
-              w='full'
-              value={String(field.value)}
-              onValueChange={(d) => field.onChange(d.valueAsNumber)}
-            >
-              <NumberInput.Control />
-              <NumberInput.Input placeholder={t('columns.batch')} />
-            </NumberInput.Root>
-          )}
-        />
-        <Field.ErrorText>
-          {form.formState.errors.batch?.message}
         </Field.ErrorText>
       </Field.Root>
       <Field.Root required>
