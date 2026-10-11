@@ -14,7 +14,6 @@ export interface Product {
   item: Item;
   description: string;
   amount: number;
-  batch: number;
   unit: Unit;
   price: number;
   createdAt: Date;
