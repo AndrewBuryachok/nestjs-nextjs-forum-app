@@ -48,7 +48,7 @@ export default function CustomActions(props: Props) {
             action.disabled || (!!action.userId && action.userId !== user?.id)
           }
           onClick={
-            user || action.color === Color.BLUE
+            user || !action.color || action.color === Color.BLUE
               ? openActionDialog[index]
               : openAuthDialog
           }
