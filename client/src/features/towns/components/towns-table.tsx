@@ -3,6 +3,7 @@ import { Town } from '../types';
 import CustomTable from '@/components/custom-table';
 import CustomAvatarWithUser from '@/components/custom-avatar-with-user';
 import CustomText from '@/components/custom-text';
+import TownsResidentsActions from './towns-residents-actions';
 import DateText from '@/components/date-text';
 import TownsActions from './towns-actions';
 
@@ -33,6 +34,12 @@ export default function TownsTable(props: Props) {
         {
           value: 'y',
           render: (town) => <CustomText value={`${town.y}`} />,
+        },
+        {
+          value: 'residents',
+          render: (town) => (
+            <TownsResidentsActions tab={props.tab} town={town} />
+          ),
         },
         {
           value: 'created',
