@@ -6,6 +6,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TownUser } from './town-user.entity';
+import { UsersService } from '../users/users.service';
+import { User } from '../users/user.entity';
 import { ResidentError } from './resident-errors.enum';
 
 @Injectable()
@@ -13,7 +15,14 @@ export class ResidentsService {
   constructor(
     @InjectRepository(TownUser)
     private townsUsersRepository: Repository<TownUser>,
+    private usersService: UsersService,
   ) {}
+
+  async selectTownResidents(townId: number): Promise<User[]> {
+    const townUsers = await this.townsUsersRepository.findBy({ townId });
+    const users = townUsers.map((townUser) => townUser.userId);
+    return this.usersService.selectUsersByIds(users);
+  }
 
   async createResident(townId: number, userId: number): Promise<void> {
     await this.create(townId, userId);
