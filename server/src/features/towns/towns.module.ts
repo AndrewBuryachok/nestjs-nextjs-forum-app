@@ -4,12 +4,13 @@ import { Town } from './town.entity';
 import { TownUser } from './town-user.entity';
 import { UsersModule } from '../users/users.module';
 import { TownsController } from './towns.controller';
+import { ResidentsController } from './residents.controller';
 import { TownsService } from './towns.service';
 import { ResidentsService } from './residents.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Town, TownUser]), UsersModule],
-  controllers: [TownsController],
+  controllers: [TownsController, ResidentsController],
   providers: [TownsService, ResidentsService],
 })
 export class TownsModule {}
