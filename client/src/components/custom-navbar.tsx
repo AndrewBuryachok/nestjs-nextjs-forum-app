@@ -40,7 +40,11 @@ export default function CustomNavbar() {
       icon: <LuMailbox />,
       links: [{ value: 'orders' }, { value: 'lockers' }],
     },
-    { value: 'towns', icon: <LuBuilding /> },
+    {
+      value: 'towns',
+      icon: <LuBuilding />,
+      links: [{ value: 'towns' }, { value: 'residents', my: true }],
+    },
     { value: 'map', icon: <LuMap /> },
     { value: 'users', icon: <LuUsers /> },
   ];
