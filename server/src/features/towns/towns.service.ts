@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
@@ -60,6 +61,14 @@ export class TownsService {
     );
   }
 
+  async upgradeTown(townId: number): Promise<void> {
+    const town = await this.throwIfTownNotFound(townId);
+    if (town.level === Number(process.env.MAX_TOWN_LEVEL)) {
+      throw new BadRequestException(TownError.MAX_LEVEL);
+    }
+    await this.upgrade(town.id);
+  }
+
   async editMyTown(
     myId: number,
     townId: number,
@@ -106,6 +115,14 @@ export class TownsService {
       return town;
     } catch (error) {
       throw new InternalServerErrorException(TownError.CREATE_FAILED);
+    }
+  }
+
+  private async upgrade(id: number): Promise<void> {
+    try {
+      await this.townsRepository.increment({ id }, 'level', 1);
+    } catch (error) {
+      throw new InternalServerErrorException(TownError.UPGRADE_FAILED);
     }
   }
 
