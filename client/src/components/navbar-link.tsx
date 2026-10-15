@@ -10,7 +10,7 @@ import { LuChevronDown, LuChevronRight, LuDot } from 'react-icons/lu';
 type Props = {
   value: string;
   icon: React.ReactNode;
-  links?: { value: string; my?: boolean }[];
+  links?: { value: string; my?: boolean; sent?: boolean }[];
 };
 
 export default function NavbarLink(props: Props) {
@@ -50,7 +50,9 @@ export default function NavbarLink(props: Props) {
             variant={link.value === page ? 'subtle' : 'ghost'}
             onClick={closeDrawer}
           >
-            <Link href={`/${link.value}${link.my ? '/my' : ''}`}>
+            <Link
+              href={`/${link.value}${link.my ? '/my' : link.sent ? '/sent' : ''}`}
+            >
               <HStack>
                 <LuDot />
                 {t(`pages.${link.value}`)}

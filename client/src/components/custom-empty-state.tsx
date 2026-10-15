@@ -6,6 +6,7 @@ import {
   LuCalendarDays,
   LuCreditCard,
   LuLandPlot,
+  LuMail,
   LuMailbox,
   LuReceipt,
   LuShoppingBag,
@@ -25,8 +26,10 @@ export default function CustomEmptyState(props: Props) {
   const t = useTranslations();
 
   const icon = {
+    applications: <LuMail />,
     cards: <LuCreditCard />,
     fines: <LuReceipt />,
+    invitations: <LuMail />,
     lockers: <LuMailbox />,
     notifications: <LuBellOff />,
     orders: <LuShoppingBag />,
