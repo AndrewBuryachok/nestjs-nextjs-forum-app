@@ -43,7 +43,12 @@ export default function CustomNavbar() {
     {
       value: 'towns',
       icon: <LuBuilding />,
-      links: [{ value: 'towns' }, { value: 'residents', my: true }],
+      links: [
+        { value: 'towns' },
+        { value: 'residents', my: true },
+        { value: 'invitations', sent: true },
+        { value: 'applications', sent: true },
+      ],
     },
     { value: 'map', icon: <LuMap /> },
     { value: 'users', icon: <LuUsers /> },
