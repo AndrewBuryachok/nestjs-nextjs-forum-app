@@ -1,6 +1,10 @@
 import { Role } from '@/constants/roles';
 
 export const PAGE_TABS_MAP = {
+  applications: {
+    sent: {},
+    received: {},
+  },
   cards: {
     my: {},
     all: { roles: [Role.ADMIN] },
@@ -9,6 +13,10 @@ export const PAGE_TABS_MAP = {
     my: {},
     paid: {},
     all: { roles: [Role.ADMIN] },
+  },
+  invitations: {
+    sent: {},
+    received: {},
   },
   lockers: {
     main: { public: true },
