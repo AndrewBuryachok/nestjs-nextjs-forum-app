@@ -37,6 +37,13 @@ export class UsersService {
     return { data, total };
   }
 
+  async getUsersByIds(ids: number[], req: Request): Promise<Response<User>> {
+    const [data, total] = await this.getUsersQueryBuilder(req)
+      .andWhere('user.id = ANY (:ids)', { ids })
+      .getManyAndCount();
+    return { data, total };
+  }
+
   selectAllUsers(): Promise<User[]> {
     return this.selectUsersQueryBuilder().getMany();
   }
