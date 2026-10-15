@@ -47,6 +47,13 @@ export class TownsService {
     return { data, total };
   }
 
+  async getTownsByIds(ids: number[], req: Request): Promise<Response<Town>> {
+    const [data, total] = await this.getTownsQueryBuilder(req)
+      .andWhere('town.id = ANY (:ids)', { ids })
+      .getManyAndCount();
+    return { data, total };
+  }
+
   @Transactional()
   async createTown(dto: CreateTownWithUserDto): Promise<void> {
     await this.usersService.throwIfUserNotFound(dto.userId);
