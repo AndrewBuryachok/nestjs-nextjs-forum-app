@@ -4,6 +4,7 @@ import {
   createTownSchema,
   createTownWithUserSchema,
   editTownSchema,
+  upgradeTownSchema,
 } from './schema';
 import { actionClient } from '@/lib/safe-action';
 import { send } from '@/lib/api';
@@ -18,6 +19,12 @@ export const createTownWithUserAction = actionClient
   .inputSchema(createTownWithUserSchema)
   .action(({ parsedInput: body }) => {
     return send('POST', '/towns/all', body);
+  });
+
+export const upgradeTownAction = actionClient
+  .inputSchema(upgradeTownSchema)
+  .action(({ parsedInput: { townId } }) => {
+    return send('POST', `/towns/${townId}`);
   });
 
 export const editMyTownAction = actionClient
