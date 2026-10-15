@@ -9,6 +9,7 @@ import { TownUser } from './town-user.entity';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
 import { ResidentError } from './resident-errors.enum';
+import { Request, Response } from '../../common/interfaces';
 
 @Injectable()
 export class ResidentsService {
@@ -17,6 +18,14 @@ export class ResidentsService {
     private townsUsersRepository: Repository<TownUser>,
     private usersService: UsersService,
   ) {}
+
+  async getMyResidents(myId: number, req: Request): Promise<Response<User>> {
+    const townUsers = await this.townsUsersRepository.findBy({
+      town: { townUsers: { userId: myId } },
+    });
+    const users = townUsers.map((townUser) => townUser.userId);
+    return this.usersService.getUsersByIds(users, req);
+  }
 
   async selectTownResidents(townId: number): Promise<User[]> {
     const townUsers = await this.townsUsersRepository.findBy({ townId });
