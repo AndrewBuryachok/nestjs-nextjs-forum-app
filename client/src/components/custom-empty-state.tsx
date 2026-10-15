@@ -34,6 +34,7 @@ export default function CustomEmptyState(props: Props) {
     products: <LuShoppingBasket />,
     purchases: <LuShoppingCart />,
     rents: <LuCalendarDays />,
+    residents: <LuUsers />,
     shops: <LuStore />,
     towns: <LuBuilding />,
     transactions: <LuBanknote />,
