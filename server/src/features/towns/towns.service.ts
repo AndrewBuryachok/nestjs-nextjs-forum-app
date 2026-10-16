@@ -54,6 +54,10 @@ export class TownsService {
     return { data, total };
   }
 
+  selectAllTowns(): Promise<Town[]> {
+    return this.selectTownsQueryBuilder().getMany();
+  }
+
   @Transactional()
   async createTown(dto: CreateTownWithUserDto): Promise<void> {
     await this.usersService.throwIfUserNotFound(dto.userId);
@@ -142,6 +146,13 @@ export class TownsService {
     } catch (error) {
       throw new InternalServerErrorException(TownError.EDIT_FAILED);
     }
+  }
+
+  private selectTownsQueryBuilder(): SelectQueryBuilder<Town> {
+    return this.townsRepository
+      .createQueryBuilder('town')
+      .select(['town.id', 'town.name', 'town.x', 'town.y'])
+      .orderBy('town.name', 'ASC');
   }
 
   private getTownsQueryBuilder(req: Request): SelectQueryBuilder<Town> {
