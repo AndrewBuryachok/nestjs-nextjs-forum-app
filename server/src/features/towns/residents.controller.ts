@@ -18,6 +18,12 @@ export class ResidentsController {
   }
 
   @Public()
+  @Get('not/select')
+  selectNotResidents(): Promise<User[]> {
+    return this.residentsService.selectNotResidents();
+  }
+
+  @Public()
   @Get(':townId/select')
   selectTownResidents(@Param() { townId }: TownIdDto): Promise<User[]> {
     return this.residentsService.selectTownResidents(townId);

@@ -27,6 +27,12 @@ export class ResidentsService {
     return this.usersService.getUsersByIds(users, req);
   }
 
+  async selectNotResidents(): Promise<User[]> {
+    const townUsers = await this.townsUsersRepository.find();
+    const users = townUsers.map((townUser) => townUser.userId);
+    return this.usersService.selectUsersByNotIds(users);
+  }
+
   async selectTownResidents(townId: number): Promise<User[]> {
     const townUsers = await this.townsUsersRepository.findBy({ townId });
     const users = townUsers.map((townUser) => townUser.userId);
