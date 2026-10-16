@@ -43,6 +43,12 @@ export class TownsController {
     return this.townsService.getAllTowns(req);
   }
 
+  @Public()
+  @Get('all/select')
+  selectAllTowns(): Promise<Town[]> {
+    return this.townsService.selectAllTowns();
+  }
+
   @Post()
   createMyTown(
     @MyId() myId: number,
