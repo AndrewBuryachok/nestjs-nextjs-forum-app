@@ -222,6 +222,12 @@ describe('App', () => {
         .expect((res) => expect(res.body.length).toBeGreaterThan(0));
     });
 
+    it('GET /residents/not/select', () => {
+      return request(app.getHttpServer())
+        .get('/residents/not/select')
+        .expect((res) => expect(res.body.length).toBeGreaterThan(0));
+    });
+
     it('GET /residents/:townId/select', () => {
       return request(app.getHttpServer())
         .get(`/residents/${towns[0]}/select`)
