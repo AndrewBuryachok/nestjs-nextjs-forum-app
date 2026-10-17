@@ -1,4 +1,7 @@
 export const NOTIFICATION_TABS_MAP = {
+  applications: {
+    create: 'received',
+  },
   cards: {
     add: 'my',
     remove: 'my',
@@ -6,6 +9,9 @@ export const NOTIFICATION_TABS_MAP = {
   fines: {
     create: 'my',
     pay: 'paid',
+  },
+  invitations: {
+    create: 'received',
   },
   lockers: {
     create: 'main',
