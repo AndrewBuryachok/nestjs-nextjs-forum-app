@@ -101,8 +101,20 @@ export class TownsService {
     return town;
   }
 
+  async throwIfNotTownMayor(userId: number): Promise<Town> {
+    const town = await this.findTownByUser(userId);
+    if (!town) {
+      throw new ForbiddenException(TownError.NOT_MAYOR);
+    }
+    return town;
+  }
+
   private findTownById(id: number): Promise<Town | null> {
     return this.townsRepository.findOneBy({ id });
+  }
+
+  private findTownByUser(userId: number): Promise<Town | null> {
+    return this.townsRepository.findOneBy({ userId });
   }
 
   private async create(dto: CreateTownWithUserDto): Promise<Town> {
