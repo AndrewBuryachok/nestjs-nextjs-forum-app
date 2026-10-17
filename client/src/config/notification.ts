@@ -1,6 +1,9 @@
 export const NOTIFICATION_TABS_MAP = {
   applications: {
+    accept: 'sent',
     create: 'received',
+    delete: 'received',
+    reject: 'sent',
   },
   cards: {
     add: 'my',
@@ -11,7 +14,10 @@ export const NOTIFICATION_TABS_MAP = {
     pay: 'paid',
   },
   invitations: {
+    accept: 'sent',
     create: 'received',
+    delete: 'received',
+    reject: 'sent',
   },
   lockers: {
     create: 'main',

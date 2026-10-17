@@ -6,7 +6,10 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Field } from '@chakra-ui/react';
 import { createApplicationAction } from '../actions';
-import { createApplicationSchema, CreateApplicationType } from '../schema';
+import {
+  createOrDeleteApplicationSchema,
+  CreateOrDeleteApplicationType,
+} from '../schema';
 import { useSelectAllTowns } from '@/features/towns/hooks';
 import { useDialogContext } from '@/providers/dialog-provider';
 import { toaster } from '@/components/ui/toaster';
@@ -20,8 +23,8 @@ export default function CreateApplicationForm() {
 
   const { closeDialog } = useDialogContext();
 
-  const form = useForm<CreateApplicationType>({
-    resolver: zodResolver(createApplicationSchema),
+  const form = useForm<CreateOrDeleteApplicationType>({
+    resolver: zodResolver(createOrDeleteApplicationSchema),
   });
 
   const onSubmit = form.handleSubmit(async (data) => {
