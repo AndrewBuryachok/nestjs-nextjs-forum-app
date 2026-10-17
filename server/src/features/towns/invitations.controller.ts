@@ -1,7 +1,8 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { InvitationsService } from './invitations.service';
 import { Town } from './town.entity';
 import { User } from '../users/user.entity';
+import { CreateInvitationDto } from './invitation.dto';
 import { MyId } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 
@@ -23,5 +24,13 @@ export class InvitationsController {
     @Query() req: Request,
   ): Promise<Response<Town>> {
     return this.invitationsService.getReceivedInvitations(myId, req);
+  }
+
+  @Post()
+  createInvitation(
+    @MyId() myId: number,
+    @Body() dto: CreateInvitationDto,
+  ): Promise<void> {
+    return this.invitationsService.createInvitation(myId, dto);
   }
 }
