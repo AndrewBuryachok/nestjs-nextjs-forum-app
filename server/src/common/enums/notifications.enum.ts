@@ -1,7 +1,13 @@
 export enum Notification {
   CREATE_TOWN = 'create towns',
   CREATE_INVITATION = 'create invitations',
+  DELETE_INVITATION = 'delete invitations',
+  ACCEPT_INVITATION = 'accept invitations',
+  REJECT_INVITATION = 'reject invitations',
   CREATE_APPLICATION = 'create applications',
+  DELETE_APPLICATION = 'delete applications',
+  ACCEPT_APPLICATION = 'accept applications',
+  REJECT_APPLICATION = 'reject applications',
   ADD_CARD_USER = 'add cards',
   REMOVE_CARD_USER = 'remove cards',
   CREATE_TRANSACTION = 'create transactions',
