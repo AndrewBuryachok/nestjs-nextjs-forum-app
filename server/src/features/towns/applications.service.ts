@@ -2,9 +2,11 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
+import { Transactional } from 'typeorm-transactional';
 import { Application } from './application.entity';
 import { MqttService } from '../mqtt/mqtt.service';
 import { TownsService } from './towns.service';
@@ -74,6 +76,58 @@ export class ApplicationsService {
     );
   }
 
+  async deleteApplication(myId: number, townId: number): Promise<void> {
+    const town = await this.townsService.throwIfTownNotFound(townId);
+    const application = await this.throwIfApplicationNotFound(townId, myId);
+    await this.delete(application.id);
+    this.mqttService.publishNotification(
+      myId,
+      town.userId,
+      myId,
+      Notification.DELETE_APPLICATION,
+    );
+  }
+
+  @Transactional()
+  async acceptApplication(myId: number, userId: number): Promise<void> {
+    const town = await this.townsService.throwIfNotTownMayor(myId);
+    await this.usersService.throwIfUserNotFound(userId);
+    const application = await this.throwIfApplicationNotFound(town.id, userId);
+    await this.residentsService.throwIfResidentAlreadyExists(userId);
+    await this.residentsService.createResident(town.id, userId);
+    await this.accept(application.id);
+    this.mqttService.publishNotification(
+      myId,
+      userId,
+      town.id,
+      Notification.ACCEPT_APPLICATION,
+    );
+  }
+
+  async rejectApplication(myId: number, userId: number): Promise<void> {
+    const town = await this.townsService.throwIfNotTownMayor(myId);
+    await this.usersService.throwIfUserNotFound(userId);
+    const application = await this.throwIfApplicationNotFound(town.id, userId);
+    await this.reject(application.id);
+    this.mqttService.publishNotification(
+      myId,
+      userId,
+      town.id,
+      Notification.REJECT_APPLICATION,
+    );
+  }
+
+  async throwIfApplicationNotFound(
+    townId: number,
+    userId: number,
+  ): Promise<Application> {
+    const application = await this.findApplicationByTownAndUser(townId, userId);
+    if (!application) {
+      throw new NotFoundException(ApplicationError.NOT_FOUND);
+    }
+    return application;
+  }
+
   private findApplicationByTownAndUser(
     townId: number,
     userId: number,
@@ -95,6 +149,39 @@ export class ApplicationsService {
       return application;
     } catch (error) {
       throw new InternalServerErrorException(ApplicationError.CREATE_FAILED);
+    }
+  }
+
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.applicationsRepository.update(
+        { id },
+        { resolvedAt: new Date() },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(ApplicationError.DELETE_FAILED);
+    }
+  }
+
+  private async accept(id: number): Promise<void> {
+    try {
+      await this.applicationsRepository.update(
+        { id },
+        { accepted: true, resolvedAt: new Date() },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(ApplicationError.ACCEPT_FAILED);
+    }
+  }
+
+  private async reject(id: number): Promise<void> {
+    try {
+      await this.applicationsRepository.update(
+        { id },
+        { accepted: false, resolvedAt: new Date() },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(ApplicationError.REJECT_FAILED);
     }
   }
 }
