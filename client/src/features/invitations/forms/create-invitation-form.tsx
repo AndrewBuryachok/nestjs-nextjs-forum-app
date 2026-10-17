@@ -6,7 +6,10 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Field } from '@chakra-ui/react';
 import { createInvitationAction } from '../actions';
-import { createInvitationSchema, CreateInvitationType } from '../schema';
+import {
+  createOrDeleteInvitationSchema,
+  CreateOrDeleteInvitationType,
+} from '../schema';
 import { useSelectNotResidents } from '@/features/residents/hooks';
 import { useDialogContext } from '@/providers/dialog-provider';
 import { toaster } from '@/components/ui/toaster';
@@ -20,8 +23,8 @@ export default function CreateInvitationForm() {
 
   const { closeDialog } = useDialogContext();
 
-  const form = useForm<CreateInvitationType>({
-    resolver: zodResolver(createInvitationSchema),
+  const form = useForm<CreateOrDeleteInvitationType>({
+    resolver: zodResolver(createOrDeleteInvitationSchema),
   });
 
   const onSubmit = form.handleSubmit(async (data) => {
