@@ -1,5 +1,6 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
+import ApplicationsAction from './applications-action';
 import SentApplicationsTable from './sent-applications-table';
 import ReceivedApplicationsTable from './received-applications-table';
 
@@ -13,6 +14,7 @@ export default function ApplicationsPage(props: Props) {
     <CustomPage
       page='applications'
       tab={props.tab}
+      action={<ApplicationsAction tab={props.tab} />}
       table={
         props.tab === 'sent' ? (
           <SentApplicationsTable
