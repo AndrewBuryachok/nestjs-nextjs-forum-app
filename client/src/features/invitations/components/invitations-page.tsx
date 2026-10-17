@@ -1,5 +1,6 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
+import InvitationsAction from './invitations-action';
 import SentInvitationsTable from './sent-invitations-table';
 import ReceivedInvitationsTable from './received-invitations-table';
 
@@ -13,6 +14,7 @@ export default function InvitationsPage(props: Props) {
     <CustomPage
       page='invitations'
       tab={props.tab}
+      action={<InvitationsAction tab={props.tab} />}
       table={
         props.tab === 'sent' ? (
           <SentInvitationsTable
