@@ -1,5 +1,6 @@
 import { Town } from '../../towns/types';
 import { viewTownAction } from '../../towns/actions/view-town-action';
+import { deleteApplicationAction } from '../actions/delete-application-action';
 import CustomActions from '@/components/custom-actions';
 
 type Props = {
@@ -9,7 +10,9 @@ type Props = {
 export default function SentApplicationsActions(props: Props) {
   return (
     <CustomActions
-      actions={[viewTownAction].map((action) => action(props.town))}
+      actions={[viewTownAction, deleteApplicationAction].map((action) =>
+        action(props.town),
+      )}
     />
   );
 }

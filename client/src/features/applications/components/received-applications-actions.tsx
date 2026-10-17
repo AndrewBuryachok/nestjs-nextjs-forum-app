@@ -1,5 +1,7 @@
 import { User } from '../../users/types';
 import { viewUserAction } from '../../users/actions/view-user-action';
+import { acceptApplicationAction } from '../actions/accept-application-action';
+import { rejectApplicationAction } from '../actions/reject-application-action';
 import CustomActions from '@/components/custom-actions';
 
 type Props = {
@@ -9,7 +11,11 @@ type Props = {
 export default function ReceivedApplicationsActions(props: Props) {
   return (
     <CustomActions
-      actions={[viewUserAction].map((action) => action(props.user))}
+      actions={[
+        viewUserAction,
+        acceptApplicationAction,
+        rejectApplicationAction,
+      ].map((action) => action(props.user))}
     />
   );
 }
