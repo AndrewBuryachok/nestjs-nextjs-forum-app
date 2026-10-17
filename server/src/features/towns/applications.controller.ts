@@ -1,8 +1,18 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApplicationsService } from './applications.service';
 import { Town } from './town.entity';
 import { User } from '../users/user.entity';
 import { CreateApplicationDto } from './application.dto';
+import { TownIdDto } from './town.dto';
+import { UserIdDto } from '../users/user.dto';
 import { MyId } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 
@@ -32,5 +42,29 @@ export class ApplicationsController {
     @Body() dto: CreateApplicationDto,
   ): Promise<void> {
     return this.applicationsService.createApplication(myId, dto);
+  }
+
+  @Delete(':townId')
+  deleteApplication(
+    @MyId() myId: number,
+    @Param() { townId }: TownIdDto,
+  ): Promise<void> {
+    return this.applicationsService.deleteApplication(myId, townId);
+  }
+
+  @Post(':userId/accept')
+  acceptApplication(
+    @MyId() myId: number,
+    @Param() { userId }: UserIdDto,
+  ): Promise<void> {
+    return this.applicationsService.acceptApplication(myId, userId);
+  }
+
+  @Post(':userId/reject')
+  rejectApplication(
+    @MyId() myId: number,
+    @Param() { userId }: UserIdDto,
+  ): Promise<void> {
+    return this.applicationsService.rejectApplication(myId, userId);
   }
 }
