@@ -2,9 +2,11 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
+import { Transactional } from 'typeorm-transactional';
 import { Invitation } from './invitation.entity';
 import { MqttService } from '../mqtt/mqtt.service';
 import { TownsService } from './towns.service';
@@ -75,6 +77,57 @@ export class InvitationsService {
     );
   }
 
+  async deleteInvitation(myId: number, userId: number): Promise<void> {
+    const town = await this.townsService.throwIfNotTownMayor(myId);
+    await this.usersService.throwIfUserNotFound(userId);
+    const invitation = await this.throwIfInvitationNotFound(town.id, userId);
+    await this.delete(invitation.id);
+    this.mqttService.publishNotification(
+      myId,
+      userId,
+      town.id,
+      Notification.DELETE_INVITATION,
+    );
+  }
+
+  @Transactional()
+  async acceptInvitation(myId: number, townId: number): Promise<void> {
+    const town = await this.townsService.throwIfTownNotFound(townId);
+    const invitation = await this.throwIfInvitationNotFound(townId, myId);
+    await this.residentsService.throwIfResidentAlreadyExists(myId);
+    await this.residentsService.createResident(townId, myId);
+    await this.accept(invitation.id);
+    this.mqttService.publishNotification(
+      myId,
+      town.userId,
+      myId,
+      Notification.ACCEPT_INVITATION,
+    );
+  }
+
+  async rejectInvitation(myId: number, townId: number): Promise<void> {
+    const town = await this.townsService.throwIfTownNotFound(townId);
+    const invitation = await this.throwIfInvitationNotFound(townId, myId);
+    await this.reject(invitation.id);
+    this.mqttService.publishNotification(
+      myId,
+      town.userId,
+      myId,
+      Notification.REJECT_INVITATION,
+    );
+  }
+
+  async throwIfInvitationNotFound(
+    townId: number,
+    userId: number,
+  ): Promise<Invitation> {
+    const invitation = await this.findInvitationByTownAndUser(townId, userId);
+    if (!invitation) {
+      throw new NotFoundException(InvitationError.NOT_FOUND);
+    }
+    return invitation;
+  }
+
   private findInvitationByTownAndUser(
     townId: number,
     userId: number,
@@ -93,6 +146,39 @@ export class InvitationsService {
       return invitation;
     } catch (error) {
       throw new InternalServerErrorException(InvitationError.CREATE_FAILED);
+    }
+  }
+
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.invitationsRepository.update(
+        { id },
+        { resolvedAt: new Date() },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(InvitationError.DELETE_FAILED);
+    }
+  }
+
+  private async accept(id: number): Promise<void> {
+    try {
+      await this.invitationsRepository.update(
+        { id },
+        { accepted: true, resolvedAt: new Date() },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(InvitationError.ACCEPT_FAILED);
+    }
+  }
+
+  private async reject(id: number): Promise<void> {
+    try {
+      await this.invitationsRepository.update(
+        { id },
+        { accepted: false, resolvedAt: new Date() },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(InvitationError.REJECT_FAILED);
     }
   }
 }
