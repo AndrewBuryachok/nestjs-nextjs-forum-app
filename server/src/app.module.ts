@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { addTransactionalDataSource } from 'typeorm-transactional';
 import { MqttModule } from './features/mqtt/mqtt.module';
+import { RedisModule } from './features/redis/redis.module';
 import { AuthModule } from './features/auth/auth.module';
 import { UsersModule } from './features/users/users.module';
 import { LicensesModule } from './features/licenses/licenses.module';
@@ -51,6 +52,7 @@ import { AtGuard, RolesGuard } from './common/guards';
       },
     }),
     MqttModule,
+    RedisModule,
     AuthModule,
     UsersModule,
     LicensesModule,
