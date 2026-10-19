@@ -11,6 +11,7 @@ import { Transactional } from 'typeorm-transactional';
 import { Card } from './card.entity';
 import { CardUser } from './card-user.entity';
 import { MqttService } from '../mqtt/mqtt.service';
+import { RedisService } from '../redis/redis.service';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
 import {
@@ -30,6 +31,7 @@ export class CardsService {
     @InjectRepository(CardUser)
     private cardsUsersRepository: Repository<CardUser>,
     private mqttService: MqttService,
+    private redisService: RedisService,
     private usersService: UsersService,
   ) {}
 
@@ -67,6 +69,11 @@ export class CardsService {
     const cardUsers = await this.findUsersByCard(cardId);
     const users = cardUsers.map((cardUser) => cardUser.userId);
     return this.usersService.selectUsersByNotIds(users);
+  }
+
+  async sumUserCards(userId: number): Promise<number> {
+    const sum = await this.redisService.get(`cards:${userId}:sum`);
+    return sum ? Number(sum) : 0;
   }
 
   async createCard(dto: CreateCardWithUserDto): Promise<void> {
@@ -206,6 +213,7 @@ export class CardsService {
   ): Promise<number> {
     const card = await this.throwIfNotCardUser(cardId, userId);
     await this.increaseBalance(cardId, sum);
+    await this.redisService.incrBy(`cards:${card.userId}:sum`, sum);
     return card.userId;
   }
 
@@ -219,6 +227,7 @@ export class CardsService {
       throw new BadRequestException(CardError.NOT_ENOUGH_BALANCE);
     }
     await this.decreaseBalance(cardId, sum);
+    await this.redisService.decrBy(`cards:${card.userId}:sum`, sum);
     return card.userId;
   }
 
