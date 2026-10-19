@@ -7,6 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from './user.entity';
+import { RedisService } from '../redis/redis.service';
 import {
   ChangeMyPasswordDto,
   ChangeUserPasswordDto,
@@ -24,6 +25,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private redisService: RedisService,
   ) {}
 
   async getMainUsers(req: Request): Promise<Response<User>> {
@@ -80,6 +82,7 @@ export class UsersService {
   async createUser(dto: CreateUserDto): Promise<User> {
     await this.throwIfNickAlreadyUsed(dto.nick);
     const user = await this.create(dto);
+    await this.redisService.set(`users:${dto.nick}:id`, String(user.id));
     return user;
   }
 
@@ -165,6 +168,11 @@ export class UsersService {
 
   findUserByNick(nick: string): Promise<User | null> {
     return this.usersRepository.findOneBy({ nick });
+  }
+
+  async findIdByNick(nick: string): Promise<number | null> {
+    const id = await this.redisService.get(`users:${nick}:id`);
+    return id ? Number(id) : null;
   }
 
   private async create(dto: CreateUserDto): Promise<User> {
