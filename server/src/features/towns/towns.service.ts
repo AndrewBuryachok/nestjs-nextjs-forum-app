@@ -1,5 +1,7 @@
 import {
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -21,6 +23,7 @@ export class TownsService {
   constructor(
     @InjectRepository(Town)
     private townsRepository: Repository<Town>,
+    @Inject(forwardRef(() => ResidentsService))
     private residentsService: ResidentsService,
     private mqttService: MqttService,
     private usersService: UsersService,
@@ -60,7 +63,7 @@ export class TownsService {
   @Transactional()
   async createTown(dto: CreateTownWithUserDto): Promise<void> {
     await this.usersService.throwIfUserNotFound(dto.userId);
-    await this.residentsService.throwIfResidentAlreadyExists(dto.userId);
+    await this.residentsService.throwIfResidentAlreadyIn(dto.userId);
     const town = await this.create(dto);
     await this.residentsService.createResident(town.id, dto.userId);
     this.mqttService.publishNotification(

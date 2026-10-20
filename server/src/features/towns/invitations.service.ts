@@ -60,7 +60,7 @@ export class InvitationsService {
   ): Promise<void> {
     const town = await this.townsService.throwIfNotTownMayor(myId);
     await this.usersService.throwIfUserNotFound(dto.userId);
-    await this.residentsService.throwIfResidentAlreadyExists(dto.userId);
+    await this.residentsService.throwIfResidentAlreadyIn(dto.userId);
     const invitation = await this.findInvitationByTownAndUser(
       town.id,
       dto.userId,
@@ -94,7 +94,7 @@ export class InvitationsService {
   async acceptInvitation(myId: number, townId: number): Promise<void> {
     const town = await this.townsService.throwIfTownNotFound(townId);
     const invitation = await this.throwIfInvitationNotFound(townId, myId);
-    await this.residentsService.throwIfResidentAlreadyExists(myId);
+    await this.residentsService.throwIfResidentAlreadyIn(myId);
     await this.residentsService.createResident(townId, myId);
     await this.accept(invitation.id);
     this.mqttService.publishNotification(
