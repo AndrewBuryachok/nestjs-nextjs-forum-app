@@ -14,6 +14,7 @@ import {
   CreateUserDto,
   EditUserProfileDto,
   UpdateUserRoleDto,
+  UserNickDto,
 } from './user.dto';
 import { UserError } from './user-errors.enum';
 import { Request, Response } from '../../common/interfaces';
@@ -72,6 +73,10 @@ export class UsersService {
     return this.selectUsersQueryBuilder()
       .where('user.id != ALL (:ids)', { ids })
       .getMany();
+  }
+
+  async createUserWithoutPassword(dto: UserNickDto): Promise<void> {
+    await this.createUser({ ...dto, password: '' });
   }
 
   async createUser(dto: CreateUserDto): Promise<User> {

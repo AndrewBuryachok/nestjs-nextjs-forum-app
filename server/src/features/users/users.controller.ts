@@ -16,6 +16,7 @@ import {
   EditUserProfileDto,
   UpdateUserRoleDto,
   UserIdDto,
+  UserNickDto,
 } from './user.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
@@ -47,6 +48,11 @@ export class UsersController {
   @Get(':userId/select')
   selectOneUser(@Param() { userId }: UserIdDto): Promise<User> {
     return this.usersService.selectOneUser(userId);
+  }
+
+  @Post()
+  createUser(@Body() dto: UserNickDto): Promise<void> {
+    return this.usersService.createUserWithoutPassword(dto);
   }
 
   @Patch('me/profile')
