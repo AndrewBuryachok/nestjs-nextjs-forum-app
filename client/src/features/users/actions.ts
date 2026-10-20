@@ -3,6 +3,7 @@
 import {
   changeMyPasswordSchema,
   changeUserPasswordSchema,
+  createUserSchema,
   editMyProfileSchema,
   editUserProfileSchema,
   updateUserRoleSchema,
@@ -10,6 +11,12 @@ import {
 import { actionClient } from '@/lib/safe-action';
 import { send } from '@/lib/api';
 import { createSession, verifySession } from '@/lib/session';
+
+export const createUserAction = actionClient
+  .inputSchema(createUserSchema)
+  .action(({ parsedInput: body }) => {
+    return send('POST', '/users', body);
+  });
 
 export const editMyProfileAction = actionClient
   .inputSchema(editMyProfileSchema)

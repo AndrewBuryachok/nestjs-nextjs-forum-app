@@ -1,5 +1,6 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
+import UsersAction from './users-action';
 import UsersTable from './users-table';
 
 type Props = {
@@ -9,7 +10,7 @@ type Props = {
 
 export default function UsersPage(props: Props) {
   return (
-    <CustomPage page='users' tab={props.tab}>
+    <CustomPage page='users' tab={props.tab} action={<UsersAction />}>
       <UsersTable tab={props.tab} searchParams={props.searchParams} />
     </CustomPage>
   );
