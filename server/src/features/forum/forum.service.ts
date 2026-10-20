@@ -36,8 +36,14 @@ export class ForumService {
     private ordersService: OrdersService,
   ) {}
 
-  selectOneUser(nick: string): Promise<User> {
-    return this.usersService.selectOneUserByNick(nick);
+  async selectOneUser(nick: string): Promise<User> {
+    try {
+      const user = await this.usersService.selectOneUserByNick(nick);
+      return user;
+    } catch (error) {
+      await this.usersService.createUserWithoutPassword({ nick });
+      return this.usersService.selectOneUserByNick(nick);
+    }
   }
 
   selectAllUsers(): Promise<User[]> {
