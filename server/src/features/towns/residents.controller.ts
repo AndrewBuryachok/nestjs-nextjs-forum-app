@@ -1,7 +1,8 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
 import { ResidentsService } from './residents.service';
 import { User } from '../users/user.entity';
 import { TownIdDto } from './town.dto';
+import { UserIdDto } from '../users/user.dto';
 import { MyId, Public } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 
@@ -27,5 +28,13 @@ export class ResidentsController {
   @Get(':townId/select')
   selectTownResidents(@Param() { townId }: TownIdDto): Promise<User[]> {
     return this.residentsService.selectTownResidents(townId);
+  }
+
+  @Delete(':userId')
+  deleteResident(
+    @MyId() myId: number,
+    @Param() { userId }: UserIdDto,
+  ): Promise<void> {
+    return this.residentsService.deleteResident(myId, userId);
   }
 }
