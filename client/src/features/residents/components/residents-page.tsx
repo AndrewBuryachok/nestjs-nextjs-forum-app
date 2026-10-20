@@ -1,5 +1,6 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
+import ResidentsAction from './residents-action';
 import ResidentsTable from './residents-table';
 
 type Props = {
@@ -12,6 +13,7 @@ export default function ResidentsPage(props: Props) {
     <CustomPage
       page='residents'
       tab={props.tab}
+      action={<ResidentsAction />}
       table={
         <ResidentsTable tab={props.tab} searchParams={props.searchParams} />
       }

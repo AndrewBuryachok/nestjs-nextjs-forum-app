@@ -47,6 +47,7 @@ export const NOTIFICATION_TABS_MAP = {
     expire: 'completed',
   },
   residents: {
+    leave: 'my',
     delete: 'my',
   },
   shops: {

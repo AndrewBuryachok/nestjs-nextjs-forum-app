@@ -10,6 +10,7 @@ import AuthFormWithTabs from '@/features/auth/forms/auth-form-with-tabs';
 type Props = {
   action: string;
   dialog: string;
+  icon?: React.ReactNode;
   body: React.ReactNode;
 };
 
@@ -35,7 +36,7 @@ export default function CustomAction(props: Props) {
       variant='ghost'
       onClick={user ? openActionDialog : openAuthDialog}
     >
-      <LuPlus />
+      {props.icon ?? <LuPlus />}
     </IconButton>
   );
 }
