@@ -1,6 +1,12 @@
 import { z } from 'zod';
 import { Role } from '@/constants/roles';
 
+export const createUserSchema = z.object({
+  nick: z.string().min(3).max(16),
+});
+
+export type CreateUserType = z.infer<typeof createUserSchema>;
+
 export const editMyProfileSchema = z.object({
   avatar: z.string().min(3).max(16).or(z.literal('')),
 });
