@@ -58,7 +58,7 @@ export class ApplicationsService {
     myId: number,
     dto: CreateApplicationDto,
   ): Promise<void> {
-    await this.residentsService.throwIfResidentAlreadyExists(myId);
+    await this.residentsService.throwIfResidentAlreadyIn(myId);
     const town = await this.townsService.throwIfTownNotFound(dto.townId);
     const application = await this.findApplicationByTownAndUser(
       dto.townId,
@@ -93,7 +93,7 @@ export class ApplicationsService {
     const town = await this.townsService.throwIfNotTownMayor(myId);
     await this.usersService.throwIfUserNotFound(userId);
     const application = await this.throwIfApplicationNotFound(town.id, userId);
-    await this.residentsService.throwIfResidentAlreadyExists(userId);
+    await this.residentsService.throwIfResidentAlreadyIn(userId);
     await this.residentsService.createResident(town.id, userId);
     await this.accept(application.id);
     this.mqttService.publishNotification(

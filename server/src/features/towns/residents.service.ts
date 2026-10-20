@@ -1,21 +1,29 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TownUser } from './town-user.entity';
+import { TownsService } from './towns.service';
+import { MqttService } from '../mqtt/mqtt.service';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
 import { ResidentError } from './resident-errors.enum';
 import { Request, Response } from '../../common/interfaces';
+import { Notification } from '../../common/enums';
 
 @Injectable()
 export class ResidentsService {
   constructor(
     @InjectRepository(TownUser)
     private townsUsersRepository: Repository<TownUser>,
+    @Inject(forwardRef(() => TownsService))
+    private townsService: TownsService,
+    private mqttService: MqttService,
     private usersService: UsersService,
   ) {}
 
@@ -43,11 +51,40 @@ export class ResidentsService {
     await this.create(townId, userId);
   }
 
-  async throwIfResidentAlreadyExists(userId: number): Promise<void> {
+  async deleteResident(myId: number, userId: number): Promise<void> {
+    if (userId === myId) {
+      throw new BadRequestException(ResidentError.OWNER);
+    }
+    const town = await this.townsService.throwIfNotTownMayor(myId);
+    const townUser = await this.throwIfResidentNotIn(town.id, userId);
+    await this.delete(townUser.id);
+    this.mqttService.publishNotification(
+      myId,
+      userId,
+      userId,
+      Notification.DELETE_RESIDENT,
+    );
+  }
+
+  async throwIfResidentAlreadyIn(userId: number): Promise<void> {
     const townUser = await this.townsUsersRepository.findOneBy({ userId });
     if (townUser) {
-      throw new BadRequestException(ResidentError.ALREADY_EXISTS);
+      throw new BadRequestException(ResidentError.ALREADY_IN);
     }
+  }
+
+  async throwIfResidentNotIn(
+    townId: number,
+    userId: number,
+  ): Promise<TownUser> {
+    const townUser = await this.townsUsersRepository.findOneBy({
+      townId,
+      userId,
+    });
+    if (!townUser) {
+      throw new BadRequestException(ResidentError.NOT_IN);
+    }
+    return townUser;
   }
 
   private async create(townId: number, userId: number): Promise<TownUser> {
@@ -57,6 +94,14 @@ export class ResidentsService {
       return townUser;
     } catch (error) {
       throw new InternalServerErrorException(ResidentError.CREATE_FAILED);
+    }
+  }
+
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.townsUsersRepository.softDelete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(ResidentError.DELETE_FAILED);
     }
   }
 }
