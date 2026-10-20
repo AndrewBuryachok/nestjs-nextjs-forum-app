@@ -51,10 +51,26 @@ export class ResidentsService {
     await this.create(townId, userId);
   }
 
-  async deleteResident(myId: number, userId: number): Promise<void> {
-    if (userId === myId) {
-      throw new BadRequestException(ResidentError.OWNER);
+  async leaveTown(myId: number): Promise<void> {
+    const townUser = await this.townsUsersRepository.findOne({
+      relations: { town: true },
+      where: { userId: myId },
+    });
+    if (!townUser) {
+      throw new BadRequestException(ResidentError.NOT_RESIDENT);
     }
+    this.throwIfResidentIsOwner(myId, townUser.town.userId);
+    await this.delete(townUser.id);
+    this.mqttService.publishNotification(
+      myId,
+      townUser.town.userId,
+      myId,
+      Notification.LEAVE_TOWN,
+    );
+  }
+
+  async deleteResident(myId: number, userId: number): Promise<void> {
+    this.throwIfResidentIsOwner(userId, myId);
     const town = await this.townsService.throwIfNotTownMayor(myId);
     const townUser = await this.throwIfResidentNotIn(town.id, userId);
     await this.delete(townUser.id);
@@ -85,6 +101,12 @@ export class ResidentsService {
       throw new BadRequestException(ResidentError.NOT_IN);
     }
     return townUser;
+  }
+
+  private throwIfResidentIsOwner(userId: number, ownerUserId: number): void {
+    if (userId === ownerUserId) {
+      throw new BadRequestException(ResidentError.OWNER);
+    }
   }
 
   private async create(townId: number, userId: number): Promise<TownUser> {
