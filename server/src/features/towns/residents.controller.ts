@@ -30,6 +30,11 @@ export class ResidentsController {
     return this.residentsService.selectTownResidents(townId);
   }
 
+  @Delete('me')
+  leaveTown(@MyId() myId: number): Promise<void> {
+    return this.residentsService.leaveTown(myId);
+  }
+
   @Delete(':userId')
   deleteResident(
     @MyId() myId: number,
