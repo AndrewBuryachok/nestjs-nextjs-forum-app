@@ -257,7 +257,14 @@ export class TownsService {
   private getTownsQueryBuilder(req: Request): SelectQueryBuilder<Town> {
     return this.townsRepository
       .createQueryBuilder('town')
-      .select(['town.id', 'town.name', 'town.x', 'town.y', 'town.createdAt'])
+      .select([
+        'town.id',
+        'town.name',
+        'town.x',
+        'town.y',
+        'town.level',
+        'town.createdAt',
+      ])
       .innerJoin('town.user', 'ownerUser')
       .addSelect(['ownerUser.id', 'ownerUser.nick', 'ownerUser.avatar'])
       .loadRelationCountAndMap('town.users', 'town.townUsers')
