@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   forwardRef,
   Inject,
@@ -14,7 +15,11 @@ import { TownChunk } from './town-chunk.entity';
 import { ResidentsService } from './residents.service';
 import { MqttService } from '../mqtt/mqtt.service';
 import { UsersService } from '../users/users.service';
-import { CreateTownWithUserDto, EditTownDto } from './town.dto';
+import {
+  CreateTownWithUserDto,
+  EditTownDto,
+  UpdateTownChunkDto,
+} from './town.dto';
 import { TownError } from './town-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 import { Notification } from '../../common/enums';
@@ -97,6 +102,69 @@ export class TownsService {
     await this.edit(townId, dto);
   }
 
+  async addMyTownChunk(
+    myId: number,
+    townId: number,
+    dto: UpdateTownChunkDto,
+  ): Promise<void> {
+    const town = await this.throwIfNotTownOwner(townId, myId);
+    await this.addTownChunk(town, dto);
+  }
+
+  async addUserTownChunk(
+    townId: number,
+    dto: UpdateTownChunkDto,
+  ): Promise<void> {
+    const town = await this.throwIfTownNotFound(townId);
+    await this.addTownChunk(town, dto);
+  }
+
+  private async addTownChunk(
+    town: Town,
+    dto: UpdateTownChunkDto,
+  ): Promise<void> {
+    const townChunk = await this.townsChunksRepository.findOneBy({
+      x: dto.x,
+      y: dto.y,
+    });
+    if (townChunk) {
+      throw new BadRequestException(TownError.CHUNK_ALREADY_IN);
+    }
+    await this.addChunk(town.id, dto.x, dto.y);
+  }
+
+  async removeMyTownChunk(
+    myId: number,
+    townId: number,
+    dto: UpdateTownChunkDto,
+  ): Promise<void> {
+    const town = await this.throwIfNotTownOwner(townId, myId);
+    await this.removeTownChunk(town, dto);
+  }
+
+  async removeUserTownChunk(
+    townId: number,
+    dto: UpdateTownChunkDto,
+  ): Promise<void> {
+    const town = await this.throwIfTownNotFound(townId);
+    await this.removeTownChunk(town, dto);
+  }
+
+  private async removeTownChunk(
+    town: Town,
+    dto: UpdateTownChunkDto,
+  ): Promise<void> {
+    const townChunk = await this.townsChunksRepository.findOneBy({
+      townId: town.id,
+      x: dto.x,
+      y: dto.y,
+    });
+    if (!townChunk) {
+      throw new BadRequestException(TownError.CHUNK_NOT_IN);
+    }
+    await this.removeChunk(townChunk.id);
+  }
+
   async throwIfTownNotFound(townId: number): Promise<Town> {
     const town = await this.findTownById(townId);
     if (!town) {
@@ -152,6 +220,23 @@ export class TownsService {
       );
     } catch (error) {
       throw new InternalServerErrorException(TownError.EDIT_FAILED);
+    }
+  }
+
+  private async addChunk(townId: number, x: number, y: number): Promise<void> {
+    try {
+      const townChunk = this.townsChunksRepository.create({ townId, x, y });
+      await this.townsChunksRepository.save(townChunk);
+    } catch (error) {
+      throw new InternalServerErrorException(TownError.ADD_CHUNK_FAILED);
+    }
+  }
+
+  private async removeChunk(id: number): Promise<void> {
+    try {
+      await this.townsChunksRepository.softDelete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(TownError.REMOVE_CHUNK_FAILED);
     }
   }
 
