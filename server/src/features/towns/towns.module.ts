@@ -4,6 +4,7 @@ import { Town } from './town.entity';
 import { TownUser } from './town-user.entity';
 import { Invitation } from './invitation.entity';
 import { Application } from './application.entity';
+import { TownChunk } from './town-chunk.entity';
 import { UsersModule } from '../users/users.module';
 import { TownsController } from './towns.controller';
 import { ResidentsController } from './residents.controller';
@@ -16,7 +17,13 @@ import { ApplicationsService } from './applications.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Town, TownUser, Invitation, Application]),
+    TypeOrmModule.forFeature([
+      Town,
+      TownUser,
+      Invitation,
+      Application,
+      TownChunk,
+    ]),
     UsersModule,
   ],
   controllers: [
