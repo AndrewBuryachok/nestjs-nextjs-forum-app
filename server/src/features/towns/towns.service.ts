@@ -152,6 +152,17 @@ export class TownsService {
     town: Town,
     dto: UpdateTownChunkDto,
   ): Promise<void> {
+    const chunks = await this.townsChunksRepository.countBy({
+      townId: town.id,
+    });
+    const maxChunks = Number(
+      this.configService.getOrThrow('MAX_TOWN_CHUNKS').split(',')[
+        town.level - 1
+      ],
+    );
+    if (chunks === maxChunks) {
+      throw new BadRequestException(TownError.MAX_CHUNKS);
+    }
     const townChunk = await this.townsChunksRepository.findOneBy({
       x: dto.x,
       y: dto.y,
