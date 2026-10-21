@@ -22,3 +22,11 @@ export const editTownSchema = z.object({
 });
 
 export type EditTownType = z.infer<typeof editTownSchema>;
+
+export const updateTownChunkSchema = z.object({
+  townId: z.number().int().min(1),
+  x: z.number().int().min(-1000).max(1000),
+  y: z.number().int().min(-1000).max(1000),
+});
+
+export type UpdateTownChunkType = z.infer<typeof updateTownChunkSchema>;
