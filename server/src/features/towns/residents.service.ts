@@ -82,6 +82,10 @@ export class ResidentsService {
     );
   }
 
+  countTownResidents(townId: number): Promise<number> {
+    return this.townsUsersRepository.countBy({ townId });
+  }
+
   async throwIfResidentAlreadyIn(userId: number): Promise<void> {
     const townUser = await this.townsUsersRepository.findOneBy({ userId });
     if (townUser) {
