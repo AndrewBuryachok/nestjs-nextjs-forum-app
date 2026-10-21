@@ -4,6 +4,7 @@ import { faker } from '@faker-js/faker';
 import { User } from '../../features/users/user.entity';
 import { Town } from '../../features/towns/town.entity';
 import { TownUser } from '../../features/towns/town-user.entity';
+import { TownChunk } from '../../features/towns/town-chunk.entity';
 import { Card } from '../../features/cards/card.entity';
 import { CardUser } from '../../features/cards/card-user.entity';
 import { Transaction } from '../../features/transactions/transaction.entity';
@@ -55,6 +56,20 @@ export default class AppSeeder implements Seeder {
       );
       const townUser = await townUserFactory.make({ town, user });
       townsUsers.push(townUser);
+    }
+    const townChunkFactory = factoryManager.get(TownChunk);
+    const townsChunks: TownChunk[] = [];
+    for (const town of towns) {
+      for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+          if (faker.datatype.boolean()) {
+            const x = Math.floor(town.x / 16) + i;
+            const y = Math.floor(town.y / 16) + j;
+            const townChunk = await townChunkFactory.make({ town, x, y });
+            townsChunks.push(townChunk);
+          }
+        }
+      }
     }
     const cardFactory = factoryManager.get(Card);
     const cards: Card[] = [];
@@ -340,6 +355,7 @@ export default class AppSeeder implements Seeder {
     await dataSource.getRepository(User).save(users);
     await dataSource.getRepository(Town).save(towns);
     await dataSource.getRepository(TownUser).save(townsUsers);
+    await dataSource.getRepository(TownChunk).save(townsChunks);
     await dataSource.getRepository(Card).save(cards);
     await dataSource.getRepository(CardUser).save(cardsUsers);
     await dataSource.getRepository(Transaction).save(transactions);

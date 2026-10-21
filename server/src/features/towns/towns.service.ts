@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { Town } from './town.entity';
+import { TownChunk } from './town-chunk.entity';
 import { ResidentsService } from './residents.service';
 import { MqttService } from '../mqtt/mqtt.service';
 import { UsersService } from '../users/users.service';
@@ -23,6 +24,8 @@ export class TownsService {
   constructor(
     @InjectRepository(Town)
     private townsRepository: Repository<Town>,
+    @InjectRepository(TownChunk)
+    private townsChunksRepository: Repository<TownChunk>,
     @Inject(forwardRef(() => ResidentsService))
     private residentsService: ResidentsService,
     private mqttService: MqttService,
@@ -58,6 +61,12 @@ export class TownsService {
 
   selectAllTowns(): Promise<Town[]> {
     return this.selectTownsQueryBuilder().getMany();
+  }
+
+  selectTownChunks(townId: number): Promise<TownChunk[]> {
+    return this.selectTownsChunksQueryBuilder()
+      .where('townChunk.townId = :townId', { townId })
+      .getMany();
   }
 
   @Transactional()
@@ -146,6 +155,13 @@ export class TownsService {
     }
   }
 
+  private selectTownsChunksQueryBuilder(): SelectQueryBuilder<TownChunk> {
+    return this.townsChunksRepository
+      .createQueryBuilder('townChunk')
+      .select(['townChunk.id', 'townChunk.x', 'townChunk.y'])
+      .orderBy('townChunk.id', 'ASC');
+  }
+
   private selectTownsQueryBuilder(): SelectQueryBuilder<Town> {
     return this.townsRepository
       .createQueryBuilder('town')
@@ -160,6 +176,7 @@ export class TownsService {
       .innerJoin('town.user', 'ownerUser')
       .addSelect(['ownerUser.id', 'ownerUser.nick', 'ownerUser.avatar'])
       .loadRelationCountAndMap('town.users', 'town.townUsers')
+      .loadRelationCountAndMap('town.chunks', 'town.townChunks')
       .where(
         new Brackets(
           (qb) => req.id && qb.where('town.id = :id', { id: req.id }),
