@@ -4,6 +4,7 @@ import {
   createTownSchema,
   createTownWithUserSchema,
   editTownSchema,
+  updateTownChunkSchema,
 } from './schema';
 import { actionClient } from '@/lib/safe-action';
 import { send } from '@/lib/api';
@@ -30,4 +31,28 @@ export const editUserTownAction = actionClient
   .inputSchema(editTownSchema)
   .action(({ parsedInput: { townId, ...body } }) => {
     return send('PATCH', `/towns/all/${townId}`, body);
+  });
+
+export const addMyTownChunkAction = actionClient
+  .inputSchema(updateTownChunkSchema)
+  .action(({ parsedInput: { townId, ...body } }) => {
+    return send('POST', `/towns/${townId}/chunks`, body);
+  });
+
+export const addUserTownChunkAction = actionClient
+  .inputSchema(updateTownChunkSchema)
+  .action(({ parsedInput: { townId, ...body } }) => {
+    return send('POST', `/towns/all/${townId}/chunks`, body);
+  });
+
+export const removeMyTownChunkAction = actionClient
+  .inputSchema(updateTownChunkSchema)
+  .action(({ parsedInput: { townId, ...body } }) => {
+    return send('DELETE', `/towns/${townId}/chunks`, body);
+  });
+
+export const removeUserTownChunkAction = actionClient
+  .inputSchema(updateTownChunkSchema)
+  .action(({ parsedInput: { townId, ...body } }) => {
+    return send('DELETE', `/towns/all/${townId}/chunks`, body);
   });
