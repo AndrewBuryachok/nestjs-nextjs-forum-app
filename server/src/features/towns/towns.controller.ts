@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { TownsService } from './towns.service';
 import { Town } from './town.entity';
+import { TownChunk } from './town-chunk.entity';
 import {
   CreateTownDto,
   CreateTownWithUserDto,
@@ -47,6 +48,12 @@ export class TownsController {
   @Get('all/select')
   selectAllTowns(): Promise<Town[]> {
     return this.townsService.selectAllTowns();
+  }
+
+  @Public()
+  @Get(':townId/chunks')
+  selectTownChunks(@Param() { townId }: TownIdDto): Promise<TownChunk[]> {
+    return this.townsService.selectTownChunks(townId);
   }
 
   @Post()
