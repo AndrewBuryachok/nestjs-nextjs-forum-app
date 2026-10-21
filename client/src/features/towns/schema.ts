@@ -14,6 +14,12 @@ export const createTownWithUserSchema = createTownSchema.extend({
 
 export type CreateTownWithUserType = z.infer<typeof createTownWithUserSchema>;
 
+export const upgradeTownSchema = z.object({
+  townId: z.number().int().min(1),
+});
+
+export type UpgradeTownType = z.infer<typeof upgradeTownSchema>;
+
 export const editTownSchema = z.object({
   townId: z.number().int().min(1),
   name: z.string().min(1).max(16),
