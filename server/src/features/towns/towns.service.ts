@@ -105,6 +105,15 @@ export class TownsService {
     if (town.level === maxLevel) {
       throw new BadRequestException(TownError.MAX_LEVEL);
     }
+    const users = await this.residentsService.countTownResidents(town.id);
+    const minUsers = Number(
+      this.configService.getOrThrow('MIN_TOWN_USERS').split(',')[
+        town.level - 1
+      ],
+    );
+    if (users < minUsers) {
+      throw new BadRequestException(TownError.MIN_USERS);
+    }
     await this.upgrade(town.id);
   }
 
