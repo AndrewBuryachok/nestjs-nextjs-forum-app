@@ -1,5 +1,6 @@
 export enum TownError {
   MAX_LEVEL = 'Місто досягло максимального рівня',
+  MIN_USERS = 'Місто не досягло мінімальної кількості жителів',
   CHUNK_ALREADY_IN = 'Чанк вже в місті',
   CHUNK_NOT_IN = 'Чанк не в місті',
   NOT_OWNER = 'Ви не мер міста',
