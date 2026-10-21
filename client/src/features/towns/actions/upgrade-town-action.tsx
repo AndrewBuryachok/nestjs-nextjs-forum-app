@@ -7,7 +7,12 @@ export const upgradeTownFactory = (town: Town, isAll: boolean) => ({
   action: 'upgrade',
   dialog: 'town',
   color: Color.GREEN,
-  disabled: town.level === Number(process.env.NEXT_PUBLIC_MAX_TOWN_LEVEL),
+  disabled:
+    town.level === Number(process.env.NEXT_PUBLIC_MAX_TOWN_LEVEL) ||
+    town.users <
+      Number(
+        process.env.NEXT_PUBLIC_MIN_TOWN_USERS!.split(',')[town.level - 1],
+      ),
   userId: isAll ? 0 : town.user.id,
   icon: <LuPlus />,
   body: <UpgradeTownForm town={town} isAll={isAll} />,
