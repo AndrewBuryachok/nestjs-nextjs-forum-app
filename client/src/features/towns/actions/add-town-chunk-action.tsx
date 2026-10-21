@@ -7,6 +7,9 @@ export const addTownChunkFactory = (town: Town, isAll: boolean) => ({
   action: 'add',
   dialog: 'chunk',
   color: Color.GREEN,
+  disabled:
+    town.chunks ===
+    Number(process.env.NEXT_PUBLIC_MAX_TOWN_CHUNKS!.split(',')[town.level - 1]),
   userId: isAll ? 0 : town.user.id,
   icon: <LuSquarePlus />,
   body: <AddTownChunkForm town={town} isAll={isAll} />,
