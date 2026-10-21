@@ -5,6 +5,7 @@ import {
   createTownWithUserSchema,
   editTownSchema,
   updateTownChunkSchema,
+  upgradeTownSchema,
 } from './schema';
 import { actionClient } from '@/lib/safe-action';
 import { send } from '@/lib/api';
@@ -19,6 +20,18 @@ export const createTownWithUserAction = actionClient
   .inputSchema(createTownWithUserSchema)
   .action(({ parsedInput: body }) => {
     return send('POST', '/towns/all', body);
+  });
+
+export const upgradeMyTownAction = actionClient
+  .inputSchema(upgradeTownSchema)
+  .action(({ parsedInput: { townId } }) => {
+    return send('POST', `/towns/${townId}`);
+  });
+
+export const upgradeUserTownAction = actionClient
+  .inputSchema(upgradeTownSchema)
+  .action(({ parsedInput: { townId } }) => {
+    return send('POST', `/towns/all/${townId}`);
   });
 
 export const editMyTownAction = actionClient
