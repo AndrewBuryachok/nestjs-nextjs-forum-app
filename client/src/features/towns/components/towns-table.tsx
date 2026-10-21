@@ -4,6 +4,7 @@ import CustomTable from '@/components/custom-table';
 import CustomAvatarWithUser from '@/components/custom-avatar-with-user';
 import CustomText from '@/components/custom-text';
 import TownsResidentsActions from './towns-residents-actions';
+import TownsChunksActions from './towns-chunks-actions';
 import DateText from '@/components/date-text';
 import TownsActions from './towns-actions';
 
@@ -40,6 +41,10 @@ export default function TownsTable(props: Props) {
           render: (town) => (
             <TownsResidentsActions tab={props.tab} town={town} />
           ),
+        },
+        {
+          value: 'chunks',
+          render: (town) => <TownsChunksActions tab={props.tab} town={town} />,
         },
         {
           value: 'created',
