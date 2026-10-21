@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { BaseTown } from './types';
+import { BaseTown, TownChunk } from './types';
 import { BaseUser } from '../users/types';
 import { fetcher } from '@/lib/fetcher';
 
@@ -8,3 +8,6 @@ export const useSelectAllTowns = (shouldFetch = true) =>
 
 export const useSelectTownResidents = (townId: number) =>
   useSWR<BaseUser[]>(`/api/residents/${townId}/select`, fetcher);
+
+export const useSelectTownChunks = (townId: number) =>
+  useSWR<TownChunk[]>(`/api/towns/${townId}/chunks`, fetcher);
