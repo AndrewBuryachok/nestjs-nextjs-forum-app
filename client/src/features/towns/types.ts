@@ -9,6 +9,7 @@ export interface BaseTownWithUser extends BasePlace {
 
 export interface Town extends Place {
   user: BaseUser;
+  level: number;
   users: number;
   chunks: number;
 }

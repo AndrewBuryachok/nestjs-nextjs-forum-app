@@ -3,6 +3,7 @@ import { Field, Input } from '@chakra-ui/react';
 import { Town } from '../types';
 import ViewForm from '@/components/view-form';
 import UserInput from '@/components/user-input';
+import LevelBadge from '@/components/level-badge';
 import DateInput from '@/components/date-input';
 
 type Props = {
@@ -33,6 +34,10 @@ export default function ViewTownForm(props: Props) {
       <Field.Root>
         <Field.Label>{t('columns.y')}</Field.Label>
         <Input readOnly value={props.town.y} />
+      </Field.Root>
+      <Field.Root>
+        <Field.Label>{t('columns.level')}</Field.Label>
+        <LevelBadge level={props.town.level} />
       </Field.Root>
       <Field.Root>
         <Field.Label>{t('columns.created')}</Field.Label>
