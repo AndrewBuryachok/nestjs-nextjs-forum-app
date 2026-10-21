@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -15,6 +16,7 @@ import {
   CreateTownWithUserDto,
   EditTownDto,
   TownIdDto,
+  UpdateTownChunkDto,
 } from './town.dto';
 import { MyId, Public, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
@@ -86,5 +88,41 @@ export class TownsController {
     @Body() dto: EditTownDto,
   ): Promise<void> {
     return this.townsService.editUserTown(townId, dto);
+  }
+
+  @Post(':townId/chunks')
+  addMyTownChunk(
+    @MyId() myId: number,
+    @Param() { townId }: TownIdDto,
+    @Body() dto: UpdateTownChunkDto,
+  ): Promise<void> {
+    return this.townsService.addMyTownChunk(myId, townId, dto);
+  }
+
+  @Roles([Role.ADMIN])
+  @Post('all/:townId/chunks')
+  addUserTownChunk(
+    @Param() { townId }: TownIdDto,
+    @Body() dto: UpdateTownChunkDto,
+  ): Promise<void> {
+    return this.townsService.addUserTownChunk(townId, dto);
+  }
+
+  @Delete(':townId/chunks')
+  removeMyTownChunk(
+    @MyId() myId: number,
+    @Param() { townId }: TownIdDto,
+    @Body() dto: UpdateTownChunkDto,
+  ): Promise<void> {
+    return this.townsService.removeMyTownChunk(myId, townId, dto);
+  }
+
+  @Roles([Role.ADMIN])
+  @Delete('all/:townId/chunks')
+  removeUserTownChunk(
+    @Param() { townId }: TownIdDto,
+    @Body() dto: UpdateTownChunkDto,
+  ): Promise<void> {
+    return this.townsService.removeUserTownChunk(townId, dto);
   }
 }
