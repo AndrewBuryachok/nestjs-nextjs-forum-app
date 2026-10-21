@@ -72,6 +72,20 @@ export class TownsController {
     return this.townsService.createTown(dto);
   }
 
+  @Post(':townId')
+  upgradeMyTown(
+    @MyId() myId: number,
+    @Param() { townId }: TownIdDto,
+  ): Promise<void> {
+    return this.townsService.upgradeMyTown(myId, townId);
+  }
+
+  @Roles([Role.ADMIN])
+  @Post('all/:townId')
+  upgradeUserTown(@Param() { townId }: TownIdDto): Promise<void> {
+    return this.townsService.upgradeUserTown(townId);
+  }
+
   @Patch(':townId')
   editMyTown(
     @MyId() myId: number,

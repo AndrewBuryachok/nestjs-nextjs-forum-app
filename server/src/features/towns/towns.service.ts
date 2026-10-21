@@ -7,6 +7,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
@@ -31,6 +32,7 @@ export class TownsService {
     private townsRepository: Repository<Town>,
     @InjectRepository(TownChunk)
     private townsChunksRepository: Repository<TownChunk>,
+    private configService: ConfigService,
     @Inject(forwardRef(() => ResidentsService))
     private residentsService: ResidentsService,
     private mqttService: MqttService,
@@ -86,6 +88,24 @@ export class TownsService {
       town.id,
       Notification.CREATE_TOWN,
     );
+  }
+
+  async upgradeMyTown(myId: number, townId: number): Promise<void> {
+    const town = await this.throwIfNotTownOwner(townId, myId);
+    await this.upgradeTown(town);
+  }
+
+  async upgradeUserTown(townId: number): Promise<void> {
+    const town = await this.throwIfTownNotFound(townId);
+    await this.upgradeTown(town);
+  }
+
+  private async upgradeTown(town: Town): Promise<void> {
+    const maxLevel = Number(this.configService.getOrThrow('MAX_TOWN_LEVEL'));
+    if (town.level === maxLevel) {
+      throw new BadRequestException(TownError.MAX_LEVEL);
+    }
+    await this.upgrade(town.id);
   }
 
   async editMyTown(
@@ -209,6 +229,14 @@ export class TownsService {
       return town;
     } catch (error) {
       throw new InternalServerErrorException(TownError.CREATE_FAILED);
+    }
+  }
+
+  private async upgrade(id: number): Promise<void> {
+    try {
+      await this.townsRepository.increment({ id }, 'level', 1);
+    } catch (error) {
+      throw new InternalServerErrorException(TownError.UPGRADE_FAILED);
     }
   }
 
