@@ -10,5 +10,6 @@ export interface Fine {
   sum: number;
   description: string;
   createdAt: Date;
+  completedAt: Date;
   paidAt?: Date;
 }
