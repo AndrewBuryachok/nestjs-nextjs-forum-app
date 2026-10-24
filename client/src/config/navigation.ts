@@ -18,7 +18,7 @@ export const PAGE_TABS_MAP = {
   fines: {
     my: {},
     paid: {},
-    all: { roles: [Role.ADMIN] },
+    all: { roles: [Role.ADMIN, Role.INSPECTOR, Role.JUDGE] },
   },
   invitations: {
     sent: {},
