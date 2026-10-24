@@ -48,6 +48,10 @@ export default function ViewFineForm(props: Props) {
         <DateInput value={props.fine.createdAt} />
       </Field.Root>
       <Field.Root>
+        <Field.Label>{t('columns.completed')}</Field.Label>
+        <DateInput value={props.fine.completedAt} />
+      </Field.Root>
+      <Field.Root>
         <Field.Label>{t('columns.paid')}</Field.Label>
         {props.fine.paidAt ? (
           <DateInput value={props.fine.paidAt} />

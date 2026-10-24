@@ -12,6 +12,8 @@ export const NOTIFICATION_TABS_MAP = {
   fines: {
     create: 'my',
     pay: 'paid',
+    remind: 'my',
+    expire: 'my',
   },
   invitations: {
     accept: 'sent',

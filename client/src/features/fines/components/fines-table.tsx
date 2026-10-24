@@ -53,8 +53,8 @@ export default function FinesTable(props: Props) {
         },
         props.tab === 'my'
           ? {
-              value: 'created',
-              render: (fine) => <DateText value={fine.createdAt} />,
+              value: 'completed',
+              render: (fine) => <DateText value={fine.completedAt} />,
             }
           : {
               value: 'paid',
