@@ -35,19 +35,19 @@ export class FinesController {
     return this.finesService.getPaidFines(myId, req);
   }
 
-  @Roles([Role.ADMIN])
+  @Roles([Role.ADMIN, Role.INSPECTOR, Role.JUDGE])
   @Get('all')
   getAllFines(@Query() req: Request): Promise<Response<Fine>> {
     return this.finesService.getAllFines(req);
   }
 
-  @Roles([Role.ADMIN])
+  @Roles([Role.ADMIN, Role.INSPECTOR, Role.JUDGE])
   @Post()
   createFine(@Body() dto: CreateFineDto): Promise<void> {
     return this.finesService.createFine(dto);
   }
 
-  @Roles([Role.ADMIN])
+  @Roles([Role.ADMIN, Role.INSPECTOR, Role.JUDGE])
   @Patch(':fineId')
   editFine(
     @Param() { fineId }: FineIdDto,
@@ -56,7 +56,7 @@ export class FinesController {
     return this.finesService.editFine(fineId, dto);
   }
 
-  @Roles([Role.ADMIN])
+  @Roles([Role.ADMIN, Role.INSPECTOR, Role.JUDGE])
   @Delete(':fineId')
   deleteFine(@Param() { fineId }: FineIdDto): Promise<void> {
     return this.finesService.deleteFine(fineId);
