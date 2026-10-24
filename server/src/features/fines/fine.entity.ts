@@ -51,6 +51,9 @@ export class Fine {
   @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
   createdAt: Date;
 
+  @Column({ type: 'timestamptz', name: 'completed_at' })
+  completedAt: Date;
+
   @Column({ type: 'timestamptz', name: 'paid_at', nullable: true })
   paidAt?: Date;
 }

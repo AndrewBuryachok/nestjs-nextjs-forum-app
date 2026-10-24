@@ -4,9 +4,16 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  OnModuleInit,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import {
+  Brackets,
+  IsNull,
+  MoreThan,
+  Repository,
+  SelectQueryBuilder,
+} from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { Fine } from './fine.entity';
 import { MqttService } from '../mqtt/mqtt.service';
@@ -18,7 +25,7 @@ import { Request, Response } from '../../common/interfaces';
 import { Notification, TransactionType } from '../../common/enums';
 
 @Injectable()
-export class FinesService {
+export class FinesService implements OnModuleInit {
   constructor(
     @InjectRepository(Fine)
     private finesRepository: Repository<Fine>,
@@ -26,6 +33,16 @@ export class FinesService {
     private cardsService: CardsService,
     private transactionsService: TransactionsService,
   ) {}
+
+  async onModuleInit() {
+    const fines = await this.finesRepository.findBy({
+      completedAt: MoreThan(new Date()),
+      paidAt: IsNull(),
+    });
+    for (const fine of fines) {
+      this.addTimeout(fine.id, fine.receiverUserId, fine.completedAt);
+    }
+  }
 
   async getMyFines(myId: number, req: Request): Promise<Response<Fine>> {
     const [data, total] = await this.getMyFinesQueryBuilder(myId, req)
@@ -59,6 +76,7 @@ export class FinesService {
       fine.id,
       Notification.CREATE_FINE,
     );
+    this.addTimeout(fine.id, dto.receiverUserId, fine.completedAt);
   }
 
   async editMyFine(
@@ -93,6 +111,7 @@ export class FinesService {
   private async deleteFine(fine: Fine): Promise<void> {
     this.throwIfFineAlreadyPaid(fine);
     await this.delete(fine.id);
+    this.removeTimeout(fine.id);
   }
 
   async payMyFine(
@@ -128,6 +147,7 @@ export class FinesService {
       fine.id,
       Notification.PAY_FINE,
     );
+    this.removeTimeout(fine.id);
   }
 
   async throwIfFineNotFound(fineId: number): Promise<Fine> {
@@ -164,14 +184,43 @@ export class FinesService {
     return this.finesRepository.findOneBy({ id });
   }
 
+  private addTimeout(id: number, userId: number, date: Date) {
+    const before = new Date(date);
+    before.setDate(before.getDate() - 3);
+    this.mqttService.scheduleNotification(
+      `fines/${id}/remind`,
+      before,
+      0,
+      userId,
+      id,
+      Notification.REMIND_FINE,
+    );
+    this.mqttService.scheduleNotification(
+      `fines/${id}/expire`,
+      date,
+      0,
+      userId,
+      id,
+      Notification.EXPIRE_FINE,
+    );
+  }
+
+  private removeTimeout(id: number) {
+    this.mqttService.unscheduleNotification(`fines/${id}/remind`);
+    this.mqttService.unscheduleNotification(`fines/${id}/expire`);
+  }
+
   private async create(dto: CreateFineWithUserDto): Promise<Fine> {
     try {
+      const completedAt = new Date();
+      completedAt.setDate(completedAt.getDate() + 7);
       const fine = this.finesRepository.create({
         senderUserId: dto.senderUserId,
         senderCardId: dto.senderCardId,
         receiverUserId: dto.receiverUserId,
         sum: dto.sum,
         description: dto.description,
+        completedAt,
       });
       await this.finesRepository.save(fine);
       return fine;
@@ -236,6 +285,7 @@ export class FinesService {
         'fine.sum',
         'fine.description',
         'fine.createdAt',
+        'fine.completedAt',
         'fine.paidAt',
       ])
       .innerJoin('fine.senderUser', 'senderUser')
