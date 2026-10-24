@@ -16,6 +16,8 @@ export enum Notification {
   TRANSFER_TRANSACTION = 'transfer transactions',
   CREATE_FINE = 'create fines',
   PAY_FINE = 'pay fines',
+  REMIND_FINE = 'remind fines',
+  EXPIRE_FINE = 'expire fines',
   CREATE_SHOP = 'create shops',
   CREATE_PLOT = 'create plots',
   CREATE_RENT = 'create rents',
