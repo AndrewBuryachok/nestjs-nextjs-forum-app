@@ -22,7 +22,9 @@ import { ProductsModule } from './features/products/products.module';
 import { LockersModule } from './features/lockers/lockers.module';
 import { OrdersModule } from './features/orders/orders.module';
 import { ForumController } from './features/forum/forum.controller';
+import { ModController } from './features/mod/mod.controller';
 import { ForumService } from './features/forum/forum.service';
+import { ModService } from './features/mod/mod.service';
 import { AtGuard, RolesGuard } from './common/guards';
 
 @Module({
@@ -67,9 +69,10 @@ import { AtGuard, RolesGuard } from './common/guards';
     LockersModule,
     OrdersModule,
   ],
-  controllers: [ForumController],
+  controllers: [ForumController, ModController],
   providers: [
     ForumService,
+    ModService,
     { provide: APP_GUARD, useClass: AtGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
     {
