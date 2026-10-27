@@ -182,6 +182,12 @@ export class OrdersService {
       orderId,
       Notification.TAKE_ORDER,
     );
+    await this.mqttService.sendMessage(
+      dto.userId,
+      order.customerUserId,
+      'взял ваш заказ',
+      true,
+    );
   }
 
   async cancelMyOrder(myId: number, orderId: number): Promise<void> {
@@ -202,6 +208,12 @@ export class OrdersService {
       order.customerUserId,
       order.id,
       Notification.CANCEL_ORDER,
+    );
+    await this.mqttService.sendMessage(
+      order.executorUserId!,
+      order.customerUserId,
+      'отменил ваш заказ',
+      true,
     );
   }
 
@@ -226,6 +238,12 @@ export class OrdersService {
       order.customerUserId,
       order.id,
       Notification.EXECUTE_ORDER,
+    );
+    await this.mqttService.sendMessage(
+      order.executorUserId!,
+      order.customerUserId,
+      'выполнил ваш заказ',
+      true,
     );
   }
 
@@ -266,6 +284,12 @@ export class OrdersService {
       order.executorUserId!,
       order.id,
       Notification.COMPLETE_ORDER,
+    );
+    await this.mqttService.sendMessage(
+      order.customerUserId,
+      order.executorUserId!,
+      'завершил ваш заказ',
+      true,
     );
   }
 
