@@ -60,6 +60,12 @@ export class TransactionsService {
       { ...dto, type: TransactionType.DEPOSIT, description: '' },
       myId,
     );
+    await this.mqttService.sendMessage(
+      myId,
+      dto.userId,
+      'положил вам АРы на карту',
+      true,
+    );
   }
 
   async createWithdrawTransaction(
@@ -69,6 +75,12 @@ export class TransactionsService {
     await this.createDecreaseTransaction(
       { ...dto, type: TransactionType.WITHDRAW, description: '' },
       myId,
+    );
+    await this.mqttService.sendMessage(
+      myId,
+      dto.userId,
+      'снял АРы с вашей карты',
+      true,
     );
   }
 
@@ -92,6 +104,12 @@ export class TransactionsService {
       dto.receiverUserId,
       transaction.id,
       Notification.TRANSFER_TRANSACTION,
+    );
+    await this.mqttService.sendMessage(
+      dto.senderUserId,
+      dto.receiverUserId,
+      'создал вам перевод',
+      true,
     );
   }
 
