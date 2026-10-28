@@ -1,15 +1,9 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import { Fine } from '../types';
 import { viewFineAction } from '../actions/view-fine-action';
-import { payMyFineAction, payUserFineAction } from '../actions/pay-fine-action';
-import {
-  editMyFineAction,
-  editUserFineAction,
-} from '../actions/edit-fine-action';
-import {
-  deleteMyFineAction,
-  deleteUserFineAction,
-} from '../actions/delete-fine-action';
+import { payFineAction } from '../actions/pay-fine-action';
+import { editFineAction } from '../actions/edit-fine-action';
+import { deleteFineAction } from '../actions/delete-fine-action';
 import CustomActions from '@/components/custom-actions';
 
 type Props = {
@@ -19,9 +13,9 @@ type Props = {
 
 export default function FinesActions(props: Props) {
   const actions = {
-    my: [payMyFineAction, editMyFineAction, deleteMyFineAction],
+    my: [payFineAction],
     paid: [],
-    all: [payUserFineAction, editUserFineAction, deleteUserFineAction],
+    all: [editFineAction, deleteFineAction],
   }[props.tab];
 
   return (

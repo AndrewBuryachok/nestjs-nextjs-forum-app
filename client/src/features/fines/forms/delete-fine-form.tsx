@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Fine } from '../types';
-import { deleteMyFineAction, deleteUserFineAction } from '../actions';
+import { deleteFineAction } from '../actions';
 import { deleteFineSchema, DeleteFineType } from '../schema';
 import { useDialogContext } from '@/providers/dialog-provider';
 import { toaster } from '@/components/ui/toaster';
@@ -13,7 +13,6 @@ import CustomForm from '@/components/custom-form';
 
 type Props = {
   fine: Fine;
-  isAll: boolean;
 };
 
 export default function DeleteFineForm(props: Props) {
@@ -31,9 +30,7 @@ export default function DeleteFineForm(props: Props) {
   });
 
   const onSubmit = form.handleSubmit(async (data) => {
-    const res = props.isAll
-      ? await deleteUserFineAction(data)
-      : await deleteMyFineAction(data);
+    const res = await deleteFineAction(data);
     if (res.data) {
       if (res.data.ok) {
         const title = t('toasts.fines.delete.success');
