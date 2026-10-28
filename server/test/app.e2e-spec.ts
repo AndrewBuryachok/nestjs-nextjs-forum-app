@@ -585,32 +585,6 @@ describe('App', () => {
     it('POST /fines', () => {
       return request(app.getHttpServer())
         .post('/fines')
-        .set('Authorization', `Bearer ${user.access}`)
-        .send({
-          senderCardId: cards[0],
-          receiverUserId: user.user.id,
-          sum: 10,
-          description: '',
-        })
-        .expect(201);
-    });
-
-    it('POST /fines', () => {
-      return request(app.getHttpServer())
-        .post('/fines')
-        .set('Authorization', `Bearer ${user.access}`)
-        .send({
-          senderCardId: cards[0],
-          receiverUserId: user.user.id,
-          sum: 10,
-          description: '',
-        })
-        .expect(201);
-    });
-
-    it('POST /fines/all', () => {
-      return request(app.getHttpServer())
-        .post('/fines/all')
         .set('Authorization', `Bearer ${admin.access}`)
         .send({
           senderUserId: user.user.id,
@@ -622,9 +596,9 @@ describe('App', () => {
         .expect(201);
     });
 
-    it('POST /fines/all', () => {
+    it('POST /fines', () => {
       return request(app.getHttpServer())
-        .post('/fines/all')
+        .post('/fines')
         .set('Authorization', `Bearer ${admin.access}`)
         .send({
           senderUserId: user.user.id,
@@ -653,28 +627,13 @@ describe('App', () => {
 
     it('PATCH /fines/:fineId', () => {
       return request(app.getHttpServer())
-        .patch(`/fines/${fines[0]}`)
-        .set('Authorization', `Bearer ${user.access}`)
-        .send({ sum: 10, description: '' })
-        .expect(200);
-    });
-
-    it('PATCH /fines/all/:fineId', () => {
-      return request(app.getHttpServer())
-        .patch(`/fines/all/${fines[1]}`)
+        .patch(`/fines/${fines[1]}`)
         .set('Authorization', `Bearer ${admin.access}`)
         .send({ sum: 10, description: '' })
         .expect(200);
     });
 
     it('DELETE /fines/:fineId', () => {
-      return request(app.getHttpServer())
-        .delete(`/fines/${fines[0]}`)
-        .set('Authorization', `Bearer ${user.access}`)
-        .expect(200);
-    });
-
-    it('DELETE /fines/all/:fineId', () => {
       return request(app.getHttpServer())
         .delete(`/fines/all/${fines[1]}`)
         .set('Authorization', `Bearer ${admin.access}`)
@@ -685,14 +644,6 @@ describe('App', () => {
       return request(app.getHttpServer())
         .post(`/fines/${fines[2]}`)
         .set('Authorization', `Bearer ${user.access}`)
-        .send({ cardId: cards[0] })
-        .expect(201);
-    });
-
-    it('POST /fines/all/:fineId', () => {
-      return request(app.getHttpServer())
-        .post(`/fines/all/${fines[3]}`)
-        .set('Authorization', `Bearer ${admin.access}`)
         .send({ cardId: cards[0] })
         .expect(201);
     });

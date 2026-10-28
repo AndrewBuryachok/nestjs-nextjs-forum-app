@@ -19,7 +19,7 @@ import { Fine } from './fine.entity';
 import { MqttService } from '../mqtt/mqtt.service';
 import { CardsService } from '../cards/cards.service';
 import { TransactionsService } from '../transactions/transactions.service';
-import { CreateFineWithUserDto, EditFineDto, PayFineDto } from './fine.dto';
+import { CreateFineDto, EditFineDto, PayFineDto } from './fine.dto';
 import { FineError } from './fine-errors.enum';
 import { Request, Response } from '../../common/interfaces';
 import { Notification, TransactionType } from '../../common/enums';
@@ -64,7 +64,7 @@ export class FinesService implements OnModuleInit {
     return { data, total };
   }
 
-  async createFine(dto: CreateFineWithUserDto): Promise<void> {
+  async createFine(dto: CreateFineDto): Promise<void> {
     await this.cardsService.throwIfNotCardUser(
       dto.senderCardId,
       dto.senderUserId,
@@ -79,60 +79,22 @@ export class FinesService implements OnModuleInit {
     this.addTimeout(fine.id, dto.receiverUserId, fine.completedAt);
   }
 
-  async editMyFine(
-    myId: number,
-    fineId: number,
-    dto: EditFineDto,
-  ): Promise<void> {
-    const fine = await this.throwIfNotFineSender(fineId, myId);
-    await this.editFine(fine, dto);
-  }
-
-  async editUserFine(fineId: number, dto: EditFineDto): Promise<void> {
+  async editFine(fineId: number, dto: EditFineDto): Promise<void> {
     const fine = await this.throwIfFineNotFound(fineId);
-    await this.editFine(fine, dto);
-  }
-
-  private async editFine(fine: Fine, dto: EditFineDto): Promise<void> {
-    this.throwIfFineAlreadyPaid(fine);
     await this.edit(fine.id, dto);
   }
 
-  async deleteMyFine(myId: number, fineId: number): Promise<void> {
-    const fine = await this.throwIfNotFineSender(fineId, myId);
-    await this.deleteFine(fine);
-  }
-
-  async deleteUserFine(fineId: number): Promise<void> {
+  async deleteFine(fineId: number): Promise<void> {
     const fine = await this.throwIfFineNotFound(fineId);
-    await this.deleteFine(fine);
-  }
-
-  private async deleteFine(fine: Fine): Promise<void> {
-    this.throwIfFineAlreadyPaid(fine);
     await this.delete(fine.id);
     this.removeTimeout(fine.id);
   }
 
-  async payMyFine(
-    myId: number,
-    fineId: number,
-    dto: PayFineDto,
-  ): Promise<void> {
-    const fine = await this.throwIfNotFineReceiver(fineId, myId);
-    await this.payFine(fine, dto);
-  }
-
-  async payUserFine(fineId: number, dto: PayFineDto): Promise<void> {
-    const fine = await this.throwIfFineNotFound(fineId);
-    await this.payFine(fine, dto);
-  }
-
   @Transactional()
-  private async payFine(fine: Fine, dto: PayFineDto): Promise<void> {
-    this.throwIfFineAlreadyPaid(fine);
+  async payFine(myId: number, fineId: number, dto: PayFineDto): Promise<void> {
+    const fine = await this.throwIfNotFineReceiver(fineId, myId);
     await this.transactionsService.createTransferTransaction({
-      senderUserId: fine.receiverUserId,
+      senderUserId: myId,
       senderCardId: dto.cardId,
       receiverUserId: fine.senderUserId,
       receiverCardId: fine.senderCardId,
@@ -140,14 +102,14 @@ export class FinesService implements OnModuleInit {
       sum: fine.sum,
       description: fine.description,
     });
-    await this.pay(fine.id, dto);
+    await this.pay(fineId, dto);
     this.mqttService.publishNotification(
-      fine.receiverUserId,
+      myId,
       fine.senderUserId,
-      fine.id,
+      fineId,
       Notification.PAY_FINE,
     );
-    this.removeTimeout(fine.id);
+    this.removeTimeout(fineId);
   }
 
   async throwIfFineNotFound(fineId: number): Promise<Fine> {
@@ -155,13 +117,8 @@ export class FinesService implements OnModuleInit {
     if (!fine) {
       throw new NotFoundException(FineError.NOT_FOUND);
     }
-    return fine;
-  }
-
-  async throwIfNotFineSender(fineId: number, userId: number): Promise<Fine> {
-    const fine = await this.throwIfFineNotFound(fineId);
-    if (fine.senderUserId !== userId) {
-      throw new ForbiddenException(FineError.NOT_SENDER);
+    if (fine.paidAt) {
+      throw new BadRequestException(FineError.ALREADY_PAID);
     }
     return fine;
   }
@@ -172,12 +129,6 @@ export class FinesService implements OnModuleInit {
       throw new ForbiddenException(FineError.NOT_RECEIVER);
     }
     return fine;
-  }
-
-  private throwIfFineAlreadyPaid(fine: Fine): void {
-    if (fine.paidAt) {
-      throw new BadRequestException(FineError.ALREADY_PAID);
-    }
   }
 
   private findFineById(id: number): Promise<Fine | null> {
@@ -210,7 +161,7 @@ export class FinesService implements OnModuleInit {
     this.mqttService.unscheduleNotification(`fines/${id}/expire`);
   }
 
-  private async create(dto: CreateFineWithUserDto): Promise<Fine> {
+  private async create(dto: CreateFineDto): Promise<Fine> {
     try {
       const completedAt = new Date();
       completedAt.setDate(completedAt.getDate() + 7);
