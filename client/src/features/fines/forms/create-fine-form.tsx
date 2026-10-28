@@ -6,24 +6,17 @@ import { useTranslations } from 'next-intl';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Field, Input, NumberInput } from '@chakra-ui/react';
-import { createMyFineAction, createUserFineAction } from '../actions';
+import { createFineAction } from '../actions';
 import { createFineSchema, CreateFineType } from '../schema';
 import { useSelectAllUsers } from '@/features/users/hooks';
-import {
-  useSelectMyCards,
-  useSelectUserCardsWithBalance,
-} from '@/features/cards/hooks';
+import { useSelectUserCards } from '@/features/cards/hooks';
 import { useDialogContext } from '@/providers/dialog-provider';
 import { toaster } from '@/components/ui/toaster';
 import CustomForm from '@/components/custom-form';
 import UsersCombobox from '@/features/users/components/users-combobox';
-import CardsWithBalanceCombobox from '@/features/cards/components/cards-with-balance-combobox';
+import CardsCombobox from '@/features/cards/components/cards-combobox';
 
-type Props = {
-  isAll: boolean;
-};
-
-export default function CreateFineForm(props: Props) {
+export default function CreateFineForm() {
   const t = useTranslations();
 
   const router = useRouter();
@@ -44,9 +37,7 @@ export default function CreateFineForm(props: Props) {
   }, [senderUserId]);
 
   const onSubmit = form.handleSubmit(async (data) => {
-    const res = props.isAll
-      ? await createUserFineAction({ ...data, senderUserId })
-      : await createMyFineAction(data);
+    const res = await createFineAction({ ...data, senderUserId });
     if (res.data) {
       if (res.data.ok) {
         const title = t('toasts.fines.create.success');
@@ -61,28 +52,24 @@ export default function CreateFineForm(props: Props) {
   });
 
   const users = useSelectAllUsers();
-  const cards = props.isAll
-    ? useSelectUserCardsWithBalance(senderUserId)
-    : useSelectMyCards();
+  const cards = useSelectUserCards(senderUserId);
 
   return (
     <CustomForm disabled={form.formState.isSubmitting} onSubmit={onSubmit}>
-      {props.isAll && (
-        <Field.Root required>
-          <Field.Label>
-            {t('columns.sender')}
-            <Field.RequiredIndicator />
-          </Field.Label>
-          <UsersCombobox
-            data={users.data}
-            loading={users.isLoading}
-            placeholder={t('columns.sender')}
-            value={senderUserId}
-            setValue={setSenderUserId}
-          />
-        </Field.Root>
-      )}
-      <Field.Root disabled={props.isAll && !senderUserId} required>
+      <Field.Root required>
+        <Field.Label>
+          {t('columns.sender')}
+          <Field.RequiredIndicator />
+        </Field.Label>
+        <UsersCombobox
+          data={users.data}
+          loading={users.isLoading}
+          placeholder={t('columns.sender')}
+          value={senderUserId}
+          setValue={setSenderUserId}
+        />
+      </Field.Root>
+      <Field.Root disabled={!senderUserId} required>
         <Field.Label>
           {t('columns.card')}
           <Field.RequiredIndicator />
@@ -91,7 +78,7 @@ export default function CreateFineForm(props: Props) {
           control={form.control}
           name='senderCardId'
           render={({ field }) => (
-            <CardsWithBalanceCombobox
+            <CardsCombobox
               data={cards.data}
               loading={cards.isLoading}
               placeholder={t('columns.card')}

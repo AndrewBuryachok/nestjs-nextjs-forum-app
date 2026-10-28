@@ -6,12 +6,9 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Field } from '@chakra-ui/react';
 import { Fine } from '../types';
-import { payMyFineAction, payUserFineAction } from '../actions';
+import { payFineAction } from '../actions';
 import { payFineSchema, PayFineType } from '../schema';
-import {
-  useSelectMyCards,
-  useSelectUserCardsWithBalance,
-} from '@/features/cards/hooks';
+import { useSelectMyCards } from '@/features/cards/hooks';
 import { useDialogContext } from '@/providers/dialog-provider';
 import { toaster } from '@/components/ui/toaster';
 import CustomForm from '@/components/custom-form';
@@ -19,7 +16,6 @@ import CardsWithBalanceCombobox from '@/features/cards/components/cards-with-bal
 
 type Props = {
   fine: Fine;
-  isAll: boolean;
 };
 
 export default function PayFineForm(props: Props) {
@@ -37,9 +33,7 @@ export default function PayFineForm(props: Props) {
   });
 
   const onSubmit = form.handleSubmit(async (data) => {
-    const res = props.isAll
-      ? await payUserFineAction(data)
-      : await payMyFineAction(data);
+    const res = await payFineAction(data);
     if (res.data) {
       if (res.data.ok) {
         const title = t('toasts.fines.pay.success');
@@ -53,9 +47,7 @@ export default function PayFineForm(props: Props) {
     }
   });
 
-  const cards = props.isAll
-    ? useSelectUserCardsWithBalance(props.fine.receiverUser.id)
-    : useSelectMyCards();
+  const cards = useSelectMyCards();
 
   const card = cards.data?.find((card) => card.id === form.watch('cardId'));
   const notEnoughBalance = card && card.balance < props.fine.sum;

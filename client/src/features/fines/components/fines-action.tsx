@@ -7,11 +7,7 @@ type Props = {
 };
 
 export default function FinesAction(props: Props) {
-  return (
-    <CustomAction
-      action='create'
-      dialog='fine'
-      body={<CreateFineForm isAll={props.tab === 'all'} />}
-    />
-  );
+  return props.tab === 'all' ? (
+    <CustomAction action='create' dialog='fine' body={<CreateFineForm />} />
+  ) : null;
 }
