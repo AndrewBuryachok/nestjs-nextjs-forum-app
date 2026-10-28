@@ -32,19 +32,17 @@ export class CreateFineDto extends EditFineDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
+  senderUserId: number;
+
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
   senderCardId: number;
 
   @IsNotEmpty()
   @IsInt()
   @Min(1)
   receiverUserId: number;
-}
-
-export class CreateFineWithUserDto extends CreateFineDto {
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  senderUserId: number;
 }
 
 export class PayFineDto {
