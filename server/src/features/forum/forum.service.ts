@@ -115,7 +115,7 @@ export class ForumService {
   }
 
   payFine(myId: number, fineId: number, dto: PayFineDto): Promise<void> {
-    return this.finesService.payMyFine(myId, fineId, dto);
+    return this.finesService.payFine(myId, fineId, dto);
   }
 
   getMainProducts(req: Request): Promise<Response<Product>> {

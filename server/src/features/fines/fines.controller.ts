@@ -10,13 +10,7 @@ import {
 } from '@nestjs/common';
 import { FinesService } from './fines.service';
 import { Fine } from './fine.entity';
-import {
-  CreateFineDto,
-  CreateFineWithUserDto,
-  EditFineDto,
-  FineIdDto,
-  PayFineDto,
-} from './fine.dto';
+import { CreateFineDto, EditFineDto, FineIdDto, PayFineDto } from './fine.dto';
 import { MyId, Roles } from '../../common/decorators';
 import { Request, Response } from '../../common/interfaces';
 import { Role } from '../../common/enums';
@@ -47,67 +41,33 @@ export class FinesController {
     return this.finesService.getAllFines(req);
   }
 
-  @Post()
-  createMyFine(
-    @MyId() myId: number,
-    @Body() dto: CreateFineDto,
-  ): Promise<void> {
-    return this.finesService.createFine({ ...dto, senderUserId: myId });
-  }
-
   @Roles([Role.ADMIN])
-  @Post('all')
-  createUserFine(@Body() dto: CreateFineWithUserDto): Promise<void> {
+  @Post()
+  createFine(@Body() dto: CreateFineDto): Promise<void> {
     return this.finesService.createFine(dto);
   }
 
+  @Roles([Role.ADMIN])
   @Patch(':fineId')
-  editMyFine(
-    @MyId() myId: number,
+  editFine(
     @Param() { fineId }: FineIdDto,
     @Body() dto: EditFineDto,
   ): Promise<void> {
-    return this.finesService.editMyFine(myId, fineId, dto);
+    return this.finesService.editFine(fineId, dto);
   }
 
   @Roles([Role.ADMIN])
-  @Patch('all/:fineId')
-  editUserFine(
-    @Param() { fineId }: FineIdDto,
-    @Body() dto: EditFineDto,
-  ): Promise<void> {
-    return this.finesService.editUserFine(fineId, dto);
-  }
-
   @Delete(':fineId')
-  deleteMyFine(
-    @MyId() myId: number,
-    @Param() { fineId }: FineIdDto,
-  ): Promise<void> {
-    return this.finesService.deleteMyFine(myId, fineId);
-  }
-
-  @Roles([Role.ADMIN])
-  @Delete('all/:fineId')
-  deleteUserFine(@Param() { fineId }: FineIdDto): Promise<void> {
-    return this.finesService.deleteUserFine(fineId);
+  deleteFine(@Param() { fineId }: FineIdDto): Promise<void> {
+    return this.finesService.deleteFine(fineId);
   }
 
   @Post(':fineId')
-  payMyFine(
+  payFine(
     @MyId() myId: number,
     @Param() { fineId }: FineIdDto,
     @Body() dto: PayFineDto,
   ): Promise<void> {
-    return this.finesService.payMyFine(myId, fineId, dto);
-  }
-
-  @Roles([Role.ADMIN])
-  @Post('all/:fineId')
-  payUserFine(
-    @Param() { fineId }: FineIdDto,
-    @Body() dto: PayFineDto,
-  ): Promise<void> {
-    return this.finesService.payUserFine(fineId, dto);
+    return this.finesService.payFine(myId, fineId, dto);
   }
 }
