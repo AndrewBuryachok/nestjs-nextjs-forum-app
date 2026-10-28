@@ -6,7 +6,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Field, Input, NumberInput } from '@chakra-ui/react';
 import { Fine } from '../types';
-import { editMyFineAction, editUserFineAction } from '../actions';
+import { editFineAction } from '../actions';
 import { editFineSchema, EditFineType } from '../schema';
 import { useDialogContext } from '@/providers/dialog-provider';
 import { toaster } from '@/components/ui/toaster';
@@ -14,7 +14,6 @@ import CustomForm from '@/components/custom-form';
 
 type Props = {
   fine: Fine;
-  isAll: boolean;
 };
 
 export default function EditFineForm(props: Props) {
@@ -34,9 +33,7 @@ export default function EditFineForm(props: Props) {
   });
 
   const onSubmit = form.handleSubmit(async (data) => {
-    const res = props.isAll
-      ? await editUserFineAction(data)
-      : await editMyFineAction(data);
+    const res = await editFineAction(data);
     if (res.data) {
       if (res.data.ok) {
         const title = t('toasts.fines.edit.success');
