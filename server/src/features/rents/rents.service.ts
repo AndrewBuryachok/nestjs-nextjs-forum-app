@@ -4,10 +4,9 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  OnModuleInit,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, MoreThan, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { Rent } from './rent.entity';
 import { MqttService } from '../mqtt/mqtt.service';
@@ -20,7 +19,7 @@ import { Request, Response } from '../../common/interfaces';
 import { Notification, TransactionType } from '../../common/enums';
 
 @Injectable()
-export class RentsService implements OnModuleInit {
+export class RentsService {
   constructor(
     @InjectRepository(Rent)
     private rentsRepository: Repository<Rent>,
@@ -29,16 +28,6 @@ export class RentsService implements OnModuleInit {
     private transactionsService: TransactionsService,
     private plotsService: PlotsService,
   ) {}
-
-  async onModuleInit() {
-    const rents = await this.rentsRepository.find({
-      relations: { plot: true },
-      where: { completedAt: MoreThan(new Date()) },
-    });
-    for (const rent of rents) {
-      this.addTimeout(rent.id, rent.userId, rent.plot.userId, rent.completedAt);
-    }
-  }
 
   async getMainRents(req: Request): Promise<Response<Rent>> {
     const [data, total] = await this.getRentsQueryBuilder(req)
@@ -95,7 +84,6 @@ export class RentsService implements OnModuleInit {
       rent.id,
       Notification.CREATE_RENT,
     );
-    this.addTimeout(rent.id, dto.userId, plot.userId, rent.completedAt);
     await this.mqttService.sendMessage(
       dto.userId,
       plot.userId,
@@ -126,15 +114,13 @@ export class RentsService implements OnModuleInit {
       sum: rent.plot.price,
       description: rent.plot.name,
     });
-    const date = await this.continue(rent.id, rent.completedAt);
+    await this.continue(rent.id, rent.completedAt);
     this.mqttService.publishNotification(
       rent.userId,
       rent.plot.userId,
       rent.id,
       Notification.CONTINUE_RENT,
     );
-    this.removeTimeout(rent.id);
-    this.addTimeout(rent.id, rent.userId, rent.plot.userId, date);
     await this.mqttService.sendMessage(
       rent.userId,
       rent.plot.userId,
@@ -162,7 +148,6 @@ export class RentsService implements OnModuleInit {
       rent.id,
       Notification.COMPLETE_RENT,
     );
-    this.removeTimeout(rent.id);
     await this.mqttService.sendMessage(
       rent.userId,
       rent.plot.userId,
@@ -207,47 +192,6 @@ export class RentsService implements OnModuleInit {
       relations: { plot: true },
       where: { id },
     });
-  }
-
-  private addTimeout(
-    id: number,
-    rentUserId: number,
-    plotUserId: number,
-    date: Date,
-  ) {
-    const before = new Date(date);
-    before.setDate(before.getDate() - 3);
-    const remind = (userId: number, type: 'rent' | 'plot') =>
-      this.mqttService.scheduleNotification(
-        `rents/${id}/remind/${type}`,
-        before,
-        0,
-        userId,
-        id,
-        Notification.REMIND_RENT,
-        'Ваша аренда скоро закончится',
-      );
-    remind(rentUserId, 'rent');
-    remind(plotUserId, 'plot');
-    const expire = (userId: number, type: 'rent' | 'plot') =>
-      this.mqttService.scheduleNotification(
-        `rents/${id}/expire/${type}`,
-        date,
-        0,
-        userId,
-        id,
-        Notification.EXPIRE_RENT,
-        'Ваша аренда закончилась',
-      );
-    expire(rentUserId, 'rent');
-    expire(plotUserId, 'plot');
-  }
-
-  private removeTimeout(id: number) {
-    for (const type of ['rent', 'plot']) {
-      this.mqttService.unscheduleNotification(`rents/${id}/remind/${type}`);
-      this.mqttService.unscheduleNotification(`rents/${id}/expire/${type}`);
-    }
   }
 
   private async create(dto: CreateRentWithUserDto): Promise<Rent> {

@@ -4,16 +4,9 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  OnModuleInit,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  Brackets,
-  IsNull,
-  MoreThan,
-  Repository,
-  SelectQueryBuilder,
-} from 'typeorm';
+import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { Fine } from './fine.entity';
 import { MqttService } from '../mqtt/mqtt.service';
@@ -25,7 +18,7 @@ import { Request, Response } from '../../common/interfaces';
 import { Notification, TransactionType } from '../../common/enums';
 
 @Injectable()
-export class FinesService implements OnModuleInit {
+export class FinesService {
   constructor(
     @InjectRepository(Fine)
     private finesRepository: Repository<Fine>,
@@ -33,21 +26,6 @@ export class FinesService implements OnModuleInit {
     private cardsService: CardsService,
     private transactionsService: TransactionsService,
   ) {}
-
-  async onModuleInit() {
-    const fines = await this.finesRepository.findBy({
-      completedAt: MoreThan(new Date()),
-      paidAt: IsNull(),
-    });
-    for (const fine of fines) {
-      this.addTimeout(
-        fine.id,
-        fine.senderUserId,
-        fine.receiverUserId,
-        fine.completedAt,
-      );
-    }
-  }
 
   async getMyFines(myId: number, req: Request): Promise<Response<Fine>> {
     const [data, total] = await this.getMyFinesQueryBuilder(myId, req)
@@ -81,12 +59,6 @@ export class FinesService implements OnModuleInit {
       fine.id,
       Notification.CREATE_FINE,
     );
-    this.addTimeout(
-      fine.id,
-      dto.senderUserId,
-      dto.receiverUserId,
-      fine.completedAt,
-    );
     await this.mqttService.sendMessage(
       dto.senderUserId,
       dto.receiverUserId,
@@ -103,7 +75,6 @@ export class FinesService implements OnModuleInit {
   async deleteFine(fineId: number): Promise<void> {
     const fine = await this.throwIfFineNotFound(fineId);
     await this.delete(fine.id);
-    this.removeTimeout(fine.id);
   }
 
   @Transactional()
@@ -125,7 +96,6 @@ export class FinesService implements OnModuleInit {
       fineId,
       Notification.PAY_FINE,
     );
-    this.removeTimeout(fineId);
     await this.mqttService.sendMessage(
       myId,
       fine.senderUserId,
@@ -155,47 +125,6 @@ export class FinesService implements OnModuleInit {
 
   private findFineById(id: number): Promise<Fine | null> {
     return this.finesRepository.findOneBy({ id });
-  }
-
-  private addTimeout(
-    id: number,
-    senderUserId: number,
-    receiverUserId: number,
-    date: Date,
-  ) {
-    const before = new Date(date);
-    before.setDate(before.getDate() - 3);
-    const remind = (userId: number, type: 'sender' | 'receiver') =>
-      this.mqttService.scheduleNotification(
-        `fines/${id}/remind/${type}`,
-        before,
-        0,
-        userId,
-        id,
-        Notification.REMIND_FINE,
-        'Ваш штраф скоро просрочится',
-      );
-    remind(senderUserId, 'sender');
-    remind(receiverUserId, 'receiver');
-    const expire = (userId: number, type: 'sender' | 'receiver') =>
-      this.mqttService.scheduleNotification(
-        `fines/${id}/expire/${type}`,
-        date,
-        0,
-        userId,
-        id,
-        Notification.EXPIRE_FINE,
-        'Ваш штраф просрочился',
-      );
-    expire(senderUserId, 'sender');
-    expire(receiverUserId, 'receiver');
-  }
-
-  private removeTimeout(id: number) {
-    for (const type of ['sender', 'receiver']) {
-      this.mqttService.unscheduleNotification(`fines/${id}/remind/${type}`);
-      this.mqttService.unscheduleNotification(`fines/${id}/expire/${type}`);
-    }
   }
 
   private async create(dto: CreateFineDto): Promise<Fine> {

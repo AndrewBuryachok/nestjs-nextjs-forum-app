@@ -6,7 +6,6 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { SchedulerRegistry } from '@nestjs/schedule';
 import { UsersService } from '../users/users.service';
 import { Notification } from '../../common/enums';
 import { postData } from '../../common/utils';
@@ -19,7 +18,6 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     private configService: ConfigService,
-    private schedulerRegistry: SchedulerRegistry,
     private usersService: UsersService,
   ) {}
 
@@ -74,47 +72,6 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
       this.logger.debug(`Successfully sent message ${text} to ${toUser.nick}`);
     } catch (error) {
       this.logger.error(`Failed to sent message ${text} to ${toUser.nick}`);
-      this.logger.error(error);
-    }
-  }
-
-  scheduleNotification(
-    key: string,
-    date: Date,
-    fromUserId: number,
-    toUserId: number,
-    id: number,
-    notification: Notification,
-    message: string,
-  ) {
-    try {
-      const delay = date.getTime() - Date.now();
-      if (delay > 0 && delay < 24 * 24 * 60 * 60 * 1000) {
-        const timeout = setTimeout(async () => {
-          this.publishNotification(fromUserId, toUserId, id, notification);
-          await this.sendMessage(fromUserId, toUserId, message, true);
-        }, delay);
-        this.schedulerRegistry.addTimeout(key, timeout);
-        this.logger.debug(
-          `Successfully scheduled notification ${key} at ${date.toISOString()}`,
-        );
-      }
-    } catch (error) {
-      this.logger.error(
-        `Failed to schedule notification ${key} at ${date.toISOString()}`,
-      );
-      this.logger.error(error);
-    }
-  }
-
-  unscheduleNotification(key: string) {
-    try {
-      if (this.schedulerRegistry.doesExist('timeout', key)) {
-        this.schedulerRegistry.deleteTimeout(key);
-        this.logger.debug(`Successfully unscheduled notification ${key}`);
-      }
-    } catch (error) {
-      this.logger.error(`Failed to unschedule notification ${key}`);
       this.logger.error(error);
     }
   }
