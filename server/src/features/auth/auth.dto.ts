@@ -1,10 +1,17 @@
-import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class AuthDto {
   @IsNotEmpty()
   @IsString()
   @MinLength(3)
   @MaxLength(16)
+  @Matches(/^\w+$/)
   nick: string;
 
   @IsNotEmpty()
