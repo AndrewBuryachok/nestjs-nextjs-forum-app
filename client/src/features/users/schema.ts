@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { Role } from '@/constants/roles';
 
 export const editMyProfileSchema = z.object({
-  avatar: z.string().min(3).max(16).or(z.literal('')),
+  avatar: z.string().min(3).max(16).regex(/^\w+$/).or(z.literal('')),
 });
 
 export type EditMyProfileType = z.infer<typeof editMyProfileSchema>;
