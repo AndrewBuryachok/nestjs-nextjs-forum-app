@@ -3,6 +3,7 @@ import {
   IsInt,
   IsNotEmpty,
   IsString,
+  Matches,
   MaxLength,
   Min,
   MinLength,
@@ -25,6 +26,7 @@ export class UserNickDto {
   @IsString()
   @MinLength(3)
   @MaxLength(16)
+  @Matches(/^\w+$/)
   nick: string;
 }
 
@@ -36,6 +38,7 @@ export class EditUserProfileDto {
   @IsString()
   @MinLength(3)
   @MaxLength(16)
+  @Matches(/^\w+$/)
   avatar: string;
 }
 
