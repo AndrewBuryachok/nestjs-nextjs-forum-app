@@ -116,7 +116,7 @@ export class ComplaintsService {
     myId: number,
     dto: CreateComplaintMessageDto,
   ): Promise<void> {
-    const complaint = await this.throwIfNotComplaintUser(dto.complaintId, myId);
+    const complaint = await this.throwIfComplaintNotFound(dto.complaintId);
     this.throwIfComplaintAlreadyClosed(complaint);
     await this.createMessage(myId, dto);
     const userId =
@@ -135,20 +135,6 @@ export class ComplaintsService {
     const complaint = await this.findComplaintById(complaintId);
     if (!complaint) {
       throw new NotFoundException(ComplaintError.NOT_FOUND);
-    }
-    return complaint;
-  }
-
-  async throwIfNotComplaintUser(
-    complaintId: number,
-    userId: number,
-  ): Promise<Complaint> {
-    const complaint = await this.throwIfComplaintNotFound(complaintId);
-    if (
-      complaint.senderUserId !== userId &&
-      complaint.receiverUserId !== userId
-    ) {
-      throw new ForbiddenException(ComplaintError.NOT_USER);
     }
     return complaint;
   }
