@@ -13,6 +13,7 @@ export interface Complaint {
 export interface ComplaintMessage {
   id: number;
   user: BaseUser;
+  image: string;
   text: string;
   createdAt: Date;
 }
