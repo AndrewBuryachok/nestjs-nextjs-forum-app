@@ -1,7 +1,7 @@
 'use client';
 
 import { Fragment, useEffect, useRef } from 'react';
-import { Card, Stack, Timeline } from '@chakra-ui/react';
+import { Card, Image, Stack, Timeline } from '@chakra-ui/react';
 import { ComplaintWithMessages } from '../types';
 import { useAuthContext } from '@/providers/auth-provider';
 import CustomSeparator from '@/components/custom-separator';
@@ -71,6 +71,7 @@ export default function ComplaintsTimeline(props: Props) {
                     maxW='xs'
                   >
                     <Card.Body>
+                      <Image rounded='sm' src={message.image} />
                       <Card.Description>{message.text}</Card.Description>
                     </Card.Body>
                   </Card.Root>
