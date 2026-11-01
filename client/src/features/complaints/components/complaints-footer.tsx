@@ -15,10 +15,7 @@ export default function ComplaintsFooter(props: Props) {
 
   const { user } = useAuthContext();
 
-  if (
-    user?.id !== props.complaint.senderUser.id &&
-    user?.id !== props.complaint.receiverUser.id
-  ) {
+  if (!user) {
     return (
       <Alert.Root size='sm' status='neutral'>
         <Alert.Indicator />
