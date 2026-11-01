@@ -28,6 +28,9 @@ export class ComplaintMessage {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
+  @Column({ default: '' })
+  image: string;
+
   @Column()
   text: string;
 

@@ -71,7 +71,12 @@ export class ComplaintsService {
   async getOneComplaint(id: number): Promise<Complaint> {
     return this.getComplaintsQueryBuilder({ id })
       .leftJoin('complaint.messages', 'message')
-      .addSelect(['message.id', 'message.text', 'message.createdAt'])
+      .addSelect([
+        'message.id',
+        'message.image',
+        'message.text',
+        'message.createdAt',
+      ])
       .leftJoin('message.user', 'messageUser')
       .addSelect(['messageUser.id', 'messageUser.nick', 'messageUser.avatar'])
       .getOneOrFail();
