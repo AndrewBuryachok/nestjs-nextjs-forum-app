@@ -117,13 +117,27 @@ export class ProductsService {
   }
 
   async deleteMyProduct(myId: number, productId: number): Promise<void> {
-    await this.throwIfNotProductOwner(productId, myId);
+    const product = await this.throwIfNotProductOwner(productId, myId);
     await this.delete(productId);
+    this.unpublishCreateProductNotification(product.userId, product.id);
   }
 
   async deleteUserProduct(productId: number): Promise<void> {
-    await this.throwIfProductNotFound(productId);
+    const product = await this.throwIfProductNotFound(productId);
     await this.delete(productId);
+    this.unpublishCreateProductNotification(product.userId, product.id);
+  }
+
+  private unpublishCreateProductNotification(
+    userId: number,
+    productId: number,
+  ): void {
+    this.mqttService.unpublishNotification(
+      userId,
+      0,
+      productId,
+      Notification.CREATE_PRODUCT,
+    );
   }
 
   async throwIfProductNotFound(productId: number): Promise<Product> {

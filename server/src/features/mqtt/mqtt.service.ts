@@ -194,6 +194,18 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     );
   }
 
+  unpublishNotification(
+    fromUserId: number,
+    toUserId: number,
+    id: number,
+    notification: Notification,
+  ) {
+    const [action, page] = notification.split(' ');
+    this.unpublish(
+      `notifications/${toUserId}/${page}/${id}/${action}/${fromUserId}`,
+    );
+  }
+
   private publish(topic: string) {
     this.client.publish(
       `${this.configService.getOrThrow('MQTT_TOPIC')}/${topic}`,
