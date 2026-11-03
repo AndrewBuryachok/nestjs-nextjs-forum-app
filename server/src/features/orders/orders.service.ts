@@ -151,6 +151,7 @@ export class OrdersService {
       item: order.item,
     });
     await this.delete(order.id);
+    this.unpublishCreateOrderNotification(order.customerUserId, order.id);
   }
 
   async takeMyOrder(
@@ -266,6 +267,19 @@ export class OrdersService {
       order.executorUserId!,
       order.id,
       Notification.COMPLETE_ORDER,
+    );
+    this.unpublishCreateOrderNotification(order.customerUserId, order.id);
+  }
+
+  private unpublishCreateOrderNotification(
+    userId: number,
+    orderId: number,
+  ): void {
+    this.mqttService.unpublishNotification(
+      userId,
+      0,
+      orderId,
+      Notification.CREATE_ORDER,
     );
   }
 
