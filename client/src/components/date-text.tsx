@@ -1,31 +1,22 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { SkeletonText } from '@chakra-ui/react';
-import CustomText from './custom-text';
 
 type Props = {
   value: Date;
 };
 
 export default function DateText(props: Props) {
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+  const [value, setValue] = useState('');
 
   useEffect(() => {
-    const value = new Date(props.value);
-    setDate(value.toLocaleDateString('uk'));
-    setTime(value.toLocaleTimeString('uk'));
+    const date = new Date(props.value);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    setValue(`${day}.${month} ${hours}:${minutes}`);
   }, [props.value]);
 
-  if (!date || !time) {
-    return <SkeletonText noOfLines={2} />;
-  }
-
-  return (
-    <div>
-      <CustomText value={date} />
-      <CustomText muted value={time} />
-    </div>
-  );
+  return value;
 }

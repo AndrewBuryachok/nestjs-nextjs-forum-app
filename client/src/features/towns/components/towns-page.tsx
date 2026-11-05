@@ -1,7 +1,7 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
 import TownsAction from './towns-action';
-import TownsTable from './towns-table';
+import TownsGallery from './towns-gallery';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.towns;
@@ -14,7 +14,9 @@ export default function TownsPage(props: Props) {
       page='towns'
       tab={props.tab}
       action={<TownsAction tab={props.tab} />}
-      table={<TownsTable tab={props.tab} searchParams={props.searchParams} />}
+      gallery={
+        <TownsGallery tab={props.tab} searchParams={props.searchParams} />
+      }
     />
   );
 }

@@ -9,7 +9,7 @@ export default function BankIconWithText() {
   return (
     <HStack>
       <BankIcon />
-      <CustomText value={t('bank')} />
+      <CustomText bold value={t('bank')} />
     </HStack>
   );
 }

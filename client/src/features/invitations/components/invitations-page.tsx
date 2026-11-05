@@ -1,8 +1,8 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
 import InvitationsAction from './invitations-action';
-import SentInvitationsTable from './sent-invitations-table';
-import ReceivedInvitationsTable from './received-invitations-table';
+import SentInvitationsGallery from './sent-invitations-gallery';
+import ReceivedInvitationsGallery from './received-invitations-gallery';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.invitations;
@@ -15,14 +15,14 @@ export default function InvitationsPage(props: Props) {
       page='invitations'
       tab={props.tab}
       action={<InvitationsAction tab={props.tab} />}
-      table={
+      gallery={
         props.tab === 'sent' ? (
-          <SentInvitationsTable
+          <SentInvitationsGallery
             tab={props.tab}
             searchParams={props.searchParams}
           />
         ) : (
-          <ReceivedInvitationsTable
+          <ReceivedInvitationsGallery
             tab={props.tab}
             searchParams={props.searchParams}
           />

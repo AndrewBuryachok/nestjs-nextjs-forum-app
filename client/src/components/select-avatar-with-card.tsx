@@ -13,7 +13,7 @@ export default function SelectAvatarWithCard(props: Props) {
     <HStack>
       <CustomAvatar user={props.card.user} />
       <div>
-        <CustomText value={props.card.user.nick} />
+        <CustomText bold value={props.card.user.nick} />
         <CustomText muted value={props.card.name} />
       </div>
       {'balance' in props.card && <CurrencyText value={props.card.balance} />}

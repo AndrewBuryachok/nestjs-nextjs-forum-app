@@ -58,7 +58,7 @@ export default function CustomCombobox<T>(props: Props<T>) {
       <Combobox.Positioner>
         <Combobox.Content>
           <Combobox.Empty>
-            <CustomText value={t(`emptyStates.${props.empty}.title`)} />
+            <CustomText bold value={t(`emptyStates.${props.empty}.title`)} />
             <CustomText
               muted
               value={t(`emptyStates.${props.empty}.description`)}

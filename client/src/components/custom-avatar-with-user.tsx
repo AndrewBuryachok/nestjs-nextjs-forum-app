@@ -11,7 +11,7 @@ export default function CustomAvatarWithUser(props: Props) {
   return (
     <HStack>
       <CustomAvatar user={props.user} />
-      <CustomText value={props.user.nick} />
+      <CustomText bold value={props.user.nick} />
     </HStack>
   );
 }

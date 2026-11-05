@@ -13,7 +13,7 @@ export default function ChunkIconWithText(props: Props) {
   return (
     <HStack>
       <ChunkIcon />
-      <CustomText value={value} />
+      <CustomText bold value={value} />
     </HStack>
   );
 }

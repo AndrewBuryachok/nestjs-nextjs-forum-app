@@ -20,6 +20,7 @@ export default function PlaceText(props: Props) {
   return (
     <div>
       <CustomText
+        bold
         value={
           props.cell ? `${props.place.name} #${props.cell}` : props.place.name
         }

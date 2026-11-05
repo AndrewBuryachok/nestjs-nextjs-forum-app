@@ -1,7 +1,7 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
 import TransactionsAction from './transactions-action';
-import TransactionsTable from './transactions-table';
+import TransactionsGallery from './transactions-gallery';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.transactions;
@@ -14,8 +14,11 @@ export default function TransactionsPage(props: Props) {
       page='transactions'
       tab={props.tab}
       action={<TransactionsAction tab={props.tab} />}
-      table={
-        <TransactionsTable tab={props.tab} searchParams={props.searchParams} />
+      gallery={
+        <TransactionsGallery
+          tab={props.tab}
+          searchParams={props.searchParams}
+        />
       }
     />
   );

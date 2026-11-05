@@ -1,6 +1,6 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
-import RentsTable from './rents-table';
+import RentsGallery from './rents-gallery';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.rents;
@@ -12,7 +12,9 @@ export default function RentsPage(props: Props) {
     <CustomPage
       page='rents'
       tab={props.tab}
-      table={<RentsTable tab={props.tab} searchParams={props.searchParams} />}
+      gallery={
+        <RentsGallery tab={props.tab} searchParams={props.searchParams} />
+      }
     />
   );
 }

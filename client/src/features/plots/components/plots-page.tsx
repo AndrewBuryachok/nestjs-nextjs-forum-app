@@ -1,7 +1,7 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
 import PlotsAction from './plots-action';
-import PlotsTable from './plots-table';
+import PlotsGallery from './plots-gallery';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.plots;
@@ -14,7 +14,9 @@ export default function PlotsPage(props: Props) {
       page='plots'
       tab={props.tab}
       action={<PlotsAction tab={props.tab} />}
-      table={<PlotsTable tab={props.tab} searchParams={props.searchParams} />}
+      gallery={
+        <PlotsGallery tab={props.tab} searchParams={props.searchParams} />
+      }
     />
   );
 }

@@ -1,7 +1,7 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
 import LockersAction from './lockers-action';
-import LockersTable from './lockers-table';
+import LockersGallery from './lockers-gallery';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.lockers;
@@ -14,7 +14,9 @@ export default function LockersPage(props: Props) {
       page='lockers'
       tab={props.tab}
       action={<LockersAction tab={props.tab} />}
-      table={<LockersTable tab={props.tab} searchParams={props.searchParams} />}
+      gallery={
+        <LockersGallery tab={props.tab} searchParams={props.searchParams} />
+      }
     />
   );
 }
