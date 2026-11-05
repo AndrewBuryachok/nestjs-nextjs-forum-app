@@ -1,7 +1,7 @@
 export enum FineError {
   ALREADY_PAID = 'Штраф вже сплачено',
-  NOT_SENDER = 'Ви не відправник штрафу',
-  NOT_RECEIVER = 'Ви не отримувач штрафу',
+  NOT_SENDER = 'Ви не стягувач штрафу',
+  NOT_RECEIVER = 'Ви не платник штрафу',
   NOT_FOUND = 'Не вдалося знайти штраф',
   CREATE_FAILED = 'Не вдалося створити штраф',
   EDIT_FAILED = 'Не вдалося редагувати штраф',
