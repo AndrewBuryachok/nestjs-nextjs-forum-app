@@ -21,11 +21,11 @@ export default function ViewFineForm(props: Props) {
         <Input readOnly value={props.fine.id} />
       </Field.Root>
       <Field.Root>
-        <Field.Label>{t('columns.sender')}</Field.Label>
+        <Field.Label>{t('columns.payee')}</Field.Label>
         <CardInput user={props.fine.senderUser} card={props.fine.senderCard} />
       </Field.Root>
       <Field.Root>
-        <Field.Label>{t('columns.receiver')}</Field.Label>
+        <Field.Label>{t('columns.payer')}</Field.Label>
         {props.fine.receiverCard ? (
           <CardInput
             user={props.fine.receiverUser}
