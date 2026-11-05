@@ -1,7 +1,7 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
 import ShopsAction from './shops-action';
-import ShopsTable from './shops-table';
+import ShopsGallery from './shops-gallery';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.shops;
@@ -14,7 +14,9 @@ export default function ShopsPage(props: Props) {
       page='shops'
       tab={props.tab}
       action={<ShopsAction tab={props.tab} />}
-      table={<ShopsTable tab={props.tab} searchParams={props.searchParams} />}
+      gallery={
+        <ShopsGallery tab={props.tab} searchParams={props.searchParams} />
+      }
     />
   );
 }

@@ -8,18 +8,20 @@ type Props = {
 };
 
 export default function DateInput(props: Props) {
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+  const [value, setValue] = useState('');
 
   useEffect(() => {
-    const value = new Date(props.value);
-    setDate(value.toLocaleDateString('uk'));
-    setTime(value.toLocaleTimeString('uk'));
+    const date = new Date(props.value);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    setValue(`${day}.${month} ${hours}:${minutes}`);
   }, [props.value]);
 
-  if (!date || !time) {
+  if (!value) {
     return <Skeleton h='10' w='full' />;
   }
 
-  return <Input readOnly value={date + ' ' + time} />;
+  return <Input readOnly value={value} />;
 }

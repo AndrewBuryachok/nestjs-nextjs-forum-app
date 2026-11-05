@@ -1,7 +1,7 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
 import FinesAction from './fines-action';
-import FinesTable from './fines-table';
+import FinesGallery from './fines-gallery';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.fines;
@@ -14,7 +14,9 @@ export default function FinesPage(props: Props) {
       page='fines'
       tab={props.tab}
       action={<FinesAction tab={props.tab} />}
-      table={<FinesTable tab={props.tab} searchParams={props.searchParams} />}
+      gallery={
+        <FinesGallery tab={props.tab} searchParams={props.searchParams} />
+      }
     />
   );
 }

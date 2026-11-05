@@ -32,10 +32,10 @@
     "submit": "Підтвердити"
   },
   "columns": {
-    "actions": "Дії",
     "amount": "Кількість",
     "avatar": "Аватар",
     "balance": "Баланс",
+    "banker": "Банкір",
     "card": "Карта",
     "cells": "Комірки",
     "chunk": "Чанк",

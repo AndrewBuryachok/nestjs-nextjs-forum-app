@@ -17,11 +17,11 @@ export default function ItemImageWithText(props: Props) {
       <ItemImage item={props.item} />
       {props.description ? (
         <div>
-          <CustomText value={t(`items.${props.item}`)} />
+          <CustomText bold value={t(`items.${props.item}`)} />
           <CustomText muted value={props.description} />
         </div>
       ) : (
-        <CustomText value={t(`items.${props.item}`)} />
+        <CustomText bold value={t(`items.${props.item}`)} />
       )}
     </HStack>
   );

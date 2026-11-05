@@ -4,13 +4,13 @@ import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomHeading from './custom-heading';
 import SearchButton from './search-button';
 import CustomTabs from './custom-tabs';
-import TableSkeleton from './table-skeleton';
+import GallerySkeleton from './gallery-skeleton';
 
 type Props = {
   page: keyof typeof PAGE_TABS_MAP;
   tab: string;
   action?: React.ReactNode;
-  table: React.ReactNode;
+  gallery: React.ReactNode;
 };
 
 export default function CustomPage(props: Props) {
@@ -24,7 +24,7 @@ export default function CustomPage(props: Props) {
         </HStack>
       </Flex>
       <CustomTabs page={props.page} tab={props.tab} />
-      <Suspense fallback={<TableSkeleton />}>{props.table}</Suspense>
+      <Suspense fallback={<GallerySkeleton />}>{props.gallery}</Suspense>
     </>
   );
 }

@@ -1,8 +1,8 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import CustomPage from '@/components/custom-page';
 import ApplicationsAction from './applications-action';
-import SentApplicationsTable from './sent-applications-table';
-import ReceivedApplicationsTable from './received-applications-table';
+import SentApplicationsGallery from './sent-applications-gallery';
+import ReceivedApplicationsGallery from './received-applications-gallery';
 
 type Props = {
   tab: keyof typeof PAGE_TABS_MAP.applications;
@@ -15,14 +15,14 @@ export default function ApplicationsPage(props: Props) {
       page='applications'
       tab={props.tab}
       action={<ApplicationsAction tab={props.tab} />}
-      table={
+      gallery={
         props.tab === 'sent' ? (
-          <SentApplicationsTable
+          <SentApplicationsGallery
             tab={props.tab}
             searchParams={props.searchParams}
           />
         ) : (
-          <ReceivedApplicationsTable
+          <ReceivedApplicationsGallery
             tab={props.tab}
             searchParams={props.searchParams}
           />

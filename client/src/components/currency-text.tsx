@@ -10,5 +10,5 @@ export default function CurrencyText(props: Props) {
 
   const value = `${props.value} ${t('currency')}`;
 
-  return <CustomText value={value} />;
+  return <CustomText big bold value={value} />;
 }
