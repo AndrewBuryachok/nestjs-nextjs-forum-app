@@ -70,13 +70,13 @@ export default function CreateFineForm(props: Props) {
       {props.isAll && (
         <Field.Root required>
           <Field.Label>
-            {t('columns.sender')}
+            {t('columns.payee')}
             <Field.RequiredIndicator />
           </Field.Label>
           <UsersCombobox
             data={users.data}
             loading={users.isLoading}
-            placeholder={t('columns.sender')}
+            placeholder={t('columns.payee')}
             value={senderUserId}
             setValue={setSenderUserId}
           />
@@ -103,7 +103,7 @@ export default function CreateFineForm(props: Props) {
       </Field.Root>
       <Field.Root required>
         <Field.Label>
-          {t('columns.receiver')}
+          {t('columns.payer')}
           <Field.RequiredIndicator />
         </Field.Label>
         <Controller
@@ -113,7 +113,7 @@ export default function CreateFineForm(props: Props) {
             <UsersCombobox
               data={users.data}
               loading={users.isLoading}
-              placeholder={t('columns.receiver')}
+              placeholder={t('columns.payer')}
               value={field.value}
               setValue={field.onChange}
             />

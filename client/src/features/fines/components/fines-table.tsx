@@ -21,7 +21,7 @@ export default function FinesTable(props: Props) {
       searchParams={props.searchParams}
       columns={[
         {
-          value: 'sender',
+          value: 'payee',
           render: (fine) => (
             <CustomAvatarWithCard
               user={fine.senderUser}
@@ -30,7 +30,7 @@ export default function FinesTable(props: Props) {
           ),
         },
         {
-          value: 'receiver',
+          value: 'payer',
           render: (fine) =>
             fine.receiverCard ? (
               <CustomAvatarWithCard
