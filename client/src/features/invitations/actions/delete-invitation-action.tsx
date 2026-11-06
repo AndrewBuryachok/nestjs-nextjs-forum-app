@@ -4,6 +4,7 @@ import DeleteInvitationForm from '../forms/delete-invitation-form';
 import { Color } from '@/constants/colors';
 
 export const deleteInvitationAction = (user: User) => ({
+  button: true,
   action: 'delete',
   dialog: 'invitation',
   color: Color.RED,

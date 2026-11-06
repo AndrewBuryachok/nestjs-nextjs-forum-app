@@ -1,12 +1,11 @@
 import { LuTrash2 } from 'react-icons/lu';
 import { Product } from '../types';
 import DeleteProductForm from '../forms/delete-product-form';
-import { Color } from '@/constants/colors';
 
 export const deleteProductFactory = (product: Product, isAll: boolean) => ({
+  danger: true,
   action: 'delete',
   dialog: 'product',
-  color: Color.RED,
   icon: <LuTrash2 />,
   body: <DeleteProductForm product={product} isAll={isAll} />,
 });

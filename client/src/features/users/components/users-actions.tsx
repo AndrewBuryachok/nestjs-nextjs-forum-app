@@ -1,7 +1,8 @@
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import { User } from '../types';
 import { viewUserAction } from '../actions/view-user-action';
-import { editUserAction } from '../actions/edit-user-action';
+import { editUserProfileAction } from '../actions/edit-user-profile-action';
+import { changeUserPasswordAction } from '../actions/change-user-password-action';
 import { addUserRoleAction } from '../actions/add-user-role-action';
 import { removeUserRoleAction } from '../actions/remove-user-role-action';
 import CustomActions from '@/components/custom-actions';
@@ -14,7 +15,12 @@ type Props = {
 export default function UsersActions(props: Props) {
   const actions = {
     main: [],
-    all: [editUserAction, addUserRoleAction, removeUserRoleAction],
+    all: [
+      editUserProfileAction,
+      changeUserPasswordAction,
+      addUserRoleAction,
+      removeUserRoleAction,
+    ],
   }[props.tab];
 
   return (

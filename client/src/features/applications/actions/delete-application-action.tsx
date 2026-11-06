@@ -4,6 +4,7 @@ import DeleteApplicationForm from '../forms/delete-application-form';
 import { Color } from '@/constants/colors';
 
 export const deleteApplicationAction = (town: Town) => ({
+  button: true,
   action: 'delete',
   dialog: 'application',
   color: Color.RED,
