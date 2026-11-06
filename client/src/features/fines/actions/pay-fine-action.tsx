@@ -1,15 +1,16 @@
-import { LuPlus } from 'react-icons/lu';
+import { LuBanknote } from 'react-icons/lu';
 import { Fine } from '../types';
 import PayFineForm from '../forms/pay-fine-form';
 import { Color } from '@/constants/colors';
 
 export const payFineFactory = (fine: Fine, isAll: boolean) => ({
+  button: true,
   action: 'pay',
   dialog: 'fine',
   color: Color.GREEN,
   disabled: !!fine.paidAt,
   userId: isAll ? 0 : fine.receiverUser.id,
-  icon: <LuPlus />,
+  icon: <LuBanknote />,
   body: <PayFineForm fine={fine} isAll={isAll} />,
 });
 

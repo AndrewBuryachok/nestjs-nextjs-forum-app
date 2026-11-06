@@ -1,16 +1,17 @@
-import { LuMinus } from 'react-icons/lu';
+import { LuX } from 'react-icons/lu';
 import { Order } from '../types';
 import CancelOrderForm from '../forms/cancel-order-form';
 import { Color } from '@/constants/colors';
 import { Status } from '@/constants/statuses';
 
 export const cancelOrderFactory = (order: Order, isAll: boolean) => ({
+  button: true,
   action: 'cancel',
   dialog: 'order',
   color: Color.RED,
   disabled: order.status !== Status.TAKEN,
   userId: isAll ? 0 : order.executorUser?.id,
-  icon: <LuMinus />,
+  icon: <LuX />,
   body: <CancelOrderForm order={order} isAll={isAll} />,
 });
 

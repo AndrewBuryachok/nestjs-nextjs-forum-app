@@ -1,12 +1,10 @@
 import { LuPencil } from 'react-icons/lu';
 import { Plot } from '../types';
 import EditPlotForm from '../forms/edit-plot-form';
-import { Color } from '@/constants/colors';
 
 export const editPlotFactory = (plot: Plot, isAll: boolean) => ({
   action: 'edit',
   dialog: 'plot',
-  color: Color.YELLOW,
   icon: <LuPencil />,
   body: <EditPlotForm plot={plot} isAll={isAll} />,
 });

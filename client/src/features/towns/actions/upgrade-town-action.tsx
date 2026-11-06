@@ -1,9 +1,10 @@
-import { LuPlus } from 'react-icons/lu';
+import { LuArrowBigUp } from 'react-icons/lu';
 import { Town } from '../types';
 import UpgradeTownForm from '../forms/upgrade-town-form';
 import { Color } from '@/constants/colors';
 
 export const upgradeTownFactory = (town: Town, isAll: boolean) => ({
+  button: true,
   action: 'upgrade',
   dialog: 'town',
   color: Color.GREEN,
@@ -14,7 +15,7 @@ export const upgradeTownFactory = (town: Town, isAll: boolean) => ({
         process.env.NEXT_PUBLIC_MIN_TOWN_USERS!.split(',')[town.level - 1],
       ),
   userId: isAll ? 0 : town.user.id,
-  icon: <LuPlus />,
+  icon: <LuArrowBigUp />,
   body: <UpgradeTownForm town={town} isAll={isAll} />,
 });
 

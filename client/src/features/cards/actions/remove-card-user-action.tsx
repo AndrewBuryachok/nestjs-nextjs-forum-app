@@ -4,6 +4,7 @@ import RemoveCardUserForm from '../forms/remove-card-user-form';
 import { Color } from '@/constants/colors';
 
 export const removeCardUserFactory = (card: Card, isAll: boolean) => ({
+  button: true,
   action: 'remove',
   dialog: 'user',
   color: Color.RED,

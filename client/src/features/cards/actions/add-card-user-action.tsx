@@ -4,6 +4,7 @@ import AddCardUserForm from '../forms/add-card-user-form';
 import { Color } from '@/constants/colors';
 
 export const addCardUserFactory = (card: Card, isAll: boolean) => ({
+  button: true,
   action: 'add',
   dialog: 'user',
   color: Color.GREEN,

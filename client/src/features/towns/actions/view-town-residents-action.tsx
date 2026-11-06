@@ -1,9 +1,12 @@
+import { LuUsers } from 'react-icons/lu';
 import { Town } from '../types';
 import ViewTownResidentsForm from '../forms/view-town-residents-form';
 
 export const viewTownResidentsAction = (town: Town) => ({
+  button: true,
+  number: town.users,
   action: 'view',
   dialog: 'residents',
-  icon: `${town.users}/${process.env.NEXT_PUBLIC_MIN_TOWN_USERS!.split(',')[town.level - 1]}`,
+  icon: <LuUsers />,
   body: <ViewTownResidentsForm town={town} />,
 });

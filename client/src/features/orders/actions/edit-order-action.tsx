@@ -1,13 +1,11 @@
 import { LuPencil } from 'react-icons/lu';
 import { Order } from '../types';
 import EditOrderForm from '../forms/edit-order-form';
-import { Color } from '@/constants/colors';
 import { Status } from '@/constants/statuses';
 
 export const editOrderFactory = (order: Order, isAll: boolean) => ({
   action: 'edit',
   dialog: 'order',
-  color: Color.YELLOW,
   disabled: order.status !== Status.CREATED,
   userId: isAll ? 0 : order.customerUser.id,
   icon: <LuPencil />,

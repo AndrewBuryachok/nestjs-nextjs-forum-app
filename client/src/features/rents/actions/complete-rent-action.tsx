@@ -1,15 +1,16 @@
-import { LuMinus } from 'react-icons/lu';
+import { LuX } from 'react-icons/lu';
 import { Rent } from '../types';
 import CompleteRentForm from '../forms/complete-rent-form';
 import { Color } from '@/constants/colors';
 
 export const completeRentFactory = (rent: Rent, isAll: boolean) => ({
+  button: true,
   action: 'complete',
   dialog: 'rent',
   color: Color.RED,
   disabled: new Date(rent.completedAt) < new Date(),
   userId: isAll ? 0 : rent.user.id,
-  icon: <LuMinus />,
+  icon: <LuX />,
   body: <CompleteRentForm rent={rent} isAll={isAll} />,
 });
 
