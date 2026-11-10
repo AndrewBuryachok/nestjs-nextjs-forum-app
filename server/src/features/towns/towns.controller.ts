@@ -53,6 +53,12 @@ export class TownsController {
   }
 
   @Public()
+  @Get('all/chunks')
+  selectAllChunks(): Promise<TownChunk[]> {
+    return this.townsService.selectAllChunks();
+  }
+
+  @Public()
   @Get(':townId/chunks')
   selectTownChunks(@Param() { townId }: TownIdDto): Promise<TownChunk[]> {
     return this.townsService.selectTownChunks(townId);

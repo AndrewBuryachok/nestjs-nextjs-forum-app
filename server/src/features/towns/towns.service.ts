@@ -70,6 +70,12 @@ export class TownsService {
     return this.selectTownsQueryBuilder().getMany();
   }
 
+  selectAllChunks(): Promise<TownChunk[]> {
+    return this.selectTownsChunksQueryBuilder()
+      .addSelect(['townChunk.townId'])
+      .getMany();
+  }
+
   selectTownChunks(townId: number): Promise<TownChunk[]> {
     return this.selectTownsChunksQueryBuilder()
       .where('townChunk.townId = :townId', { townId })
