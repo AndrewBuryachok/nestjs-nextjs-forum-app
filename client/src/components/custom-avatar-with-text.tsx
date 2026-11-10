@@ -5,7 +5,7 @@ import CustomText from './custom-text';
 
 type Props = {
   user: BaseUser;
-  value: string;
+  value: React.ReactNode;
 };
 
 export default function CustomAvatarWithText(props: Props) {

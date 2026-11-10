@@ -1,7 +1,7 @@
 import { Card, Flex } from '@chakra-ui/react';
 import { User } from '../../users/types';
 import CardWrapper from '@/components/card-wrapper';
-import CustomAvatarWithUser from '@/components/custom-avatar-with-user';
+import CustomAvatarWithOnline from '@/components/custom-avatar-with-online';
 import RolesBadge from '@/components/roles-badge';
 import SentInvitationsActions from './sent-invitations-actions';
 
@@ -14,7 +14,7 @@ export default function SentInvitationsCard(props: Props) {
     <CardWrapper>
       <Card.Body>
         <Flex justify='space-between'>
-          <CustomAvatarWithUser user={props.user} />
+          <CustomAvatarWithOnline user={props.user} />
           <RolesBadge roles={props.user.roles} />
         </Flex>
       </Card.Body>

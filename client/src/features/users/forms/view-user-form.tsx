@@ -48,6 +48,10 @@ export default function ViewUserForm(props: Props) {
         <Field.Label>{t('columns.registered')}</Field.Label>
         <DateInput value={props.user.createdAt} />
       </Field.Root>
+      <Field.Root>
+        <Field.Label>{t('columns.online')}</Field.Label>
+        <DateInput value={props.user.onlineAt} />
+      </Field.Root>
     </ViewForm>
   );
 }
