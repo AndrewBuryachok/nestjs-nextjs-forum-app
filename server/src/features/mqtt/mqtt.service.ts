@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
+import { UsersService } from '../users/users.service';
 import { Notification } from '../../common/enums';
 
 @Injectable()
@@ -18,20 +19,38 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
   constructor(
     private configService: ConfigService,
     private schedulerRegistry: SchedulerRegistry,
+    private usersService: UsersService,
   ) {}
 
   onModuleInit() {
     this.client = mqtt.connect(this.configService.getOrThrow('MQTT_URL'), {
       protocolVersion: 5,
     });
-    this.client.on('connect', () => {
+    this.client.on('connect', async () => {
       this.logger.log('MQTT connect');
+      try {
+        await this.usersService.resetUsersOnline();
+      } catch (error) {
+        this.logger.error(error);
+      }
+      this.client.subscribe(
+        `${this.configService.getOrThrow('MQTT_TOPIC')}/users/+`,
+      );
     });
     this.client.on('offline', () => {
       this.logger.error('MQTT offline');
     });
     this.client.on('error', (error) => {
       this.logger.error(error.message);
+    });
+    this.client.on('message', async (topic, payload) => {
+      try {
+        const userId = Number(topic.split('/')[2]);
+        const isOnline = !!payload.length;
+        await this.usersService.setUserOnline(userId, isOnline);
+      } catch (error) {
+        this.logger.error(error);
+      }
     });
   }
 
