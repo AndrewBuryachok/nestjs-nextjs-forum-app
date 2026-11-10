@@ -2,7 +2,7 @@ import { Card, Flex } from '@chakra-ui/react';
 import { PAGE_TABS_MAP } from '@/config/navigation';
 import { User } from '../../users/types';
 import CardWrapper from '@/components/card-wrapper';
-import CustomAvatarWithUser from '@/components/custom-avatar-with-user';
+import CustomAvatarWithOnline from '@/components/custom-avatar-with-online';
 import RolesBadge from '@/components/roles-badge';
 import ResidentsActions from './residents-actions';
 
@@ -16,7 +16,7 @@ export default function ResidentsCard(props: Props) {
     <CardWrapper>
       <Card.Body>
         <Flex justify='space-between'>
-          <CustomAvatarWithUser user={props.user} />
+          <CustomAvatarWithOnline user={props.user} />
           <RolesBadge roles={props.user.roles} />
         </Flex>
       </Card.Body>
