@@ -19,3 +19,7 @@ export interface TownChunk {
   x: number;
   y: number;
 }
+
+export interface TownChunkWithTown extends TownChunk {
+  townId: number;
+}
