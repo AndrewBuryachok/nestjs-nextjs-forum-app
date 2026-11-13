@@ -38,6 +38,12 @@ export const editTownSchema = z.object({
 
 export type EditTownType = z.infer<typeof editTownSchema>;
 
+export const deleteTownSchema = z.object({
+  townId: z.number().int().min(1),
+});
+
+export type DeleteTownType = z.infer<typeof deleteTownSchema>;
+
 export const updateTownChunkSchema = z.object({
   townId: z.number().int().min(1),
   x: z.number().int().min(-1000).max(1000),
