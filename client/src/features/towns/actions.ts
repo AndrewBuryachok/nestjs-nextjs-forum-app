@@ -3,6 +3,7 @@
 import {
   createTownSchema,
   createTownWithUserSchema,
+  deleteTownSchema,
   editTownSchema,
   updateTownChunkSchema,
   upgradeTownSchema,
@@ -44,6 +45,18 @@ export const editUserTownAction = actionClient
   .inputSchema(editTownSchema)
   .action(({ parsedInput: { townId, ...body } }) => {
     return send('PATCH', `/towns/all/${townId}`, body);
+  });
+
+export const deleteMyTownAction = actionClient
+  .inputSchema(deleteTownSchema)
+  .action(({ parsedInput: { townId } }) => {
+    return send('DELETE', `/towns/${townId}`);
+  });
+
+export const deleteUserTownAction = actionClient
+  .inputSchema(deleteTownSchema)
+  .action(({ parsedInput: { townId } }) => {
+    return send('DELETE', `/towns/all/${townId}`);
   });
 
 export const addMyTownChunkAction = actionClient

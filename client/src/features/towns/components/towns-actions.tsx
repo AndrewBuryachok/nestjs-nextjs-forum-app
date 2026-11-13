@@ -19,6 +19,10 @@ import {
   editMyTownAction,
   editUserTownAction,
 } from '../actions/edit-town-action';
+import {
+  deleteMyTownAction,
+  deleteUserTownAction,
+} from '../actions/delete-town-action';
 import CustomActions from '@/components/custom-actions';
 
 type Props = {
@@ -34,12 +38,14 @@ export default function TownsActions(props: Props) {
       addMyTownChunkAction,
       removeMyTownChunkAction,
       editMyTownAction,
+      deleteMyTownAction,
     ],
     all: [
       upgradeUserTownAction,
       addUserTownChunkAction,
       removeUserTownChunkAction,
       editUserTownAction,
+      deleteUserTownAction,
     ],
   }[props.tab];
 
