@@ -110,6 +110,20 @@ export class TownsController {
     return this.townsService.editUserTown(townId, dto);
   }
 
+  @Delete(':townId')
+  deleteMyTown(
+    @MyId() myId: number,
+    @Param() { townId }: TownIdDto,
+  ): Promise<void> {
+    return this.townsService.deleteMyTown(myId, townId);
+  }
+
+  @Roles([Role.ADMIN])
+  @Delete('all/:townId')
+  deleteUserTown(@Param() { townId }: TownIdDto): Promise<void> {
+    return this.townsService.deleteUserTown(townId);
+  }
+
   @Post(':townId/chunks')
   addMyTownChunk(
     @MyId() myId: number,

@@ -6,7 +6,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { TownUser } from './town-user.entity';
 import { TownsService } from './towns.service';
 import { MqttService } from '../mqtt/mqtt.service';
@@ -82,6 +82,12 @@ export class ResidentsService {
     );
   }
 
+  async deleteTownResidents(townId: number): Promise<number[]> {
+    const townUsers = await this.townsUsersRepository.findBy({ townId });
+    await this.deleteTown(townId);
+    return townUsers.map((townUser) => townUser.userId);
+  }
+
   countTownResidents(townId: number): Promise<number> {
     return this.townsUsersRepository.countBy({ townId });
   }
@@ -128,6 +134,17 @@ export class ResidentsService {
       await this.townsUsersRepository.softDelete({ id });
     } catch (error) {
       throw new InternalServerErrorException(ResidentError.DELETE_FAILED);
+    }
+  }
+
+  private async deleteTown(townId: number): Promise<void> {
+    try {
+      await this.townsUsersRepository.softDelete({
+        townId,
+        deletedAt: IsNull(),
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(ResidentError.DELETE_TOWN_FAILED);
     }
   }
 }
