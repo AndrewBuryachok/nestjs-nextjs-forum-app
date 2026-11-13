@@ -10,6 +10,8 @@ export enum TownError {
   CREATE_FAILED = 'Не вдалося створити місто',
   UPGRADE_FAILED = 'Не вдалося покращити місто',
   EDIT_FAILED = 'Не вдалося редагувати місто',
+  DELETE_FAILED = 'Не вдалося видалити місто',
   ADD_CHUNK_FAILED = 'Не вдалося додати чанк',
   REMOVE_CHUNK_FAILED = 'Не вдалося прибрати чанк',
+  REMOVE_CHUNKS_FAILED = 'Не вдалося прибрати чанки',
 }

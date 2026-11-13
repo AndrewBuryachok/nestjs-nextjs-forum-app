@@ -9,11 +9,13 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, IsNull, Repository, SelectQueryBuilder } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { Town } from './town.entity';
 import { TownChunk } from './town-chunk.entity';
 import { ResidentsService } from './residents.service';
+import { InvitationsService } from './invitations.service';
+import { ApplicationsService } from './applications.service';
 import { MqttService } from '../mqtt/mqtt.service';
 import { UsersService } from '../users/users.service';
 import {
@@ -35,6 +37,10 @@ export class TownsService {
     private configService: ConfigService,
     @Inject(forwardRef(() => ResidentsService))
     private residentsService: ResidentsService,
+    @Inject(forwardRef(() => InvitationsService))
+    private invitationsService: InvitationsService,
+    @Inject(forwardRef(() => ApplicationsService))
+    private applicationsService: ApplicationsService,
     private mqttService: MqttService,
     private usersService: UsersService,
   ) {}
@@ -135,6 +141,25 @@ export class TownsService {
   async editUserTown(townId: number, dto: EditTownDto): Promise<void> {
     await this.throwIfTownNotFound(townId);
     await this.edit(townId, dto);
+  }
+
+  async deleteMyTown(myId: number, townId: number): Promise<void> {
+    const town = await this.throwIfNotTownOwner(townId, myId);
+    await this.deleteTown(town);
+  }
+
+  async deleteUserTown(townId: number): Promise<void> {
+    const town = await this.throwIfTownNotFound(townId);
+    await this.deleteTown(town);
+  }
+
+  @Transactional()
+  private async deleteTown(town: Town): Promise<void> {
+    await this.invitationsService.deleteTownInvitations(town.id);
+    await this.applicationsService.deleteTownApplications(town.id);
+    await this.removeChunks(town.id);
+    await this.residentsService.deleteTownResidents(town.id);
+    await this.delete(town.id);
   }
 
   async addMyTownChunk(
@@ -278,6 +303,14 @@ export class TownsService {
     }
   }
 
+  private async delete(id: number): Promise<void> {
+    try {
+      await this.townsRepository.softDelete({ id });
+    } catch (error) {
+      throw new InternalServerErrorException(TownError.DELETE_FAILED);
+    }
+  }
+
   private async addChunk(townId: number, x: number, y: number): Promise<void> {
     try {
       const townChunk = this.townsChunksRepository.create({ townId, x, y });
@@ -292,6 +325,17 @@ export class TownsService {
       await this.townsChunksRepository.softDelete({ id });
     } catch (error) {
       throw new InternalServerErrorException(TownError.REMOVE_CHUNK_FAILED);
+    }
+  }
+
+  private async removeChunks(townId: number): Promise<void> {
+    try {
+      await this.townsChunksRepository.softDelete({
+        townId,
+        deletedAt: IsNull(),
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(TownError.REMOVE_CHUNKS_FAILED);
     }
   }
 

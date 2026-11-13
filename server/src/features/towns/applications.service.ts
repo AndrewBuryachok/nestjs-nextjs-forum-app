@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -25,6 +27,7 @@ export class ApplicationsService {
     @InjectRepository(Application)
     private applicationsRepository: Repository<Application>,
     private mqttService: MqttService,
+    @Inject(forwardRef(() => TownsService))
     private townsService: TownsService,
     private residentsService: ResidentsService,
     private usersService: UsersService,
@@ -86,6 +89,10 @@ export class ApplicationsService {
       myId,
       Notification.DELETE_APPLICATION,
     );
+  }
+
+  async deleteTownApplications(townId: number): Promise<void> {
+    await this.deleteTown(townId);
   }
 
   @Transactional()
@@ -160,6 +167,19 @@ export class ApplicationsService {
       );
     } catch (error) {
       throw new InternalServerErrorException(ApplicationError.DELETE_FAILED);
+    }
+  }
+
+  private async deleteTown(townId: number): Promise<void> {
+    try {
+      await this.applicationsRepository.update(
+        { townId, resolvedAt: IsNull() },
+        { resolvedAt: new Date() },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(
+        ApplicationError.DELETE_TOWN_FAILED,
+      );
     }
   }
 

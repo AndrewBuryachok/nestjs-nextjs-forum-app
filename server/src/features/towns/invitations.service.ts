@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -25,6 +27,7 @@ export class InvitationsService {
     @InjectRepository(Invitation)
     private invitationsRepository: Repository<Invitation>,
     private mqttService: MqttService,
+    @Inject(forwardRef(() => TownsService))
     private townsService: TownsService,
     private residentsService: ResidentsService,
     private usersService: UsersService,
@@ -88,6 +91,10 @@ export class InvitationsService {
       town.id,
       Notification.DELETE_INVITATION,
     );
+  }
+
+  async deleteTownInvitations(townId: number): Promise<void> {
+    await this.deleteTown(townId);
   }
 
   @Transactional()
@@ -157,6 +164,19 @@ export class InvitationsService {
       );
     } catch (error) {
       throw new InternalServerErrorException(InvitationError.DELETE_FAILED);
+    }
+  }
+
+  private async deleteTown(townId: number): Promise<void> {
+    try {
+      await this.invitationsRepository.update(
+        { townId, resolvedAt: IsNull() },
+        { resolvedAt: new Date() },
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(
+        InvitationError.DELETE_TOWN_FAILED,
+      );
     }
   }
 

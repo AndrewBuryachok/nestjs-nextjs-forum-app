@@ -5,4 +5,5 @@ export enum ResidentError {
   NOT_RESIDENT = 'Ви не житель жодного міста',
   CREATE_FAILED = 'Не вдалося додати жителя',
   DELETE_FAILED = 'Не вдалося прибрати жителя',
+  DELETE_TOWN_FAILED = 'Не вдалося прибрати жителів',
 }
