@@ -21,4 +21,6 @@ export interface Order {
   executorUser?: BaseUser;
   executorCard?: BaseCard;
   completedAt?: Date;
+  isFrom?: boolean;
+  isTo?: boolean;
 }

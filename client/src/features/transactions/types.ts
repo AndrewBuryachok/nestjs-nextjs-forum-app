@@ -15,4 +15,6 @@ export interface Transaction {
   description: string;
   item?: Item;
   createdAt: Date;
+  isFrom?: boolean;
+  isTo?: boolean;
 }

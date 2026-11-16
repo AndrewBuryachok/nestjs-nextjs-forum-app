@@ -26,7 +26,11 @@ export default function TransactionsCard(props: Props) {
             description={props.transaction.description}
             item={props.transaction.item}
           />
-          <CurrencyText value={props.transaction.sum} />
+          <CurrencyText
+            isFrom={props.transaction.isFrom}
+            isTo={props.transaction.isTo}
+            value={props.transaction.sum}
+          />
         </Flex>
       </Card.Header>
       <Card.Body>

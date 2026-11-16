@@ -22,7 +22,11 @@ export default function RentsCard(props: Props) {
       <Card.Header>
         <Flex justify='space-between'>
           <PlaceIconWithText place={props.rent.plot} />
-          <CurrencyText value={props.rent.plot.price} />
+          <CurrencyText
+            isFrom={props.rent.isFrom}
+            isTo={props.rent.isTo}
+            value={props.rent.plot.price}
+          />
         </Flex>
       </Card.Header>
       <Card.Body>

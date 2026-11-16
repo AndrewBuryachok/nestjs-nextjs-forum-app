@@ -27,7 +27,11 @@ export default function OrdersCard(props: Props) {
             item={props.order.item}
             description={props.order.description}
           />
-          <CurrencyText value={props.order.sum} />
+          <CurrencyText
+            isFrom={props.order.isFrom}
+            isTo={props.order.isTo}
+            value={props.order.sum}
+          />
         </Flex>
       </Card.Header>
       <Card.Header>

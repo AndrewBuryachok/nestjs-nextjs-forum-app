@@ -29,7 +29,11 @@ export default function FinesCard(props: Props) {
             </SquareIcon>
             <CustomText bold value={props.fine.description} />
           </HStack>
-          <CurrencyText value={props.fine.sum} />
+          <CurrencyText
+            isFrom={props.fine.isFrom}
+            isTo={props.fine.isTo}
+            value={props.fine.sum}
+          />
         </Flex>
       </Card.Header>
       <Card.Body>

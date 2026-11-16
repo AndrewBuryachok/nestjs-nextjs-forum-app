@@ -12,4 +12,6 @@ export interface Fine {
   createdAt: Date;
   completedAt: Date;
   paidAt?: Date;
+  isFrom?: boolean;
+  isTo?: boolean;
 }

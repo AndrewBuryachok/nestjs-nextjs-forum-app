@@ -17,4 +17,6 @@ export interface BaseRentWithUserAndCard {
 
 export interface Rent extends BaseRentWithUserAndCard {
   plot: BasePlotWithUserAndCardAndPrice;
+  isFrom?: boolean;
+  isTo?: boolean;
 }
