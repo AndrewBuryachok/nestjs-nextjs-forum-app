@@ -41,4 +41,8 @@ export class Rent {
 
   @Column({ type: 'timestamptz', name: 'completed_at' })
   completedAt: Date;
+
+  isFrom?: boolean;
+
+  isTo?: boolean;
 }

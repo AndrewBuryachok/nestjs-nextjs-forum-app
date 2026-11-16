@@ -45,7 +45,7 @@ export class OrdersService {
     const [data, total] = await this.getMyOrdersQueryBuilder(myId, req)
       .andWhere('order.completedAt IS NULL')
       .getManyAndCount();
-    return { data, total };
+    return { data: await this.withIsFromAndIsTo(data, myId), total };
   }
 
   async getCompletedOrders(
@@ -55,7 +55,7 @@ export class OrdersService {
     const [data, total] = await this.getMyOrdersQueryBuilder(myId, req)
       .andWhere('order.completedAt IS NOT NULL')
       .getManyAndCount();
-    return { data, total };
+    return { data: await this.withIsFromAndIsTo(data, myId), total };
   }
 
   async getAllOrders(req: Request): Promise<Response<Order>> {
@@ -428,6 +428,18 @@ export class OrdersService {
     } catch (error) {
       throw new InternalServerErrorException(OrderError.COMPLETE_FAILED);
     }
+  }
+
+  private async withIsFromAndIsTo(
+    orders: Order[],
+    userId: number,
+  ): Promise<Order[]> {
+    const cards = await this.cardsService.findIdsByUser(userId);
+    for (const order of orders) {
+      order.isFrom = cards.has(order.customerCard.id);
+      order.isTo = !!order.executorCard && cards.has(order.executorCard.id);
+    }
+    return orders;
   }
 
   private getMyOrdersQueryBuilder(

@@ -50,14 +50,14 @@ export class RentsService implements OnModuleInit {
     const [data, total] = await this.getMyRentsQueryBuilder(myId, req)
       .andWhere('rent.completedAt > NOW()')
       .getManyAndCount();
-    return { data, total };
+    return { data: await this.withIsFromAndIsTo(data, myId), total };
   }
 
   async getCompletedRents(myId: number, req: Request): Promise<Response<Rent>> {
     const [data, total] = await this.getMyRentsQueryBuilder(myId, req)
       .andWhere('rent.completedAt < NOW()')
       .getManyAndCount();
-    return { data, total };
+    return { data: await this.withIsFromAndIsTo(data, myId), total };
   }
 
   async getAllRents(req: Request): Promise<Response<Rent>> {
@@ -260,6 +260,18 @@ export class RentsService implements OnModuleInit {
       .addSelect(['plot.id', 'plot.name', 'plot.world', 'plot.x', 'plot.y'])
       .where('rent.completedAt > NOW()')
       .orderBy('plot.name', 'ASC');
+  }
+
+  private async withIsFromAndIsTo(
+    rents: Rent[],
+    userId: number,
+  ): Promise<Rent[]> {
+    const cards = await this.cardsService.findIdsByUser(userId);
+    for (const rent of rents) {
+      rent.isFrom = cards.has(rent.card.id);
+      rent.isTo = cards.has(rent.plot.card.id);
+    }
+    return rents;
   }
 
   private getMyRentsQueryBuilder(

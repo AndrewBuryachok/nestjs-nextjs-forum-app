@@ -43,7 +43,7 @@ export class TransactionsService {
         { myId },
       )
       .getManyAndCount();
-    return { data, total };
+    return { data: await this.withIsFromAndIsTo(data, myId), total };
   }
 
   async getAllTransactions(req: Request): Promise<Response<Transaction>> {
@@ -253,6 +253,20 @@ export class TransactionsService {
     } catch (error) {
       throw new InternalServerErrorException(TransactionError.DELETE_FAILED);
     }
+  }
+
+  private async withIsFromAndIsTo(
+    transactions: Transaction[],
+    userId: number,
+  ): Promise<Transaction[]> {
+    const cards = await this.cardsService.findIdsByUser(userId);
+    for (const transaction of transactions) {
+      transaction.isFrom =
+        !!transaction.senderCard && cards.has(transaction.senderCard.id);
+      transaction.isTo =
+        !!transaction.receiverCard && cards.has(transaction.receiverCard.id);
+    }
+    return transactions;
   }
 
   private getTransactionsQueryBuilder(

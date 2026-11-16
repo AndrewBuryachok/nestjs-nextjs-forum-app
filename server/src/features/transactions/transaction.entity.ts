@@ -64,4 +64,8 @@ export class Transaction {
 
   @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
   createdAt: Date;
+
+  isFrom?: boolean;
+
+  isTo?: boolean;
 }

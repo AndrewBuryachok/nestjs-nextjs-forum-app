@@ -56,4 +56,8 @@ export class Fine {
 
   @Column({ type: 'timestamptz', name: 'paid_at', nullable: true })
   paidAt?: Date;
+
+  isFrom?: boolean;
+
+  isTo?: boolean;
 }

@@ -77,4 +77,8 @@ export class Order {
 
   @Column({ type: 'timestamptz', name: 'completed_at', nullable: true })
   completedAt?: Date;
+
+  isFrom?: boolean;
+
+  isTo?: boolean;
 }

@@ -48,14 +48,14 @@ export class FinesService implements OnModuleInit {
     const [data, total] = await this.getMyFinesQueryBuilder(myId, req)
       .andWhere('fine.paidAt IS NULL')
       .getManyAndCount();
-    return { data, total };
+    return { data: await this.withIsFromAndIsTo(data, myId), total };
   }
 
   async getPaidFines(myId: number, req: Request): Promise<Response<Fine>> {
     const [data, total] = await this.getMyFinesQueryBuilder(myId, req)
       .andWhere('fine.paidAt IS NOT NULL')
       .getManyAndCount();
-    return { data, total };
+    return { data: await this.withIsFromAndIsTo(data, myId), total };
   }
 
   async getAllFines(req: Request): Promise<Response<Fine>> {
@@ -257,6 +257,20 @@ export class FinesService implements OnModuleInit {
     } catch (error) {
       throw new InternalServerErrorException(FineError.PAY_FAILED);
     }
+  }
+
+  private async withIsFromAndIsTo(
+    fines: Fine[],
+    userId: number,
+  ): Promise<Fine[]> {
+    const cards = await this.cardsService.findIdsByUser(userId);
+    for (const fine of fines) {
+      fine.isFrom =
+        (!!fine.receiverCard && cards.has(fine.receiverCard.id)) ||
+        fine.receiverUser.id === userId;
+      fine.isTo = cards.has(fine.senderCard.id);
+    }
+    return fines;
   }
 
   private getMyFinesQueryBuilder(

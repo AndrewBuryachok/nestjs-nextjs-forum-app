@@ -69,6 +69,14 @@ export class CardsService {
     return this.usersService.selectUsersByNotIds(users);
   }
 
+  async findIdsByUser(userId: number): Promise<Set<number>> {
+    const cardUsers = await this.cardsUsersRepository.find({
+      select: { cardId: true },
+      where: { userId },
+    });
+    return new Set(cardUsers.map((cardUser) => cardUser.cardId));
+  }
+
   async createCard(dto: CreateCardWithUserDto): Promise<void> {
     await this.usersService.throwIfUserNotFound(dto.userId);
     await this.create(dto);
